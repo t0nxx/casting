@@ -1,0 +1,25 @@
+{
+   "type": "mysql",
+   "host": "localhost",
+   "port": 3306,
+   "username": "root",
+   "password": "123456",
+   "database": "casting_toni",
+   "synchronize": true,
+   "logging": true,
+   "charset": "UTF8_GENERAL_CI",
+   "entities": [
+      "src/models/newModels/*.ts"
+   ],
+   "migrations": [
+      "src/migration/**/*.ts"
+   ],
+   "subscribers": [
+      "src/subscriber/**/*.ts"
+   ],
+   "cli": {
+      "entitiesDir": "src/models",
+      "migrationsDir": "src/migration",
+      "subscribersDir": "src/subscriber"
+   }
+}
