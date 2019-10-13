@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { IsNotEmpty, IsEmail, MinLength } from 'class-validator';
 import { AccountEmailaddresss } from './account_emailaddress';
+import { Profile } from './users_profile';
 // import {account_emailaddress} from "./account_emailaddress";
 // import {activity} from "./activity";
 // import {activity_attachment} from "./activity_attachment";
@@ -78,6 +79,9 @@ export class User {
 
     @OneToMany(() => AccountEmailaddresss, account => account.user)
     accountEmailaddresss: AccountEmailaddresss[];
+
+    @OneToMany(type => Profile, profile => profile.user)
+    profiles: Profile[];
 
 
 

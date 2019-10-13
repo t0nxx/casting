@@ -1,15 +1,16 @@
 import { Router } from 'express';
 import { ProfileController } from '../controllers/ProfileController';
+import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 
 const router = Router();
 const profileController = new ProfileController();
 
 
 
-router.get('/:slug', profileController.one);
-router.get('/:slug/settings', profileController.settings);
-router.get('/:slug/companies', profileController.companies);
-router.get('/:slug/album', profileController.album);
+router.get('/:slug', profileController.getProfile);
+// router.get('/:slug/settings', profileController.settings);
+// router.get('/:slug/companies', profileController.companies);
+// router.get('/:slug/album', profileController.album);
 
 // router.get('/:slug/activity', );
 // router.get('/:slug/companies', );
@@ -52,8 +53,8 @@ router.get('/:slug/album', profileController.album);
 router.get('/', profileController.all);
 // router.post('/:id', userController.add);
 
-// router.patch('/:slug/update', userController.remove);
+router.patch('/:slug/update', AuthMiddleWare, profileController.updateProfile);
 
-router.delete('/:id', profileController.remove);
+// router.delete('/:id', profileController.remove);
 
 export default router;

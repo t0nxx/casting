@@ -4,6 +4,7 @@ import { compare, hash } from 'bcryptjs';
 import { transformAndValidate } from 'class-transformer-validator';
 import { User } from '../models/newModels/auth_user';
 import { generateJwtToken } from '../helpers/GnerateJwt';
+import { Profile } from '../models/newModels/users_profile';
 
 export class AuthController {
 
@@ -24,9 +25,13 @@ export class AuthController {
                 id: user.id,
                 isAdmin: user.isAdmin,
             });
-            response.status(200).send({ success: true, token, user: { slug: user.username } });
+            return response.status(200).send({ success: true, token, user: { slug: user.username } });
         } catch (error) {
-            response.status(400).send({ success: false, error });
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
         }
     }
 
@@ -36,6 +41,7 @@ export class AuthController {
 
     async signUp(request: Request, response: Response) {
         const userRepository = getRepository(User);
+        const profileRepository = getRepository(Profile);
         try {
             const validateBody = await transformAndValidate(User, request.body);
             /* start business logic validation */
@@ -52,17 +58,47 @@ export class AuthController {
             Object.assign(newUser, validateBody);
             newUser.password = await hash(request.body.password1, 10);
             const create = await userRepository.save(newUser);
+            // start create profile for the new user
+            const newProfile = new Profile();
+            newProfile.slug = create.username;
+            newProfile.user = create;
+            await profileRepository.save(newProfile);
+            // end create profile for the new user
             const token = await generateJwtToken({
                 id: create.id,
                 isAdmin: create.isAdmin,
             });
-            response.status(200).send({ success: true, token, user: { slug: create.username } });
+            return response.status(200).send({ success: true, token, user: { slug: create.username } });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+     * @Post
+     */
+    async changePassword(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        try {
+            if (request.body.new_password1 !== request.body.new_password2) {
+                throw new Error('password1 and password2 not matched');
+            }
+            const oldPasswordIsCorrect = await compare(request.body.old_password, request['user'].password);
+            if (!oldPasswordIsCorrect) { throw new Error('old password is wrong'); }
+            let newPass = await hash(request.body.new_password1, 10);
+            await userRepository.update({ id: request['user'].id }, { password: newPass });
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            /**
+            * if ther error from class validator , return first object . else message of error
+            */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
         }
     }
 }
