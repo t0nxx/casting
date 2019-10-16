@@ -1,7 +1,12 @@
 import { BaseEntity, Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from 'typeorm';
 import { User } from './auth_user';
-import { ProfileSettings } from './profile_settings';
 import { TalentCategories } from './talent_categories';
+import { WeightRangeLookup } from './weight_range_lookup';
+import { HeightRangeLookup } from './height_range_lookup';
+import { EyeLookup } from './eye_lookup';
+import { HairLookup } from './hair_lookup';
+import { BuildLookup } from './build_lookup';
+import { EthnicitiesLookup } from './ethnicities_lookup';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -62,7 +67,23 @@ export class Profile {
     @JoinTable()
     categories: TalentCategories[];
 
+    @ManyToOne(type => WeightRangeLookup, { eager: true })
+    weight: WeightRangeLookup;
 
+    @ManyToOne(type => HeightRangeLookup, { eager: true })
+    height: HeightRangeLookup;
+
+    @ManyToOne(type => EyeLookup, { eager: true })
+    eye: EyeLookup;
+
+    @ManyToOne(type => HairLookup, { eager: true })
+    hair: HairLookup;
+
+    @ManyToOne(type => BuildLookup, { eager: true })
+    build: BuildLookup;
+
+    @ManyToOne(type => EthnicitiesLookup, { eager: true })
+    ethnicity: EthnicitiesLookup;
     // @ManyToOne(() => build_lookup, (build_lookup: build_lookup) => build_lookup.usersProfiles, {})
     // @JoinColumn({ name: 'build_id' })
     // build: build_lookup | null;

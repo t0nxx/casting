@@ -6,9 +6,12 @@ const router = Router();
 const profileController = new ProfileController();
 
 
-
+router.get('/lookups', async (req, res) => {
+    res.send('just for not sending error now');
+});
 router.get('/:slug', profileController.getProfile);
 router.get('/:slug/settings', profileController.getProfileSettings);
+
 // router.get('/:slug/companies', profileController.companies);
 // router.get('/:slug/album', profileController.album);
 
