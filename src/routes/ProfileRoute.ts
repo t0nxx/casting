@@ -52,7 +52,7 @@ router.get('/:slug/settings', profileController.getProfileSettings);
 
 router.get('/', profileController.all);
 // router.post('/:id', userController.add);
-
+router.patch('/:slug/settings', AuthMiddleWare, profileController.updateProfileSettings);
 router.patch('/:slug/update', AuthMiddleWare, profileController.updateProfile);
 
 // router.delete('/:id', profileController.remove);

@@ -91,6 +91,27 @@ export class ProfileController {
         }
     }
 
+    /**
+     * @Patch
+     */
+
+    async updateProfileSettings(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        try {
+            const profile = await profileRepository.findOne({ slug: request.params.slug });
+            const findSettings = await profileSettingsRepository.findOne({ profile })
+            if (!profile) { throw new Error('profile Not Found'); }
+            await profileSettingsRepository.update({ id: findSettings.id }, request.body);
+            const newSettings = await profileSettingsRepository.findOne({ profile })
+            return response.status(200).send({ success: true, ...newSettings });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
     // async companies(request: Request, response: Response, next: NextFunction) {
 
