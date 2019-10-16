@@ -8,7 +8,7 @@ const profileController = new ProfileController();
 
 
 router.get('/:slug', profileController.getProfile);
-// router.get('/:slug/settings', profileController.settings);
+router.get('/:slug/settings', profileController.getProfileSettings);
 // router.get('/:slug/companies', profileController.companies);
 // router.get('/:slug/album', profileController.album);
 

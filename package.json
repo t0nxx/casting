@@ -31,11 +31,14 @@
       "pg": "^7.12.1",
       "prettier": "^1.18.2",
       "reflect-metadata": "^0.1.10",
+      "rimraf": "^3.0.0",
       "tsconfig-paths": "^3.9.0",
       "typeorm": "0.2.19"
    },
    "scripts": {
-      "start:dev": "nodemon",
-      "start:prod": "node dist/main.js"
+      "start:dev": "DB_Dir=src nodemon",
+      "build": "tsc -p tsconfig.build.json",
+      "prestart:prod": "rimraf dist && npm run build",
+      "start:prod": "DB_Dir=dist pm2 start dist/main.js"
    }
 }

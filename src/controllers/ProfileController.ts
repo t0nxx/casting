@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { Profile } from '../models/newModels/users_profile'
+import { ProfileSettings } from '../models/newModels/profile_settings';
 
 export class ProfileController {
 
@@ -28,9 +29,16 @@ export class ProfileController {
 
         const profileRepository = getRepository(Profile);
         try {
-            const data = await profileRepository.findOne({ slug: request.params.slug });
+            const data = await profileRepository.findOne({ slug: request.params.slug }, {
+                relations: ['user']
+            });
+            /// extract auth_user object for response
+            const { first_name, last_name, email, username, id } = data.user;
+            // important to not retrive all user data
+            delete data.user;
+            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
             if (!data) { throw new Error('profile Not Found'); }
-            return response.status(200).send({ success: true, ...data });
+            return response.status(200).send({ success: true, ...responseObject });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -39,6 +47,25 @@ export class ProfileController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+    /**
+     * @Get
+     */
+
+    async getProfileSettings(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        try {
+            const profile = await profileRepository.findOne({ slug: request.params.slug });
+            const settings = await profileSettingsRepository.findOne({ profile })
+            if (!profile) { throw new Error('profile Not Found'); }
+            return response.status(200).send({ success: true, ...settings });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
 
     /**
@@ -64,17 +91,6 @@ export class ProfileController {
         }
     }
 
-    // async settings(request: Request, response: Response, next: NextFunction) {
-
-    //     const profileRepository = getRepository(Profile);
-    //     try {
-    //         const data = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['profileSettingss'] });
-    //         if (!data) { throw new Error('profile Not Found'); }
-    //         response.status(200).send(data.profileSettingss[0]);
-    //     } catch (error) {
-    //         response.status(400).send({ error: true, data: error.message });
-    //     }
-    // }
 
     // async companies(request: Request, response: Response, next: NextFunction) {
 

@@ -1,15 +1,17 @@
-{
+module.exports = {
    "type": "mysql",
-   "host": "localhost",
+   "host": "casting-dev.c4vmivapzauk.eu-central-1.rds.amazonaws.com",
    "port": 3306,
-   "username": "root",
-   "password": "123456",
-   "database": "casting_toni",
+   "username": "admin",
+   "password": "Gs1tf3Raah35tBW7r3Iq",
+   "database": "casting_dev",
    "synchronize": true,
    "logging": true,
    "charset": "UTF8_GENERAL_CI",
    "entities": [
-      "src/models/newModels/*.ts"
+      // for dev i'll use src folder , in prod i'll user dist folder , it 'll be set as DB_Dir in package.json
+      `${__dirname}/${process.env.DB_Dir}/models/newModels/*.{ts,js}`,
+
    ],
    "migrations": [
       "src/migration/**/*.ts"

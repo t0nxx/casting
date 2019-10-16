@@ -5,6 +5,8 @@ import { transformAndValidate } from 'class-transformer-validator';
 import { User } from '../models/newModels/auth_user';
 import { generateJwtToken } from '../helpers/GnerateJwt';
 import { Profile } from '../models/newModels/users_profile';
+import { ProfileSettings } from '../models/newModels/profile_settings';
+import { TalentCategories } from '../models/newModels/talent_categories';
 
 export class AuthController {
 
@@ -42,6 +44,8 @@ export class AuthController {
     async signUp(request: Request, response: Response) {
         const userRepository = getRepository(User);
         const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        const talentCategoryRepository = getRepository(TalentCategories);
         try {
             const validateBody = await transformAndValidate(User, request.body);
             /* start business logic validation */
@@ -58,12 +62,20 @@ export class AuthController {
             Object.assign(newUser, validateBody);
             newUser.password = await hash(request.body.password1, 10);
             const create = await userRepository.save(newUser);
+            // get profile categories 
+            const categories = await talentCategoryRepository.findByIds(request.body.category);
             // start create profile for the new user
             const newProfile = new Profile();
             newProfile.slug = create.username;
             newProfile.user = create;
-            await profileRepository.save(newProfile);
+            newProfile.categories = categories;
+            const createProfile = await profileRepository.save(newProfile);
             // end create profile for the new user
+            // start create settings for the new user
+            const newProfileSettings = new ProfileSettings();
+            newProfileSettings.profile = createProfile;
+            const crateProfileSettings = await profileSettingsRepository.save(newProfileSettings);
+            // start create settings for the new user
             const token = await generateJwtToken({
                 id: create.id,
                 isAdmin: create.isAdmin,
@@ -78,6 +90,24 @@ export class AuthController {
         }
     }
 
+    /**
+     * @Post 
+     */
+
+    async verifyEmailAndUsernamIsAvailable(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        try {
+            const usernameExist = await userRepository.findOne({ username: request.body.username });
+            const emailExist = await userRepository.findOne({ email: request.body.email });
+
+            if (usernameExist) { throw new Error('username already exist'); }
+            if (emailExist) { throw new Error('email already exist'); }
+            return response.status(200).send('0');
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send('1');
+        }
+    }
     /**
      * @Post
      */

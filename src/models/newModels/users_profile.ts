@@ -1,5 +1,7 @@
 import { BaseEntity, Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from 'typeorm';
 import { User } from './auth_user';
+import { ProfileSettings } from './profile_settings';
+import { TalentCategories } from './talent_categories';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -54,6 +56,12 @@ export class Profile {
 
     @ManyToOne(type => User, user => user.profiles, { onDelete: 'CASCADE' })
     user: User;
+
+    /// talent categories , art, music ... etc
+    @ManyToMany(type => TalentCategories, { onDelete: 'CASCADE' })
+    @JoinTable()
+    categories: TalentCategories[];
+
 
     // @ManyToOne(() => build_lookup, (build_lookup: build_lookup) => build_lookup.usersProfiles, {})
     // @JoinColumn({ name: 'build_id' })
