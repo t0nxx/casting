@@ -9,7 +9,7 @@ import { HairLookup } from '../models/newModels/hair_lookup';
 import { EyeLookup } from '../models/newModels/eye_lookup';
 import { EthnicitiesLookup } from '../models/newModels/ethnicities_lookup';
 import { Hobbies } from '../models/newModels/profile_hobbies';
-import { Courses } from 'src/models/newModels/profile_courses';
+import { Courses } from '../models/newModels/profile_courses';
 
 export class ProfileController {
 
