@@ -8,7 +8,7 @@ const profileController = new ProfileController();
 
 router.get('/lookups', profileController.getLookups);
 router.get('/:slug', profileController.getProfile);
-router.get('/:slug/settings', profileController.getProfileSettings);
+router.get('/:slug/settings', AuthMiddleWare, profileController.getProfileSettings);
 
 // router.get('/:slug/companies', profileController.companies);
 // router.get('/:slug/album', profileController.album);
@@ -35,11 +35,11 @@ router.get('/:slug/settings', profileController.getProfileSettings);
  * Post
  */
 
-// router.post('/:slug/hobbies')
-
+router.post('/:slug/hobbies', AuthMiddleWare, profileController.addHobbies);
+router.post('/:slug/training', AuthMiddleWare, profileController.addTaninig);
 // router.post('/:slug/social', );
 // router.post('/:slug/companies', );
-// router.post('/:slug/training', );
+
 // router.post('/:slug/album', );
 // router.post('/:slug/album/image', );
 // router.post('/:slug/social', );
@@ -49,13 +49,16 @@ router.get('/:slug/settings', profileController.getProfileSettings);
 // router.patch('/:slug/settings', );
 
 
-// default
+// put & patch
 
 router.get('/', profileController.all);
+router.put('/:slug/training/:id', AuthMiddleWare, profileController.updateTaninig);
 // router.post('/:id', userController.add);
 router.patch('/:slug/settings', AuthMiddleWare, profileController.updateProfileSettings);
 router.patch('/:slug/update', AuthMiddleWare, profileController.updateProfile);
 
 // router.delete('/:id', profileController.remove);
+// delete
+router.delete('/:slug/training/:id', AuthMiddleWare, profileController.deleteTaninig);
 
 export default router;

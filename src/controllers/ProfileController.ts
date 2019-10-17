@@ -9,6 +9,7 @@ import { HairLookup } from '../models/newModels/hair_lookup';
 import { EyeLookup } from '../models/newModels/eye_lookup';
 import { EthnicitiesLookup } from '../models/newModels/ethnicities_lookup';
 import { Hobbies } from '../models/newModels/profile_hobbies';
+import { Courses } from 'src/models/newModels/profile_courses';
 
 export class ProfileController {
 
@@ -45,7 +46,7 @@ export class ProfileController {
             delete data.user;
             const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
             if (!data) { throw new Error('profile Not Found'); }
-            return response.status(200).send({ success: true, ...responseObject });
+            return response.status(200).json({ success: true, ...responseObject });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -63,7 +64,7 @@ export class ProfileController {
         const profileRepository = getRepository(Profile);
         const profileSettingsRepository = getRepository(ProfileSettings);
         try {
-            const profile = await profileRepository.findOne({ slug: request.params.slug });
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
             const settings = await profileSettingsRepository.findOne({ profile })
             if (!profile) { throw new Error('profile Not Found'); }
             return response.status(200).send({ success: true, ...settings });
@@ -90,7 +91,7 @@ export class ProfileController {
 
         try {
 
-            const [height_range, weight_range, build, hair, eye, ethnicities, users_profile_hobbies] = await Promise.all([
+            const [height_range, weight_range, build, hair, eye, ethnicities, hobbies] = await Promise.all([
                 heightRepository.find(),
                 weightRepository.find(),
                 buildRepository.find(),
@@ -98,9 +99,8 @@ export class ProfileController {
                 eyeRepository.find(),
                 ethnicitiesRepository.find(),
                 hobbiesRepository.find(),
-            ])
-            console.log(users_profile_hobbies)
-            return response.status(200).send({ height_range, weight_range, build, hair, eye, ethnicities, users_profile_hobbies });
+            ]);
+            return response.status(200).send({ height_range, weight_range, build, hair, eye, ethnicities, hobbies });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -142,7 +142,7 @@ export class ProfileController {
         const profileRepository = getRepository(Profile);
         const profileSettingsRepository = getRepository(ProfileSettings);
         try {
-            const profile = await profileRepository.findOne({ slug: request.params.slug });
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
             const findSettings = await profileSettingsRepository.findOne({ profile })
             if (!profile) { throw new Error('profile Not Found'); }
             await profileSettingsRepository.update({ id: findSettings.id }, request.body);
@@ -153,6 +153,95 @@ export class ProfileController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+
+
+    /**
+     * @Post
+     */
+
+    async addHobbies(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const hobbyRepository = getRepository(Hobbies);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const hobby = await hobbyRepository.findOne({ id: request.body.hobbies })
+            profile.users_profile_hobbies = [...profile.users_profile_hobbies, hobby];
+            const save = await profileRepository.save(profile);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+     * @Post
+     */
+
+    async addTaninig(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const trainingRepository = getRepository(Courses);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const couese = new Courses();
+            couese.course_name = request.body.course_name;
+            couese.institute = request.body.institute;
+            const newCourse = await trainingRepository.save(couese);
+            profile.users_profile_courses = [...profile.users_profile_courses, newCourse];
+            const save = await profileRepository.save(profile);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+    * @Put
+    */
+
+    async updateTaninig(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const trainingRepository = getRepository(Courses);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const course = await trainingRepository.findOne({ id: request.body.id });
+            if (!course) { throw new Error('course Not Found'); }
+            const saved = await trainingRepository.update({ id: request.body.id }, request.body);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+   * @Delete
+   */
+
+    async deleteTaninig(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const trainingRepository = getRepository(Courses);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const course = await trainingRepository.findOne({ id: parseInt(request.params.id, 10) })
+            if (!course) { throw new Error('course Not Found'); }
+            const remove = await trainingRepository.remove(course);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
 
     // async companies(request: Request, response: Response, next: NextFunction) {
