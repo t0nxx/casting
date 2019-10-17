@@ -2,6 +2,13 @@ import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { Profile } from '../models/newModels/users_profile'
 import { ProfileSettings } from '../models/newModels/profile_settings';
+import { HeightRangeLookup } from '../models/newModels/height_range_lookup';
+import { WeightRangeLookup } from '../models/newModels/weight_range_lookup';
+import { BuildLookup } from '../models/newModels/build_lookup';
+import { HairLookup } from '../models/newModels/hair_lookup';
+import { EyeLookup } from '../models/newModels/eye_lookup';
+import { EthnicitiesLookup } from '../models/newModels/ethnicities_lookup';
+import { Hobbies } from '../models/newModels/profile_hobbies';
 
 export class ProfileController {
 
@@ -65,6 +72,41 @@ export class ProfileController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+
+    /**
+    * @Get
+    */
+
+    async getLookups(request: Request, response: Response, next: NextFunction) {
+
+        const heightRepository = getRepository(HeightRangeLookup);
+        const weightRepository = getRepository(WeightRangeLookup);
+        const buildRepository = getRepository(BuildLookup);
+        const hairRepository = getRepository(HairLookup);
+        const eyeRepository = getRepository(EyeLookup);
+        const ethnicitiesRepository = getRepository(EthnicitiesLookup);
+        const hobbiesRepository = getRepository(Hobbies);
+        //
+
+        try {
+
+            const [height_range, weight_range, build, hair, eye, ethnicities, users_profile_hobbies] = await Promise.all([
+                heightRepository.find(),
+                weightRepository.find(),
+                buildRepository.find(),
+                hairRepository.find(),
+                eyeRepository.find(),
+                ethnicitiesRepository.find(),
+                hobbiesRepository.find(),
+            ])
+            console.log(users_profile_hobbies)
+            return response.status(200).send({ height_range, weight_range, build, hair, eye, ethnicities, users_profile_hobbies });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
 
 

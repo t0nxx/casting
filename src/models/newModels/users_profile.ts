@@ -7,6 +7,7 @@ import { EyeLookup } from './eye_lookup';
 import { HairLookup } from './hair_lookup';
 import { BuildLookup } from './build_lookup';
 import { EthnicitiesLookup } from './ethnicities_lookup';
+import { Hobbies } from './profile_hobbies';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -66,6 +67,11 @@ export class Profile {
     @ManyToMany(type => TalentCategories, { onDelete: 'CASCADE' })
     @JoinTable()
     categories: TalentCategories[];
+
+    /// hobbies 
+    @ManyToMany(type => Hobbies, { onDelete: 'CASCADE' })
+    @JoinTable()
+    hobbies: Hobbies[];
 
     @ManyToOne(type => WeightRangeLookup, { eager: true })
     weight: WeightRangeLookup;
