@@ -10,6 +10,8 @@ import { EyeLookup } from '../models/newModels/eye_lookup';
 import { EthnicitiesLookup } from '../models/newModels/ethnicities_lookup';
 import { Hobbies } from '../models/newModels/profile_hobbies';
 import { Courses } from '../models/newModels/profile_courses';
+import { ProfileSocialNetworks } from '../models/newModels/profile_social';
+import { UploadToS3 } from '../helpers/awsUploader';
 
 export class ProfileController {
 
@@ -123,7 +125,7 @@ export class ProfileController {
             if (!profile) { throw new Error('profile Not Found'); }
             await profileRepository.update({ id: profile.id }, request.body);
             const afterUpdate = await profileRepository.findOne({ id: profile.id });
-            return response.status(200).send({ success: true, ...afterUpdate });
+            return response.status(200).send({ success: true });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -132,6 +134,79 @@ export class ProfileController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+
+    /**
+     * @Patch
+     */
+
+    async updateCover(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        try {
+            // username is the slug here 
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const newCover = await UploadToS3(request.files.file, 'image');
+            await profileRepository.update({ id: profile.id }, { cover: newCover });
+            const afterUpdate = await profileRepository.findOne({ id: profile.id });
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+     * @Post
+     */
+
+    async resetCover(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        try {
+            // username is the slug here 
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const resetCover = 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg';
+            await profileRepository.update({ id: profile.id }, { cover: resetCover });
+            const afterUpdate = await profileRepository.findOne({ id: profile.id });
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+     * @Patch
+     */
+
+    async updateAvatar(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        try {
+            // username is the slug here 
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const newAvatar = await UploadToS3(request.files.file, 'image');
+            await profileRepository.update({ id: profile.id }, { avatar: newAvatar });
+            const afterUpdate = await profileRepository.findOne({ id: profile.id });
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
     /**
      * @Patch
@@ -201,6 +276,30 @@ export class ProfileController {
     }
 
     /**
+     *@Post
+     */
+
+    async addSocialNetwork(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const socialRepository = getRepository(ProfileSocialNetworks);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const network = new ProfileSocialNetworks();
+            network.network = request.body.network;
+            network.url = request.body.url;
+            const newNetwork = await socialRepository.save(network);
+            profile.users_profile_social = [...profile.users_profile_social, newNetwork];
+            const save = await profileRepository.save(profile);
+            return response.status(200).send({ ...newNetwork });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
     * @Put
     */
 
@@ -222,8 +321,29 @@ export class ProfileController {
     }
 
     /**
-   * @Delete
-   */
+    * @Put
+    */
+
+    async updateSocialNetwork(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const socialRepository = getRepository(ProfileSocialNetworks);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const network = await socialRepository.findOne({ id: parseInt(request.params.id, 10) });
+            if (!network) { throw new Error('network Not Found'); }
+            const saved = await socialRepository.update({ id: parseInt(request.params.id, 10) }, request.body);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+    * @Delete
+    */
 
     async deleteTaninig(request: Request, response: Response, next: NextFunction) {
 

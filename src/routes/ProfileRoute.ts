@@ -1,16 +1,26 @@
 import { Router } from 'express';
 import { ProfileController } from '../controllers/ProfileController';
+import { CompanyController } from '../controllers/CompanyController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
+import { UploadToS3 } from '../helpers/awsUploader';
+import { FriendsController } from '../controllers/FriendsController';
 
 const router = Router();
 const profileController = new ProfileController();
-
+const companyController = new CompanyController();
+const friendsController = new FriendsController();
 
 router.get('/lookups', profileController.getLookups);
 router.get('/:slug', profileController.getProfile);
 router.get('/:slug/settings', AuthMiddleWare, profileController.getProfileSettings);
 
-// router.get('/:slug/companies', profileController.companies);
+router.get('/:slug/companies', companyController.getAllCompanies);
+
+// get all friends request
+router.get('/:slug/friends-request', AuthMiddleWare, friendsController.getAllFriendsRequest);
+
+// get all friends
+router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
 // router.get('/:slug/album', profileController.album);
 
 // router.get('/:slug/activity', );
@@ -37,9 +47,10 @@ router.get('/:slug/settings', AuthMiddleWare, profileController.getProfileSettin
 
 router.post('/:slug/hobbies', AuthMiddleWare, profileController.addHobbies);
 router.post('/:slug/training', AuthMiddleWare, profileController.addTaninig);
-// router.post('/:slug/social', );
-// router.post('/:slug/companies', );
-
+router.post('/:slug/social', AuthMiddleWare, profileController.addSocialNetwork);
+router.post('/:slug/companies', AuthMiddleWare, companyController.createCompany);
+// send friend request
+router.post('/:slug/friends', AuthMiddleWare, friendsController.sendFriendRequest);
 // router.post('/:slug/album', );
 // router.post('/:slug/album/image', );
 // router.post('/:slug/social', );
@@ -50,12 +61,15 @@ router.post('/:slug/training', AuthMiddleWare, profileController.addTaninig);
 
 
 // put & patch
-
-router.get('/', profileController.all);
 router.put('/:slug/training/:id', AuthMiddleWare, profileController.updateTaninig);
+router.put('/:slug/social/:id', AuthMiddleWare, profileController.updateSocialNetwork);
 // router.post('/:id', userController.add);
 router.patch('/:slug/settings', AuthMiddleWare, profileController.updateProfileSettings);
 router.patch('/:slug/update', AuthMiddleWare, profileController.updateProfile);
+
+router.patch('/:slug/avatar', AuthMiddleWare, profileController.updateAvatar);
+router.patch('/:slug/cover', AuthMiddleWare, profileController.updateCover);
+router.post('/:slug/cover/reset', AuthMiddleWare, profileController.resetCover);
 
 // router.delete('/:id', profileController.remove);
 // delete

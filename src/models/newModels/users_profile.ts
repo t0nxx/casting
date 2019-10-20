@@ -9,6 +9,8 @@ import { BuildLookup } from './build_lookup';
 import { EthnicitiesLookup } from './ethnicities_lookup';
 import { Hobbies } from './profile_hobbies';
 import { Courses } from './profile_courses';
+import { ProfileSocialNetworks } from './profile_social';
+import { Company } from './company';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -79,6 +81,15 @@ export class Profile {
     @JoinTable()
     users_profile_courses: Courses[];
 
+    // social network "accounts"
+    @ManyToMany(type => ProfileSocialNetworks, { onDelete: 'CASCADE', eager: true })
+    @JoinTable()
+    users_profile_social: ProfileSocialNetworks[];
+
+    // companies
+    @OneToMany(type => Company, c => c.profile)
+    companies: Company[];
+
     @ManyToOne(type => WeightRangeLookup, { eager: true })
     weight: WeightRangeLookup;
 
@@ -96,29 +107,6 @@ export class Profile {
 
     @ManyToOne(type => EthnicitiesLookup, { eager: true })
     ethnicity: EthnicitiesLookup;
-    // @ManyToOne(() => build_lookup, (build_lookup: build_lookup) => build_lookup.usersProfiles, {})
-    // @JoinColumn({ name: 'build_id' })
-    // build: build_lookup | null;
-
-    // @ManyToOne(() => ethnicities_lookup, (ethnicities_lookup: ethnicities_lookup) => ethnicities_lookup.usersProfiles, {})
-    // @JoinColumn({ name: 'ethnicity_id' })
-    // ethnicity: ethnicities_lookup | null;
-
-    // @ManyToOne(() => eye_lookup, (eye_lookup: eye_lookup) => eye_lookup.usersProfiles, {})
-    // @JoinColumn({ name: 'eye_id' })
-    // eye: eye_lookup | null;
-
-    // @ManyToOne(() => hair_lookup, (hair_lookup: hair_lookup) => hair_lookup.usersProfiles, {})
-    // @JoinColumn({ name: 'hair_id' })
-    // hair: hair_lookup | null;
-
-    // @ManyToOne(() => height_range_lookup, (height_range_lookup: height_range_lookup) => height_range_lookup.usersProfiles, {})
-    // @JoinColumn({ name: 'height_id' })
-    // height: height_range_lookup | null;
-
-    // @ManyToOne(() => weight_range_lookup, (weight_range_lookup: weight_range_lookup) => weight_range_lookup.usersProfiles, {})
-    // @JoinColumn({ name: 'weight_id' })
-    // weight: weight_range_lookup | null;
 
 
     // @OneToMany(() => company, (company: company) => company.profile)
@@ -136,25 +124,15 @@ export class Profile {
     // @OneToMany(() => profile_album, (profile_album: profile_album) => profile_album.userProfile)
     // profileAlbums: profile_album[];
 
-    // @OneToMany(() => profile_hobbies, (profile_hobbies: profile_hobbies) => profile_hobbies.userProfile)
-    // profileHobbiess: profile_hobbies[];
-
-    // @OneToMany(() => profile_settings, (profile_settings: profile_settings) => profile_settings.userProfile)
-    // profileSettingss: profile_settings[];
 
     // @OneToMany(() => profile_social_networks, (profile_social_networks: profile_social_networks) => profile_social_networks.userProfile)
     // profileSocialNetworkss: profile_social_networks[];
 
-    // @OneToMany(() => profile_training, (profile_training: profile_training) => profile_training.userProfile)
-    // profileTrainings: profile_training[];
 
     // @OneToMany(() => profile_viewers, (profile_viewers: profile_viewers) => profile_viewers.userProfile)
     // profileViewerss: profile_viewers[];
 
     // @OneToMany(() => profile_viewers, (profile_viewers: profile_viewers) => profile_viewers.visitorProfile)
     // profileViewerss2: profile_viewers[];
-
-    // @OneToMany(() => users_profile_categories, (users_profile_categories: users_profile_categories) => users_profile_categories.userProfile)
-    // usersProfileCategoriess: users_profile_categories[];
 
 }
