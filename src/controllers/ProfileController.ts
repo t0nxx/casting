@@ -10,6 +10,7 @@ import { EyeLookup } from '../models/newModels/eye_lookup';
 import { EthnicitiesLookup } from '../models/newModels/ethnicities_lookup';
 import { Hobbies } from '../models/newModels/profile_hobbies';
 import { Courses } from '../models/newModels/profile_courses';
+import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { ProfileSocialNetworks } from '../models/newModels/profile_social';
 import { UploadToS3 } from '../helpers/awsUploader';
 
@@ -36,19 +37,28 @@ export class ProfileController {
     */
 
     async getProfile(request: Request, response: Response, next: NextFunction) {
-
+        const friendsRepository = getRepository(FriendshipFriend);
         const profileRepository = getRepository(Profile);
         try {
             const data = await profileRepository.findOne({ slug: request.params.slug }, {
                 relations: ['user']
             });
+            const Myprofile = await profileRepository.findOne({ slug: request['user'].username });
+            let is_friends = false;
+            const isFriendWithMe = await friendsRepository.findOne({
+                where: [
+                    { fromUser: data, toUser: Myprofile },
+                    { fromUser: Myprofile, toUser: data }
+                ],
+            });
+            if (isFriendWithMe) { is_friends = true; }
             /// extract auth_user object for response
             const { first_name, last_name, email, username, id } = data.user;
             // important to not retrive all user data
             delete data.user;
-            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            const responseObject = { ...data, is_friends, auth_user: { pk: id, first_name, last_name, email, username } }
             if (!data) { throw new Error('profile Not Found'); }
-            return response.status(200).json({ success: true, ...responseObject });
+            return response.status(200).send({ ...responseObject });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error

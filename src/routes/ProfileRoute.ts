@@ -11,7 +11,7 @@ const companyController = new CompanyController();
 const friendsController = new FriendsController();
 
 router.get('/lookups', profileController.getLookups);
-router.get('/:slug', profileController.getProfile);
+router.get('/:slug', AuthMiddleWare, profileController.getProfile);
 router.get('/:slug/settings', AuthMiddleWare, profileController.getProfileSettings);
 
 router.get('/:slug/companies', companyController.getAllCompanies);
@@ -49,8 +49,13 @@ router.post('/:slug/hobbies', AuthMiddleWare, profileController.addHobbies);
 router.post('/:slug/training', AuthMiddleWare, profileController.addTaninig);
 router.post('/:slug/social', AuthMiddleWare, profileController.addSocialNetwork);
 router.post('/:slug/companies', AuthMiddleWare, companyController.createCompany);
+
 // send friend request
 router.post('/:slug/friends', AuthMiddleWare, friendsController.sendFriendRequest);
+
+// accept friend request 
+router.post('/:slug/friends/accept', AuthMiddleWare, friendsController.acceptFriendRequest);
+
 // router.post('/:slug/album', );
 // router.post('/:slug/album/image', );
 // router.post('/:slug/social', );

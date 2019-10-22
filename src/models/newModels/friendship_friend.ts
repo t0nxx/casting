@@ -11,10 +11,10 @@ export class FriendshipFriend {
     @CreateDateColumn()
     created: Date;
 
-    @ManyToOne(type => Profile)
+    @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
     fromUser: Profile;
 
-    @ManyToOne(type => Profile)
+    @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
     toUser: Profile;
 
     @Column()

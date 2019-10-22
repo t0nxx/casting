@@ -26,9 +26,9 @@ export class FriendshipFriendshipRequest {
     // })
     // viewed: Date | null;
 
-    @ManyToOne(type => Profile)
+    @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
     fromUser: Profile;
 
-    @ManyToOne(type => Profile)
+    @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
     toUser: Profile;
 }
