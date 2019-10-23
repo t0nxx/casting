@@ -13,6 +13,7 @@ import { Courses } from '../models/newModels/profile_courses';
 import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { ProfileSocialNetworks } from '../models/newModels/profile_social';
 import { UploadToS3 } from '../helpers/awsUploader';
+import { User } from '../models/newModels/auth_user';
 
 export class ProfileController {
 
@@ -127,14 +128,22 @@ export class ProfileController {
      */
 
     async updateProfile(request: Request, response: Response, next: NextFunction) {
-
+        const userRepository = getRepository(User);
         const profileRepository = getRepository(Profile);
         try {
             // username is the slug here 
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!profile) { throw new Error('profile Not Found'); }
-            await profileRepository.update({ id: profile.id }, request.body);
-            const afterUpdate = await profileRepository.findOne({ id: profile.id });
+            // bcz front end send auth_user object on body -_-
+            if (request.body.auth_user) {
+                await profileRepository.update({ id: profile.id }, { location: request.body.location });
+                await userRepository.update({ username: profile.slug }, {
+                    first_name: request.body.auth_user.first_name,
+                    last_name: request.body.auth_user.last_name,
+                })
+            } else {
+                await profileRepository.update({ id: profile.id }, request.body);
+            }
 
             const data = await profileRepository.findOne({ slug: request.params.slug }, {
                 relations: ['user']

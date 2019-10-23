@@ -56,6 +56,12 @@ router.post('/:slug/friends', AuthMiddleWare, friendsController.sendFriendReques
 // accept friend request 
 router.post('/:slug/friends/accept', AuthMiddleWare, friendsController.acceptFriendRequest);
 
+// reject friend request
+router.post('/:slug/friends/reject', AuthMiddleWare, friendsController.rejectFriendRequest);
+
+// delete friend / unfriend
+router.delete('/:slug/friends', AuthMiddleWare, friendsController.deleteFriend);
+
 // router.post('/:slug/album', );
 // router.post('/:slug/album/image', );
 // router.post('/:slug/social', );

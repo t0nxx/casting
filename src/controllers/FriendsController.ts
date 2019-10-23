@@ -19,6 +19,15 @@ export class FriendsController {
             const toUser = await profileRepository.findOne({ slug: request.params.slug });
             if (!toUser) { throw new Error('user not found'); }
 
+            const friendRequest = await friendRequestRepository.findOne({
+                where: [
+                    { toUser, fromUser },
+                    { toUser: fromUser, fromUser: toUser },
+                ],
+            });
+
+            if (friendRequest) { throw new Error('Friend request already sent before'); }
+
             const newFriendRequest = new FriendshipFriendshipRequest();
             newFriendRequest.fromUser = fromUser;
             newFriendRequest.toUser = toUser;
@@ -60,6 +69,63 @@ export class FriendsController {
             addNewFriends.room = fromUser.slug + '-' + toUser.slug + '-' + randomString.generate({ length: 5 });
             await friendsRepository.save(addNewFriends);
 
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+    /**
+    * @Post
+    * reject friend request
+    */
+
+    async rejectFriendRequest(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
+        try {
+            const toUser = await profileRepository.findOne({ slug: request['user'].username });
+            const fromUser = await profileRepository.findOne({ slug: request.params.slug });
+            const friendRequest = await friendRequestRepository.findOne({
+                where: {
+                    toUser,
+                    fromUser,
+                }
+            });
+
+            if (!friendRequest) { throw new Error('No friend request with this user'); }
+            await friendRequestRepository.remove(friendRequest);
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+    /**
+     * @Delete
+     * delete/unfriend
+     */
+
+    async deleteFriend(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const friendsRepository = getRepository(FriendshipFriend);
+        try {
+            const toUser = await profileRepository.findOne({ slug: request['user'].username });
+            const fromUser = await profileRepository.findOne({ slug: request.params.slug });
+            const friendShip = await friendsRepository.findOne({
+                where: [
+                    { toUser, fromUser },
+                    { toUser: fromUser, fromUser: toUser }
+                ]
+            });
+
+            if (!friendShip) { throw new Error('No friendShip with this user'); }
+            await friendsRepository.remove(friendShip);
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
