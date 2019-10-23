@@ -135,7 +135,16 @@ export class ProfileController {
             if (!profile) { throw new Error('profile Not Found'); }
             await profileRepository.update({ id: profile.id }, request.body);
             const afterUpdate = await profileRepository.findOne({ id: profile.id });
-            return response.status(200).send({ success: true });
+
+            const data = await profileRepository.findOne({ slug: request.params.slug }, {
+                relations: ['user']
+            });
+            /// extract auth_user object for response
+            const { first_name, last_name, email, username, id } = data.user;
+            // important to not retrive all user data
+            delete data.user;
+            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            return response.status(200).send({ ...responseObject });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -159,7 +168,7 @@ export class ProfileController {
             const newCover = await UploadToS3(request.files.file, 'image');
             await profileRepository.update({ id: profile.id }, { cover: newCover });
             const afterUpdate = await profileRepository.findOne({ id: profile.id });
-            return response.status(200).send({ success: true });
+            return response.status(200).send({ cover: afterUpdate.cover });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -183,7 +192,7 @@ export class ProfileController {
             const resetCover = 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg';
             await profileRepository.update({ id: profile.id }, { cover: resetCover });
             const afterUpdate = await profileRepository.findOne({ id: profile.id });
-            return response.status(200).send({ success: true });
+            return response.status(200).send({ cover: resetCover });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -207,7 +216,7 @@ export class ProfileController {
             const newAvatar = await UploadToS3(request.files.file, 'image');
             await profileRepository.update({ id: profile.id }, { avatar: newAvatar });
             const afterUpdate = await profileRepository.findOne({ id: profile.id });
-            return response.status(200).send({ success: true });
+            return response.status(200).send({ avatar: afterUpdate.avatar });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -301,8 +310,9 @@ export class ProfileController {
             network.url = request.body.url;
             const newNetwork = await socialRepository.save(network);
             profile.users_profile_social = [...profile.users_profile_social, newNetwork];
-            const save = await profileRepository.save(profile);
-            return response.status(200).send({ ...newNetwork });
+            await profileRepository.save(profile);
+            const savedAfterUpdateSocial = await profileRepository.findOne({ slug: request['user'].username });
+            return response.status(200).send(...savedAfterUpdateSocial.users_profile_social);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -344,7 +354,9 @@ export class ProfileController {
             const network = await socialRepository.findOne({ id: parseInt(request.params.id, 10) });
             if (!network) { throw new Error('network Not Found'); }
             const saved = await socialRepository.update({ id: parseInt(request.params.id, 10) }, request.body);
-            return response.status(200).send({ success: true });
+            const profileAfterSocialUpdate = await profileRepository.findOne({ slug: request['user'].username });
+            console.log(profileAfterSocialUpdate.users_profile_social);
+            return response.status(200).send(profileAfterSocialUpdate.users_profile_social);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
