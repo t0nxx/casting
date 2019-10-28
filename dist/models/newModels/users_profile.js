@@ -11,7 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const auth_user_1 = require("./auth_user");
-const profile_settings_1 = require("./profile_settings");
+const talent_categories_1 = require("./talent_categories");
+const weight_range_lookup_1 = require("./weight_range_lookup");
+const height_range_lookup_1 = require("./height_range_lookup");
+const eye_lookup_1 = require("./eye_lookup");
+const hair_lookup_1 = require("./hair_lookup");
+const build_lookup_1 = require("./build_lookup");
+const ethnicities_lookup_1 = require("./ethnicities_lookup");
+const profile_hobbies_1 = require("./profile_hobbies");
+const profile_courses_1 = require("./profile_courses");
+const profile_social_1 = require("./profile_social");
+const company_1 = require("./company");
 let Profile = class Profile {
 };
 __decorate([
@@ -59,9 +69,57 @@ __decorate([
     __metadata("design:type", auth_user_1.User)
 ], Profile.prototype, "user", void 0);
 __decorate([
-    typeorm_1.ManyToOne(type => profile_settings_1.ProfileSettings, pS => pS.profile, { onDelete: 'CASCADE' }),
-    __metadata("design:type", profile_settings_1.ProfileSettings)
-], Profile.prototype, "settings", void 0);
+    typeorm_1.ManyToMany(type => talent_categories_1.TalentCategories, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinTable(),
+    __metadata("design:type", Array)
+], Profile.prototype, "categories", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => profile_hobbies_1.Hobbies, { onDelete: 'CASCADE', eager: true }),
+    typeorm_1.JoinTable(),
+    __metadata("design:type", Array)
+], Profile.prototype, "users_profile_hobbies", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => profile_courses_1.Courses, { onDelete: 'CASCADE', eager: true }),
+    typeorm_1.JoinTable(),
+    __metadata("design:type", Array)
+], Profile.prototype, "users_profile_courses", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => profile_social_1.ProfileSocialNetworks, { onDelete: 'CASCADE', eager: true }),
+    typeorm_1.JoinTable(),
+    __metadata("design:type", Array)
+], Profile.prototype, "users_profile_social", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => company_1.Company, c => c.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "companies", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => company_1.Company, c => c.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "albums", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => weight_range_lookup_1.WeightRangeLookup, { eager: true }),
+    __metadata("design:type", weight_range_lookup_1.WeightRangeLookup)
+], Profile.prototype, "weight", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => height_range_lookup_1.HeightRangeLookup, { eager: true }),
+    __metadata("design:type", height_range_lookup_1.HeightRangeLookup)
+], Profile.prototype, "height", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => eye_lookup_1.EyeLookup, { eager: true }),
+    __metadata("design:type", eye_lookup_1.EyeLookup)
+], Profile.prototype, "eye", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => hair_lookup_1.HairLookup, { eager: true }),
+    __metadata("design:type", hair_lookup_1.HairLookup)
+], Profile.prototype, "hair", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => build_lookup_1.BuildLookup, { eager: true }),
+    __metadata("design:type", build_lookup_1.BuildLookup)
+], Profile.prototype, "build", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => ethnicities_lookup_1.EthnicitiesLookup, { eager: true }),
+    __metadata("design:type", ethnicities_lookup_1.EthnicitiesLookup)
+], Profile.prototype, "ethnicity", void 0);
 Profile = __decorate([
     typeorm_1.Entity('users_profile')
 ], Profile);

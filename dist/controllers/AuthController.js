@@ -15,6 +15,7 @@ const auth_user_1 = require("../models/newModels/auth_user");
 const GnerateJwt_1 = require("../helpers/GnerateJwt");
 const users_profile_1 = require("../models/newModels/users_profile");
 const profile_settings_1 = require("../models/newModels/profile_settings");
+const talent_categories_1 = require("../models/newModels/talent_categories");
 class AuthController {
     login(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -45,6 +46,7 @@ class AuthController {
             const userRepository = typeorm_1.getRepository(auth_user_1.User);
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             const profileSettingsRepository = typeorm_1.getRepository(profile_settings_1.ProfileSettings);
+            const talentCategoryRepository = typeorm_1.getRepository(talent_categories_1.TalentCategories);
             try {
                 const validateBody = yield class_transformer_validator_1.transformAndValidate(auth_user_1.User, request.body);
                 if (request.body.password1 !== request.body.password2) {
@@ -62,13 +64,15 @@ class AuthController {
                 Object.assign(newUser, validateBody);
                 newUser.password = yield bcryptjs_1.hash(request.body.password1, 10);
                 const create = yield userRepository.save(newUser);
+                const categories = yield talentCategoryRepository.findByIds(request.body.category);
                 const newProfile = new users_profile_1.Profile();
                 newProfile.slug = create.username;
                 newProfile.user = create;
-                const crateProfile = yield profileRepository.save(newProfile);
+                newProfile.categories = categories;
+                const createProfile = yield profileRepository.save(newProfile);
                 const newProfileSettings = new profile_settings_1.ProfileSettings();
-                newProfileSettings.profile = crateProfile;
-                const crateProfileSettings = yield profileSettingsRepository.save(newProfile);
+                newProfileSettings.profile = createProfile;
+                const crateProfileSettings = yield profileSettingsRepository.save(newProfileSettings);
                 const token = yield GnerateJwt_1.generateJwtToken({
                     id: create.id,
                     isAdmin: create.isAdmin,
@@ -78,6 +82,26 @@ class AuthController {
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
                 return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    verifyEmailAndUsernamIsAvailable(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userRepository = typeorm_1.getRepository(auth_user_1.User);
+            try {
+                const usernameExist = yield userRepository.findOne({ username: request.body.username });
+                const emailExist = yield userRepository.findOne({ email: request.body.email });
+                if (usernameExist) {
+                    throw new Error('username already exist');
+                }
+                if (emailExist) {
+                    throw new Error('email already exist');
+                }
+                return response.status(200).send('0');
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send('1');
             }
         });
     }

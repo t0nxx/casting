@@ -44,6 +44,6 @@
       "start:dev": "DB_Dir=src nodemon",
       "build": "tsc -p tsconfig.build.json",
       "prestart:prod": "rimraf dist && npm run build",
-      "start:prod": "DB_Dir=dist pm2 start dist/main.js"
+      "start:prod": "DB_Dir=dist node dist/main.js"
    }
 }

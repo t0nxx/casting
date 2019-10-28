@@ -1,5 +1,16 @@
 import { User } from './auth_user';
-import { ProfileSettings } from './profile_settings';
+import { TalentCategories } from './talent_categories';
+import { WeightRangeLookup } from './weight_range_lookup';
+import { HeightRangeLookup } from './height_range_lookup';
+import { EyeLookup } from './eye_lookup';
+import { HairLookup } from './hair_lookup';
+import { BuildLookup } from './build_lookup';
+import { EthnicitiesLookup } from './ethnicities_lookup';
+import { Hobbies } from './profile_hobbies';
+import { Courses } from './profile_courses';
+import { ProfileSocialNetworks } from './profile_social';
+import { Company } from './company';
+import { ProfileAlbum } from './profile_album';
 export declare class Profile {
     id: number;
     avatar: string;
@@ -12,5 +23,16 @@ export declare class Profile {
     age_from: number;
     age_to: number;
     user: User;
-    settings: ProfileSettings;
+    categories: TalentCategories[];
+    users_profile_hobbies: Hobbies[];
+    users_profile_courses: Courses[];
+    users_profile_social: ProfileSocialNetworks[];
+    companies: Company[];
+    albums: ProfileAlbum[];
+    weight: WeightRangeLookup;
+    height: HeightRangeLookup;
+    eye: EyeLookup;
+    hair: HairLookup;
+    build: BuildLookup;
+    ethnicity: EthnicitiesLookup;
 }

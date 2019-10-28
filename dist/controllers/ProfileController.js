@@ -10,6 +10,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const users_profile_1 = require("../models/newModels/users_profile");
+const profile_settings_1 = require("../models/newModels/profile_settings");
+const height_range_lookup_1 = require("../models/newModels/height_range_lookup");
+const weight_range_lookup_1 = require("../models/newModels/weight_range_lookup");
+const build_lookup_1 = require("../models/newModels/build_lookup");
+const hair_lookup_1 = require("../models/newModels/hair_lookup");
+const eye_lookup_1 = require("../models/newModels/eye_lookup");
+const ethnicities_lookup_1 = require("../models/newModels/ethnicities_lookup");
+const profile_hobbies_1 = require("../models/newModels/profile_hobbies");
+const profile_courses_1 = require("../models/newModels/profile_courses");
+const friendship_friend_1 = require("../models/newModels/friendship_friend");
+const profile_social_1 = require("../models/newModels/profile_social");
+const awsUploader_1 = require("../helpers/awsUploader");
+const auth_user_1 = require("../models/newModels/auth_user");
+const profile_album_1 = require("../models/newModels/profile_album");
 class ProfileController {
     all(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -25,18 +39,30 @@ class ProfileController {
     }
     getProfile(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            const friendsRepository = typeorm_1.getRepository(friendship_friend_1.FriendshipFriend);
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             try {
                 const data = yield profileRepository.findOne({ slug: request.params.slug }, {
                     relations: ['user']
                 });
+                const Myprofile = yield profileRepository.findOne({ slug: request['user'].username });
+                let is_friends = false;
+                const isFriendWithMe = yield friendsRepository.findOne({
+                    where: [
+                        { fromUser: data, toUser: Myprofile },
+                        { fromUser: Myprofile, toUser: data }
+                    ],
+                });
+                if (isFriendWithMe) {
+                    is_friends = true;
+                }
                 const { first_name, last_name, email, username, id } = data.user;
                 delete data.user;
-                const responseObject = Object.assign({}, data, { auth_user: { pk: id, first_name, last_name, email, username } });
+                const responseObject = Object.assign({}, data, { is_friends, auth_user: { pk: id, first_name, last_name, email, username } });
                 if (!data) {
                     throw new Error('profile Not Found');
                 }
-                return response.status(200).send(Object.assign({ success: true }, responseObject));
+                return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -47,14 +73,60 @@ class ProfileController {
     getProfileSettings(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const profileSettingsRepository = typeorm_1.getRepository(profile_settings_1.ProfileSettings);
             try {
-                const data = yield profileRepository.findOne({ slug: request.params.slug }, {
-                    relations: ['settings']
-                });
-                if (!data) {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const settings = yield profileSettingsRepository.findOne({ profile });
+                if (!profile) {
                     throw new Error('profile Not Found');
                 }
-                return response.status(200).send(Object.assign({ success: true }, data.settings));
+                return response.status(200).send(Object.assign({ success: true }, settings));
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getProfileAlbums(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const albumRepository = typeorm_1.getRepository(profile_album_1.ProfileAlbum);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request.params.slug }, {
+                    relations: ['albums']
+                });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                return response.status(200).send(...profile.albums);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getLookups(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const heightRepository = typeorm_1.getRepository(height_range_lookup_1.HeightRangeLookup);
+            const weightRepository = typeorm_1.getRepository(weight_range_lookup_1.WeightRangeLookup);
+            const buildRepository = typeorm_1.getRepository(build_lookup_1.BuildLookup);
+            const hairRepository = typeorm_1.getRepository(hair_lookup_1.HairLookup);
+            const eyeRepository = typeorm_1.getRepository(eye_lookup_1.EyeLookup);
+            const ethnicitiesRepository = typeorm_1.getRepository(ethnicities_lookup_1.EthnicitiesLookup);
+            const hobbiesRepository = typeorm_1.getRepository(profile_hobbies_1.Hobbies);
+            try {
+                const [height_range, weight_range, build, hair, eye, ethnicities, hobbies] = yield Promise.all([
+                    heightRepository.find(),
+                    weightRepository.find(),
+                    buildRepository.find(),
+                    hairRepository.find(),
+                    eyeRepository.find(),
+                    ethnicitiesRepository.find(),
+                    hobbiesRepository.find(),
+                ]);
+                return response.status(200).send({ height_range, weight_range, build, hair, eye, ethnicities, hobbies });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -64,15 +136,242 @@ class ProfileController {
     }
     updateProfile(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            const userRepository = typeorm_1.getRepository(auth_user_1.User);
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             try {
                 const profile = yield profileRepository.findOne({ slug: request['user'].username });
                 if (!profile) {
                     throw new Error('profile Not Found');
                 }
-                yield profileRepository.update({ id: profile.id }, request.body);
+                if (request.body.auth_user) {
+                    yield profileRepository.update({ id: profile.id }, { location: request.body.location });
+                    yield userRepository.update({ username: profile.slug }, {
+                        first_name: request.body.auth_user.first_name,
+                        last_name: request.body.auth_user.last_name,
+                    });
+                }
+                else {
+                    yield profileRepository.update({ id: profile.id }, request.body);
+                }
+                const data = yield profileRepository.findOne({ slug: request.params.slug }, {
+                    relations: ['user']
+                });
+                const { first_name, last_name, email, username, id } = data.user;
+                delete data.user;
+                const responseObject = Object.assign({}, data, { auth_user: { pk: id, first_name, last_name, email, username } });
+                return response.status(200).send(Object.assign({}, responseObject));
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    updateCover(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const newCover = yield awsUploader_1.UploadToS3(request.files.file, 'image');
+                yield profileRepository.update({ id: profile.id }, { cover: newCover });
                 const afterUpdate = yield profileRepository.findOne({ id: profile.id });
-                return response.status(200).send(Object.assign({ success: true }, afterUpdate));
+                return response.status(200).send({ cover: afterUpdate.cover });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    resetCover(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const resetCover = 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg';
+                yield profileRepository.update({ id: profile.id }, { cover: resetCover });
+                const afterUpdate = yield profileRepository.findOne({ id: profile.id });
+                return response.status(200).send({ cover: resetCover });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    updateAvatar(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const newAvatar = yield awsUploader_1.UploadToS3(request.files.file, 'image');
+                yield profileRepository.update({ id: profile.id }, { avatar: newAvatar });
+                const afterUpdate = yield profileRepository.findOne({ id: profile.id });
+                return response.status(200).send({ avatar: afterUpdate.avatar });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    updateProfileSettings(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const profileSettingsRepository = typeorm_1.getRepository(profile_settings_1.ProfileSettings);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const findSettings = yield profileSettingsRepository.findOne({ profile });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                yield profileSettingsRepository.update({ id: findSettings.id }, request.body);
+                const newSettings = yield profileSettingsRepository.findOne({ profile });
+                return response.status(200).send(Object.assign({ success: true }, newSettings));
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    addHobbies(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const hobbyRepository = typeorm_1.getRepository(profile_hobbies_1.Hobbies);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const hobby = yield hobbyRepository.findOne({ id: request.body.hobbies });
+                profile.users_profile_hobbies = [...profile.users_profile_hobbies, hobby];
+                const save = yield profileRepository.save(profile);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    addTaninig(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const trainingRepository = typeorm_1.getRepository(profile_courses_1.Courses);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const couese = new profile_courses_1.Courses();
+                couese.course_name = request.body.course_name;
+                couese.institute = request.body.institute;
+                const newCourse = yield trainingRepository.save(couese);
+                profile.users_profile_courses = [...profile.users_profile_courses, newCourse];
+                const save = yield profileRepository.save(profile);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    addSocialNetwork(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const socialRepository = typeorm_1.getRepository(profile_social_1.ProfileSocialNetworks);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const network = new profile_social_1.ProfileSocialNetworks();
+                network.network = request.body.network;
+                network.url = request.body.url;
+                const newNetwork = yield socialRepository.save(network);
+                profile.users_profile_social = [...profile.users_profile_social, newNetwork];
+                yield profileRepository.save(profile);
+                const savedAfterUpdateSocial = yield profileRepository.findOne({ slug: request['user'].username });
+                return response.status(200).send(...savedAfterUpdateSocial.users_profile_social);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    updateTaninig(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const trainingRepository = typeorm_1.getRepository(profile_courses_1.Courses);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const course = yield trainingRepository.findOne({ id: request.body.id });
+                if (!course) {
+                    throw new Error('course Not Found');
+                }
+                const saved = yield trainingRepository.update({ id: request.body.id }, request.body);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    updateSocialNetwork(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const socialRepository = typeorm_1.getRepository(profile_social_1.ProfileSocialNetworks);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const network = yield socialRepository.findOne({ id: parseInt(request.params.id, 10) });
+                if (!network) {
+                    throw new Error('network Not Found');
+                }
+                const saved = yield socialRepository.update({ id: parseInt(request.params.id, 10) }, request.body);
+                const profileAfterSocialUpdate = yield profileRepository.findOne({ slug: request['user'].username });
+                console.log(profileAfterSocialUpdate.users_profile_social);
+                return response.status(200).send(profileAfterSocialUpdate.users_profile_social);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    deleteTaninig(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const trainingRepository = typeorm_1.getRepository(profile_courses_1.Courses);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const course = yield trainingRepository.findOne({ id: parseInt(request.params.id, 10) });
+                if (!course) {
+                    throw new Error('course Not Found');
+                }
+                const remove = yield trainingRepository.remove(course);
+                return response.status(200).send({ success: true });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];

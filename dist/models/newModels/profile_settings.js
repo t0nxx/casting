@@ -11,6 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const users_profile_1 = require("./users_profile");
+var settingsView;
+(function (settingsView) {
+    settingsView["ONLY_FRIENDS"] = "ONLY_FRIENDS";
+    settingsView["COMPANY"] = "COMPANY";
+    settingsView["ALL"] = "ALL";
+})(settingsView = exports.settingsView || (exports.settingsView = {}));
+var myStatus;
+(function (myStatus) {
+    myStatus["ONLINE"] = "ONLINE";
+    myStatus["OFFLINE"] = "OFFLINE";
+})(myStatus = exports.myStatus || (exports.myStatus = {}));
 let ProfileSettings = class ProfileSettings {
 };
 __decorate([
@@ -18,25 +29,29 @@ __decorate([
     __metadata("design:type", Number)
 ], ProfileSettings.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'No provided setting' }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
 ], ProfileSettings.prototype, "can_see_profile", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'No provided setting' }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
 ], ProfileSettings.prototype, "can_see_wall", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'No provided setting' }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
 ], ProfileSettings.prototype, "can_comment", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'No provided setting' }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
 ], ProfileSettings.prototype, "can_contact_info", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'No provided setting' }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
 ], ProfileSettings.prototype, "can_send_message", void 0);
+__decorate([
+    typeorm_1.Column({ default: settingsView.ALL }),
+    __metadata("design:type", String)
+], ProfileSettings.prototype, "can_see_friends", void 0);
 __decorate([
     typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
@@ -62,15 +77,12 @@ __decorate([
     __metadata("design:type", Boolean)
 ], ProfileSettings.prototype, "jobs_notification", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'No provided setting' }),
-    __metadata("design:type", String)
-], ProfileSettings.prototype, "can_see_friends", void 0);
-__decorate([
-    typeorm_1.Column({ default: 'No provided setting' }),
+    typeorm_1.Column({ default: myStatus.ONLINE }),
     __metadata("design:type", String)
 ], ProfileSettings.prototype, "my_status", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => users_profile_1.Profile, profile => profile.settings),
+    typeorm_1.OneToOne(type => users_profile_1.Profile),
+    typeorm_1.JoinColumn(),
     __metadata("design:type", users_profile_1.Profile)
 ], ProfileSettings.prototype, "profile", void 0);
 ProfileSettings = __decorate([

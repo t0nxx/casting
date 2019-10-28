@@ -12,15 +12,19 @@ require("reflect-metadata");
 const typeorm_1 = require("typeorm");
 const express = require("express");
 const bodyParser = require("body-parser");
+const fileupload = require("express-fileupload");
 const cors = require("cors");
+const path = require("path");
 const index_1 = require("./routes/index");
 typeorm_1.createConnection().then((connection) => __awaiter(this, void 0, void 0, function* () {
     const app = express();
     app.use(bodyParser.json());
     app.use(cors());
+    app.use(fileupload());
+    app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     app.use(index_1.default);
-    app.get('/', (req, res) => {
-        res.send('hhhhh');
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
     });
     app.listen(3000);
     console.log('Express server has started on port 3000. Open http://localhost:3000/ to see results');
