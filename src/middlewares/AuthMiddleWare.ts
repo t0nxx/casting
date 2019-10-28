@@ -8,6 +8,7 @@ import { User } from '../models/newModels/auth_user';
 export const AuthMiddleWare = async (req, res: Response, next: NextFunction) => {
     const userRepository = getRepository(User);
     try {
+        if (!req.headers.authorization) { throw new Error('Not Token Provided'); }
         const token = req.headers.authorization.split(' ')[1];
         if (!token) { throw new Error('Not authorized'); }
         const decode: any = await verify(token, JWTSECRET);

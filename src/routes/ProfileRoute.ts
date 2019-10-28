@@ -20,7 +20,7 @@ router.get('/:slug/companies', companyController.getAllCompanies);
 router.get('/:slug/friends-request', AuthMiddleWare, friendsController.getAllFriendsRequest);
 
 // get all friends
-router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
+router.get('/:slug/friends', friendsController.getAllFriends);
 
 
 // test album

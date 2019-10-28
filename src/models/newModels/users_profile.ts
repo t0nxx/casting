@@ -37,13 +37,13 @@ export class Profile {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ default: 'https://news-app-uploads.s3.eu-central-1.amazonaws.com/1567899027453 - download.png' })
+    @Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/avatar1.png' })
     avatar: string;
 
-    @Column({ default: 'https://news-app-uploads.s3.eu-central-1.amazonaws.com/1567899027453 - download.png' })
+    @Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg' })
     cover: string;
 
-    @Column({ default: 'Not Provided' })
+    @Column({ default: 'male' })
     gender: string;
 
     @Column({ default: 'Not Provided' })
