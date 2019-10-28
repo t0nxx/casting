@@ -11,6 +11,7 @@ import { Hobbies } from './profile_hobbies';
 import { Courses } from './profile_courses';
 import { ProfileSocialNetworks } from './profile_social';
 import { Company } from './company';
+import { ProfileAlbum } from './profile_album';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -89,6 +90,10 @@ export class Profile {
     // companies
     @OneToMany(type => Company, c => c.profile)
     companies: Company[];
+
+    // albums
+    @OneToMany(type => Company, c => c.profile)
+    albums: ProfileAlbum[];
 
     @ManyToOne(type => WeightRangeLookup, { eager: true })
     weight: WeightRangeLookup;

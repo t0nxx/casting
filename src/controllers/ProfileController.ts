@@ -14,6 +14,7 @@ import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { ProfileSocialNetworks } from '../models/newModels/profile_social';
 import { UploadToS3 } from '../helpers/awsUploader';
 import { User } from '../models/newModels/auth_user';
+import { ProfileAlbum } from '../models/newModels/profile_album';
 
 export class ProfileController {
 
@@ -81,6 +82,26 @@ export class ProfileController {
             const settings = await profileSettingsRepository.findOne({ profile })
             if (!profile) { throw new Error('profile Not Found'); }
             return response.status(200).send({ success: true, ...settings });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+    * @Get
+    */
+
+    async getProfileAlbums(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const albumRepository = getRepository(ProfileAlbum);
+        try {
+            const profile = await profileRepository.findOne({ slug: request.params.slug }, {
+                relations: ['albums']
+            });
+            if (!profile) { throw new Error('profile Not Found'); }
+            return response.status(200).send(...profile.albums);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });

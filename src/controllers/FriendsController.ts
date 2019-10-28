@@ -179,14 +179,23 @@ export class FriendsController {
         const friendsRepository = getRepository(FriendshipFriend).createQueryBuilder('f');
         const friendsRepository2 = getRepository(FriendshipFriend).createQueryBuilder('f2');
         try {
+            console.log('***********');
+            console.time();
             const profile = await profileRepository.findOne({ slug: request['user'].username });
 
-            const [friendsRequestsTouser, count1] = await friendsRepository2
+            const q1 = friendsRepository2
                 .innerJoin('f2.fromUser', 'senderUser')
                 .innerJoinAndMapOne('f2.Auther', User, 'auther', 'auther.id = senderUser.userId')
                 .addSelect(['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'f2.room'])
-                .where(`f2.toUser = ${profile.id}`)
-                .getManyAndCount();
+                .where(`f2.toUser = ${profile.id}`);
+            // search friends 
+            if (request.query.query) {
+                const query1 = request.query.query;
+                q1.andWhere(`auther.username like '%${query1}%' or auther.first_name like '%${query1}%' or auther.last_name like '%${query1}%' or senderUser.location like '%${query1}%'`)
+            }
+
+            const [friendsRequestsTouser, count1] = await q1.getManyAndCount();
+
             const res1 = friendsRequestsTouser.map(e => {
                 // pk: number,
                 // first_name: string,
@@ -209,12 +218,19 @@ export class FriendsController {
                 return formatedREsponse1;
             });
 
-            const [friendsRequestsFromUser, count2] = await friendsRepository
+            const q2 = friendsRepository
                 .innerJoin('f.toUser', 'reciverUser')
                 .innerJoinAndMapOne('f.Auther', User, 'auther', 'auther.id = reciverUser.userId')
                 .addSelect(['reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'f.room'])
-                .where(`f.fromUser = ${profile.id}`)
-                .getManyAndCount();
+                .where(`f.fromUser = ${profile.id}`);
+
+            // search friends 
+            if (request.query.query) {
+                const query2 = request.query.query;
+                q2.andWhere(`auther.username like '%${query2}%' or auther.first_name like '%${query2}%' or auther.last_name like '%${query2}%' or reciverUser.location like '%${query2}%'`)
+            }
+
+            const [friendsRequestsFromUser, count2] = await q2.getManyAndCount();
 
             const res2 = friendsRequestsFromUser.map(e => {
                 const tempAuther: any = e['Auther'];
@@ -233,6 +249,8 @@ export class FriendsController {
 
             const results = [...res1, ...res2];
             const count = count1 + count2;
+            console.log('**********');
+            console.timeEnd();
             return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

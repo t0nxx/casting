@@ -21,7 +21,14 @@ router.get('/:slug/friends-request', AuthMiddleWare, friendsController.getAllFri
 
 // get all friends
 router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
-// router.get('/:slug/album', profileController.album);
+
+
+// test album
+router.get('/:slug/album', AuthMiddleWare, profileController.getProfileAlbums);
+
+router.get('/:slug/album/profile', AuthMiddleWare, async (req, res) => {
+    res.status(200).send({ s: true });
+});
 
 // router.get('/:slug/activity', );
 // router.get('/:slug/companies', );
