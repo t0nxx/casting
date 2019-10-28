@@ -2,6 +2,8 @@ import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { compare, hash } from 'bcryptjs';
 import { transformAndValidate } from 'class-transformer-validator';
+import { JWTSECRET } from '../config/Secrets';
+import { verify } from 'jsonwebtoken';
 import { User } from '../models/newModels/auth_user';
 import { generateJwtToken } from '../helpers/GnerateJwt';
 import { Profile } from '../models/newModels/users_profile';
@@ -108,6 +110,23 @@ export class AuthController {
             return response.status(400).send('1');
         }
     }
+
+    /**
+     * @Post 
+     */
+
+    async verifyToken(request: Request, response: Response) {
+        try {
+            const token = request.body.token;
+            if (!token) { throw new Error('not token provided'); }
+            const decode: any = await verify(token, JWTSECRET);
+            return response.status(200).send({ token });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send('1');
+        }
+    }
+
     /**
      * @Post
      */
