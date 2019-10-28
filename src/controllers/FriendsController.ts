@@ -181,7 +181,7 @@ export class FriendsController {
         try {
             console.log('***********');
             console.time();
-            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const profile = await profileRepository.findOne({ slug: request.params.slug });
 
             const q1 = friendsRepository2
                 .innerJoin('f2.fromUser', 'senderUser')
