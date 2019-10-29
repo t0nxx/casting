@@ -11586,7 +11586,8 @@ __webpack_require__.r(__webpack_exports__);
 var environment = {
     production: true,
     //apiUrl: 'http://18.224.72.86',
-    apiUrl: 'http://18.185.70.194:3000',
+    //apiUrl: 'http://18.185.70.194:3000',
+    apiUrl: 'http://castingsecret.com:3000',
     // apiUrl : 'http://localhost:3000',
     GOOGLE_MAPS_API_KEY: 'AIzaSyCv5QHOLPZVpiaR74O7Yg23oaRsRoqmG1g'
 };
