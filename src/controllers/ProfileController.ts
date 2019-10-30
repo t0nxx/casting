@@ -341,8 +341,8 @@ export class ProfileController {
             const newNetwork = await socialRepository.save(network);
             profile.users_profile_social = [...profile.users_profile_social, newNetwork];
             await profileRepository.save(profile);
-            const savedAfterUpdateSocial = await profileRepository.findOne({ slug: request['user'].username });
-            return response.status(200).send(...savedAfterUpdateSocial.users_profile_social);
+            // const savedAfterUpdateSocial = await profileRepository.findOne({ slug: request['user'].username });
+            return response.status(200).send(newNetwork);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
