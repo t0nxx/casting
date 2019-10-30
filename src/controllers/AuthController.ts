@@ -71,6 +71,7 @@ export class AuthController {
             newProfile.slug = create.username;
             newProfile.user = create;
             newProfile.categories = categories;
+            newProfile.about = request.body.about;
             const createProfile = await profileRepository.save(newProfile);
             // end create profile for the new user
             // start create settings for the new user
@@ -120,10 +121,14 @@ export class AuthController {
             const token = request.body.token;
             if (!token) { throw new Error('not token provided'); }
             const decode: any = await verify(token, JWTSECRET);
-            return response.status(200).send({ token });
+            if (decode) {
+                return response.status(200).send({ token: token });
+            } else {
+                throw new Error('not token provided');
+            }
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send('1');
+            return response.status(400).send(err);
         }
     }
 
