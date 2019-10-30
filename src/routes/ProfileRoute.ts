@@ -92,5 +92,6 @@ router.post('/:slug/cover/reset', AuthMiddleWare, profileController.resetCover);
 // router.delete('/:id', profileController.remove);
 // delete
 router.delete('/:slug/training/:id', AuthMiddleWare, profileController.deleteTaninig);
+router.delete('/:slug/hobbies/:id', AuthMiddleWare, profileController.deleteHobbies);
 
 export default router;

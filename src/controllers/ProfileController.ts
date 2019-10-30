@@ -78,7 +78,7 @@ export class ProfileController {
         const profileRepository = getRepository(Profile);
         const profileSettingsRepository = getRepository(ProfileSettings);
         try {
-            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const profile = await profileRepository.findOne({ slug: request.params.slug});
             const settings = await profileSettingsRepository.findOne({ profile })
             if (!profile) { throw new Error('profile Not Found'); }
             return response.status(200).send({ success: true, ...settings });
@@ -384,9 +384,9 @@ export class ProfileController {
             const network = await socialRepository.findOne({ id: parseInt(request.params.id, 10) });
             if (!network) { throw new Error('network Not Found'); }
             const saved = await socialRepository.update({ id: parseInt(request.params.id, 10) }, request.body);
-            const profileAfterSocialUpdate = await profileRepository.findOne({ slug: request['user'].username });
-            console.log(profileAfterSocialUpdate.users_profile_social);
-            return response.status(200).send(profileAfterSocialUpdate.users_profile_social);
+            const networkAfterUpdate = await socialRepository.findOne({ id: parseInt(request.params.id, 10) });
+            // const profileAfterSocialUpdate = await profileRepository.findOne({ slug: request['user'].username });
+            return response.status(200).send(networkAfterUpdate);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -413,6 +413,29 @@ export class ProfileController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+
+    /**
+   * @Delete
+   */
+
+    async deleteHobbies(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const hobbyRepository = getRepository(Hobbies);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!profile) { throw new Error('profile Not Found'); }
+            const hobby = await hobbyRepository.findOne({ id: parseInt(request.params.id, 10) });
+            if (!hobby) { throw new Error('hoby Not Found'); }
+            profile.users_profile_hobbies = profile.users_profile_hobbies.filter(element => element.id != hobby.id);
+            const save = await profileRepository.save(profile);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
 
 

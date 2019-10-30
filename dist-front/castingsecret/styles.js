@@ -598,8 +598,8 @@ if(false) {}
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/t0ni/Desktop/casting-fronendd/node_modules/@ctrl/ngx-emoji-mart/picker.css */"./node_modules/@ctrl/ngx-emoji-mart/picker.css");
-module.exports = __webpack_require__(/*! /home/t0ni/Desktop/casting-fronendd/src/styles.css */"./src/styles.css");
+__webpack_require__(/*! /home/t0ni/Desktop/casting-fronend/node_modules/@ctrl/ngx-emoji-mart/picker.css */"./node_modules/@ctrl/ngx-emoji-mart/picker.css");
+module.exports = __webpack_require__(/*! /home/t0ni/Desktop/casting-fronend/src/styles.css */"./src/styles.css");
 
 
 /***/ })
