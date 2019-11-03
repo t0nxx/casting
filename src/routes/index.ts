@@ -9,6 +9,7 @@ const routes = Router();
 const authController = new AuthController();
 // not known prefix
 routes.post('/api-token-verify', authController.verifyToken);
+routes.post('/password/reset', authController.resetPassword);
 
 routes.use('/auth', AuthRouter);
 routes.use('/profile', ProfileRouter);

@@ -155,4 +155,21 @@ export class AuthController {
 
         }
     }
+
+    /**
+    * @Post 
+    */
+
+    async resetPassword(request: Request, response: Response) {
+        try {
+            const email = request.body.email;
+            /**
+             * mail service here
+             */
+            return response.status(200).send('An Email will be sent with code');
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send(err);
+        }
+    }
 }
