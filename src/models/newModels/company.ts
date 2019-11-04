@@ -52,17 +52,7 @@ export class Company {
     @JoinTable()
     tags: TalentCategories[];
 
-    // @ManyToOne(()=>users_profile, (users_profile: users_profile)=>users_profile.companys,{  nullable:false, })
-    // @JoinColumn({ name:'profile_id'})
-    // profile:users_profile | null;
-
     // @OneToMany(()=>activity, (activity: activity)=>activity.company)
     // activitys:activity[];
-
-    // @OneToMany(()=>company_tags, (company_tags: company_tags)=>company_tags.company)
-    // companyTagss:company_tags[];
-
-    // @OneToMany(()=>jobs, (jobs: jobs)=>jobs.profile)
-    // jobss:jobs[];
 
 }

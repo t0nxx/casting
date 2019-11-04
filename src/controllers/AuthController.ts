@@ -40,6 +40,33 @@ export class AuthController {
     }
 
     /**
+   * @Post
+   */
+    async adminLogin(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        try {
+            const user = await userRepository.findOne({ username: request.body.username }, {
+                // relations: ['']
+            });
+            if (!user) { throw new Error('invalid username / password'); }
+            const checkPass = await compare(request.body.password, user.password);
+            if (!checkPass) { throw new Error('invalid username / password'); }
+            if (user.isAdmin != true) { throw new Error('Not Authorize'); }
+            const token = await generateJwtToken({
+                id: user.id,
+                isAdmin: user.isAdmin,
+            });
+            return response.status(200).send({ token });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(401).send({ success: false, error: err });
+        }
+    }
+
+    /**
      * @Post
      */
 
