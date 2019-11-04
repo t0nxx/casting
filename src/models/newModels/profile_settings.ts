@@ -62,7 +62,7 @@ export class ProfileSettings {
     @Column({ default: myStatus.ONLINE })
     my_status: myStatus;
 
-    @OneToOne(type => Profile)
+    @OneToOne(type => Profile, { onDelete: 'CASCADE' })
     @JoinColumn()
     profile: Profile;
 }

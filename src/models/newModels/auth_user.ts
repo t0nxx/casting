@@ -77,10 +77,10 @@ export class User {
     date_joined: Date;
 
 
-    @OneToMany(() => AccountEmailaddresss, account => account.user)
+    @OneToMany(() => AccountEmailaddresss, account => account.user, { onDelete: 'CASCADE' })
     accountEmailaddresss: AccountEmailaddresss[];
 
-    @OneToMany(type => Profile, profile => profile.user)
+    @OneToMany(type => Profile, profile => profile.user, { onDelete: 'CASCADE' })
     profiles: Profile[];
 
 
