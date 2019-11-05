@@ -17,19 +17,24 @@ export class AuthController {
      */
     async login(request: Request, response: Response) {
         const userRepository = getRepository(User);
+        const profileRepository = getRepository(Profile);
         try {
-            const user = await userRepository.findOne({ username: request.body.username }, {
-                // relations: ['']
-            });
+            const user = await userRepository.findOne({ username: request.body.username });
             if (!user) { throw new Error('invalid username / password'); }
             const checkPass = await compare(request.body.password, user.password);
             if (!checkPass) { throw new Error('invalid username / password'); }
 
+            const data = await profileRepository.findOne({ slug: request.body.username }, {
+                relations: ['user']
+            });
+            const { first_name, last_name, email, username, id } = data.user;
+            delete data.user;
+            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
             const token = await generateJwtToken({
                 id: user.id,
                 isAdmin: user.isAdmin,
             });
-            return response.status(200).send({ success: true, token, user: { slug: user.username } });
+            return response.status(200).send({ success: true, token, user: { ...responseObject } });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -110,7 +115,13 @@ export class AuthController {
                 id: create.id,
                 isAdmin: create.isAdmin,
             });
-            return response.status(200).send({ success: true, token, user: { slug: create.username } });
+            const data = await profileRepository.findOne({ slug: createProfile.slug }, {
+                relations: ['user']
+            });
+            delete data.user;
+            const { first_name, last_name, id, email, username } = create;
+            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            return response.status(200).send({ success: true, token, user: { ...responseObject } });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -135,7 +146,7 @@ export class AuthController {
             return response.status(200).send('0');
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send('1');
+            return response.status(400).send({ msg: error.message });
         }
     }
 
