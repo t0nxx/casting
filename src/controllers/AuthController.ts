@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { compare, hash } from 'bcryptjs';
 import { transformAndValidate } from 'class-transformer-validator';
+import * as randomString from 'randomstring';
 import { JWTSECRET } from '../config/Secrets';
 import { verify } from 'jsonwebtoken';
 import { User } from '../models/newModels/auth_user';
@@ -9,6 +10,7 @@ import { generateJwtToken } from '../helpers/GnerateJwt';
 import { Profile } from '../models/newModels/users_profile';
 import { ProfileSettings } from '../models/newModels/profile_settings';
 import { TalentCategories } from '../models/newModels/talent_categories';
+import { sendMail } from '../helpers/sendMail';
 
 export class AuthController {
 
@@ -199,12 +201,42 @@ export class AuthController {
     */
 
     async resetPassword(request: Request, response: Response) {
+        const userRepository = getRepository(User);
         try {
-            const email = request.body.email;
+            const isExist = await userRepository.findOne({ email: request.body.email });
+            if (!isExist) { throw new Error('email not register'); }
+            const randomReset = randomString.generate(6);
+            isExist.resetPassCode = randomReset;
+            await userRepository.save(isExist);
             /**
              * mail service here
              */
-            return response.status(200).send('An Email will be sent with code');
+            sendMail(isExist.email, randomReset);
+            return response.status(200).send({ msg: 'An Email will be sent with code' });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send(err);
+        }
+    }
+
+    /**
+    * @Post 
+    */
+
+    async resetPasswordConfirm(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        try {
+            if (request.body.new_password1 !== request.body.new_password2) {
+                throw new Error('password1 and password2 not matched');
+            }
+            const user = await userRepository.findOne({ email: request.body.email })
+            if (user.resetPassCode !== request.body.resetPassCode) {
+                throw new Error('invalid reset code');
+            }
+
+            let newPass = await hash(request.body.new_password1, 10);
+            await userRepository.update({ email: request.body.email }, { password: newPass });
+            return response.status(200).send({ msg: 'password reset is done' });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send(err);

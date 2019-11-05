@@ -65,6 +65,9 @@ export class User {
     @Column({ default: 'No Data Provided' })
     about: string;
 
+    @Column({ default: 'noResetPass' })
+    resetPassCode: string;
+
     @Column({ default: false })
     isAdmin: boolean;
 
