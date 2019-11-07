@@ -7,14 +7,25 @@ const router = Router();
 const companyController = new CompanyController();
 const jobsController = new JobsController();
 
-router.get('/:slug', companyController.GetOneCompany);
+router.get('/:slug', AuthMiddleWare, companyController.GetOneCompany);
 
-router.get('/:slug/jobs', jobsController.getAllJobs)
+router.patch('/:slug', AuthMiddleWare, companyController.updateCompany);
 
-router.post('/:slug/switch', async (req, res) => {
-    res.status(200).send({ s: true })
-});
+router.patch('/:slug/avatar', AuthMiddleWare, companyController.updateCompanyAvatar);
 
-// create new job 
-router.post('/:slug/jobs', jobsController.createJob)
+router.patch('/:slug/cover', AuthMiddleWare, companyController.updateCompanyCover);
+
+router.post('/:slug/follow', AuthMiddleWare, companyController.followCompany);
+
+router.post('/:slug/un-follow', AuthMiddleWare, companyController.unFollowCompany);
+
+router.delete('/:slug', AuthMiddleWare, companyController.deleteCompany);
+
+router.post('/:slug/switch', AuthMiddleWare, companyController.switchToCompany);
+
+router.get('/:slug/jobs', AuthMiddleWare, jobsController.getAllJobs);
+
+// create new job
+router.post('/:slug/jobs', AuthMiddleWare, jobsController.createJob);
+
 export default router;

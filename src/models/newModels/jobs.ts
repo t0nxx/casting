@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable,CreateDateColumn } from 'typeorm';
 import { Company } from './company';
 import { TalentCategories } from './talent_categories';
 
@@ -8,7 +8,7 @@ export class Jobs {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @CreateDateColumn()
     publish_date: Date;
 
     @Column()
@@ -41,10 +41,10 @@ export class Jobs {
     @Column({ default: 0 })
     space_rest_budget: number;
 
-    @Column({ default: false })
+    @Column({ default: true })
     is_male: boolean;
 
-    @Column({ default: false })
+    @Column({ default: true })
     is_female: boolean;
 
     @Column({ default: null })

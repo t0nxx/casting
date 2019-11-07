@@ -15,6 +15,7 @@ import { ProfileSocialNetworks } from '../models/newModels/profile_social';
 import { UploadToS3 } from '../helpers/awsUploader';
 import { User } from '../models/newModels/auth_user';
 import { ProfileAlbum } from '../models/newModels/profile_album';
+import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
 
 export class ProfileController {
 
@@ -41,24 +42,44 @@ export class ProfileController {
     async getProfile(request: Request, response: Response, next: NextFunction) {
         const friendsRepository = getRepository(FriendshipFriend);
         const profileRepository = getRepository(Profile);
+        const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
         try {
             const data = await profileRepository.findOne({ slug: request.params.slug }, {
                 relations: ['user']
             });
             const Myprofile = await profileRepository.findOne({ slug: request['user'].username });
             let is_friends = false;
+            let is_IreceivedReqFromHim = false;
+            let is_IsendReqToHim = false;
             const isFriendWithMe = await friendsRepository.findOne({
                 where: [
                     { fromUser: data, toUser: Myprofile },
                     { fromUser: Myprofile, toUser: data }
                 ],
             });
+            const me = await profileRepository.findOne({ slug: request['user'].username });
+            const him = await profileRepository.findOne({ slug: request.params.slug });
+            const is_IreceivefromHim = await friendRequestRepository.findOne({
+                where: {
+                    toUser: me,
+                    fromUser: him,
+                }
+            });
+            const is_IsendtoHim = await friendRequestRepository.findOne({
+                where: {
+                    toUser: him,
+                    fromUser: me,
+                }
+            });
             if (isFriendWithMe) { is_friends = true; }
+            if (is_IreceivefromHim) { is_IreceivedReqFromHim = true; }
+            if (is_IsendtoHim) { is_IsendReqToHim = true; }
             /// extract auth_user object for response
             const { first_name, last_name, email, username, id } = data.user;
             // important to not retrive all user data
             delete data.user;
-            const responseObject = { ...data, is_friends, auth_user: { pk: id, first_name, last_name, email, username } }
+            // tslint:disable-next-line: max-line-length
+            const responseObject = { ...data, is_friends, is_IreceivedReqFromHim, is_IsendReqToHim, auth_user: { pk: id, first_name, last_name, email, username } }
             if (!data) { throw new Error('profile Not Found'); }
             return response.status(200).send({ ...responseObject });
         } catch (error) {
@@ -78,7 +99,7 @@ export class ProfileController {
         const profileRepository = getRepository(Profile);
         const profileSettingsRepository = getRepository(ProfileSettings);
         try {
-            const profile = await profileRepository.findOne({ slug: request.params.slug});
+            const profile = await profileRepository.findOne({ slug: request.params.slug });
             const settings = await profileSettingsRepository.findOne({ profile })
             if (!profile) { throw new Error('profile Not Found'); }
             return response.status(200).send({ success: true, ...settings });
