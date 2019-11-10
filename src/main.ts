@@ -37,7 +37,7 @@ io.use((socket, next) => {
 createConnection().then(async connection => {
 
     app.use(bodyParser.json());
-    app.use(cors({ credentials: true, origin: 'http://localhost:4200' }));
+    app.use(cors({ credentials: true, origin: 'http://www.castingsecret.com:3000' }));
     app.use(fileupload());
 
     app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
