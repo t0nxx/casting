@@ -12,7 +12,7 @@ export class ChatController {
     /**
       * @Post Send Message
       */
-    async sendMessage(request: Request, response: Response) {
+    async sendMessage(request, response: Response, next) {
         const profileRepository = getRepository(Profile);
         const ChatRepository = getRepository(Chat);
         const firendsRepository = getRepository(FriendshipFriend);
@@ -20,6 +20,14 @@ export class ChatController {
             const sender = await profileRepository.findOne({ slug: request['user'].username });
             const isRoomExist = await firendsRepository.findOne({ room: request.params.room });
             if (!isRoomExist) { throw new Error('Room Not Found'); }
+
+            //test socket connection 
+            // const socket = request.socket;
+            // socket.join('hhh', () => {
+
+            // });
+            // console.log(socket);
+
             const newMessage = new Chat();
             newMessage.sender = sender;
             newMessage.room = request.params.room;
@@ -28,6 +36,18 @@ export class ChatController {
             /**
              * Socket work here
              */
+            // const io = request.io;
+            // const socket = request.sock;
+            // io.to(request.params.room).emit('message', { room: request.params.room });
+            // io.emit('message', { room: request.params.room });
+            // io.on('connection', socket => {
+            //    socket.join('hhh',()=> {
+            //        console.log('socket joined')
+            //    });
+            //    console.log(socket);
+            // })
+            //console.log(request.socket.id);
+            // console.log(io);
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

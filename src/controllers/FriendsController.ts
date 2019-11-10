@@ -5,6 +5,7 @@ import { User } from '../models/newModels/auth_user';
 import { Profile } from '../models/newModels/users_profile';
 import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
+import { Socket } from 'net';
 
 export class FriendsController {
 
@@ -174,13 +175,11 @@ export class FriendsController {
     /**
     * @Get 
     */
-    async getAllFriends(request: Request, response: Response) {
+    async getAllFriends(request, response: Response, next: NextFunction) {
         const profileRepository = getRepository(Profile);
         const friendsRepository = getRepository(FriendshipFriend).createQueryBuilder('f');
         const friendsRepository2 = getRepository(FriendshipFriend).createQueryBuilder('f2');
         try {
-            console.log('***********');
-            console.time();
             const profile = await profileRepository.findOne({ slug: request.params.slug });
 
             const q1 = friendsRepository2
@@ -248,9 +247,25 @@ export class FriendsController {
             });
 
             const results = [...res1, ...res2];
+            /**
+             * socket work here
+             */
+            // mean he is get his friends from wall page
+            if (profile.slug === request['user'].username) {
+                const io = request.app.get('io');
+                const session = request.session;
+                console.log('from friends');
+                console.log(session);
+                //io.sockets.connected[session.socketio].emit('message', 'hi from friends');
+
+                // friends.forEach(element => {
+                //     Socket.join(element.room)
+                // });
+                // io.to(room).emit('message','ddddd');
+                // console.log(socket);
+            }
             const count = count1 + count2;
-            console.log('**********');
-            console.timeEnd();
+
             return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
