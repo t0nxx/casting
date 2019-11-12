@@ -136,8 +136,8 @@ export class CompanyController {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!company) { throw new Error('company Not Found'); }
             if (company.profile.id !== profile.id) { throw new Error('Not authorize to edit this company'); }
-            let newData = Array.from(request.body);
-            if (newData.length < 1) { throw new Error('no data provided to update'); }
+            let newData = Object.keys(request.body).length;
+            if (newData < 1) { throw new Error('no data provided to update'); }
             await companyRepository.update({ slug: request.params.slug }, request.body);
             const afterUpdate = await companyRepository.findOne({ slug: request.params.slug });
             delete company.profile;

@@ -253,16 +253,19 @@ export class FriendsController {
             // mean he is get his friends from wall page
             if (profile.slug === request['user'].username) {
                 const io = request.app.get('io');
-                const session = request.session;
+                const socketID = request.cookies.io;
                 console.log('from friends');
-                console.log(session);
-                //io.sockets.connected[session.socketio].emit('message', 'hi from friends');
+                console.log(socketID);
+               // console.log(io);
+                if (socketID) {
+                    results.forEach(f => {
+                        io.sockets.connected[socketID].join(f.room, () => {
+                            console.log('joined ' + f.room);
+                        })
+                    });
+                }
+                // io.to('test9-toni2-PXVTY').emit('message','hi from join');
 
-                // friends.forEach(element => {
-                //     Socket.join(element.room)
-                // });
-                // io.to(room).emit('message','ddddd');
-                // console.log(socket);
             }
             const count = count1 + count2;
 
