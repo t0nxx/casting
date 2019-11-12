@@ -157,8 +157,8 @@ export class CompanyController {
             if (afterUpdate.profile.id === profile.id) { is_admin = true; }
             const isfollowCompany = afterUpdate.followers.find(f => f.id === profile.id);
             if (isfollowCompany) { is_follow = true; }
-            delete company.followers;
-            delete company.profile;
+            delete afterUpdate.followers;
+            delete afterUpdate.profile;
             return response.status(200).send({ ...afterUpdate, is_follow, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
