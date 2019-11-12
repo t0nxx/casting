@@ -151,7 +151,7 @@ export class CompanyController {
             //     delete request.body.tags;
             // }
             await companyRepository.update({ slug: request.params.slug }, request.body);
-            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'tags'] });
+            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'tags', 'followers'] });
             let is_follow = false;
             let is_admin = false;
             if (afterUpdate.profile.id === profile.id) { is_admin = true; }
