@@ -61,9 +61,9 @@ createConnection().then(async connection => {
         });
     });
 
-    app.get('/dashboard', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
-    });
+    // app.get('/dashboard', (req, res) => {
+    //     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
+    // });
 
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
