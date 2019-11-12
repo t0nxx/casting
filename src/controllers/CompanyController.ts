@@ -191,7 +191,7 @@ export class CompanyController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile'] });
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'tags'] });
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!company) { throw new Error('company Not Found'); }
             if (company.profile.id !== profile.id) { throw new Error('Not authorize to edit this company'); }
