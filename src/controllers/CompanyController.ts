@@ -159,7 +159,7 @@ export class CompanyController {
             if (isfollowCompany) { is_follow = true; }
             delete company.followers;
             delete company.profile;
-            return response.status(200).send({ success: true, ...afterUpdate, is_follow, is_admin });
+            return response.status(200).send({ ...afterUpdate, is_follow, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
