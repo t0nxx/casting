@@ -33,7 +33,7 @@ export class CompanyController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile'] });
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!company) { throw new Error('company Not Found'); }
             let is_follow = false;
@@ -134,13 +134,20 @@ export class CompanyController {
 
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
+        const talentCategoryRepository = getRepository(TalentCategories);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile'] });
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'tags'] });
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!company) { throw new Error('company Not Found'); }
             if (company.profile.id !== profile.id) { throw new Error('Not authorize to edit this company'); }
             let newData = Object.keys(request.body).length;
             if (newData < 1) { throw new Error('no data provided to update'); }
+            delete request.body.is_admin;
+            delete request.body.is_follow;
+            if (request.body.tags) {
+                const tags = await talentCategoryRepository.findByIds(request.body.tags);
+                request.body = tags;
+            }
             await companyRepository.update({ slug: request.params.slug }, request.body);
             const afterUpdate = await companyRepository.findOne({ slug: request.params.slug });
             delete company.profile;
