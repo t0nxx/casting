@@ -146,7 +146,7 @@ export class CompanyController {
             delete request.body.is_follow;
             if (request.body.tags) {
                 const tags = await talentCategoryRepository.findByIds(request.body.tags);
-                request.body = tags;
+                request.body.tags = tags;
             }
             await companyRepository.update({ slug: request.params.slug }, request.body);
             const afterUpdate = await companyRepository.findOne({ slug: request.params.slug });
