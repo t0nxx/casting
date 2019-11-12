@@ -33,14 +33,17 @@ export class CompanyController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers'] });
-            const user = await profileRepository.findOne({ slug: request['user'].username });
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile'] });
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!company) { throw new Error('company Not Found'); }
-            let isFollowed = false;
-            const isfollowCompany = company.followers.find(f => f.id === user.id);
-            if (isfollowCompany) { isFollowed = true; }
+            let is_follow = false;
+            let is_admin = false;
+            if (company.profile.id === profile.id) { is_admin = true; }
+            const isfollowCompany = company.followers.find(f => f.id === profile.id);
+            if (isfollowCompany) { is_follow = true; }
             delete company.followers;
-            return response.status(200).send({ success: true, ...company, isFollowed });
+            delete company.profile;
+            return response.status(200).send({ success: true, ...company, is_follow, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
