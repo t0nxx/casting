@@ -33,7 +33,7 @@ export class CompanyController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile'] });
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!company) { throw new Error('company Not Found'); }
             let is_follow = false;
@@ -144,12 +144,14 @@ export class CompanyController {
             if (newData < 1) { throw new Error('no data provided to update'); }
             delete request.body.is_admin;
             delete request.body.is_follow;
-            if (request.body.tags) {
-                const tags = await talentCategoryRepository.findByIds(request.body.tags);
-                request.body.tags = tags;
-            }
+            // if (request.body.tags) {
+            //     const tags = await talentCategoryRepository.findByIds(request.body.tags);
+            //     company.tags = [...company.tags, ...tags];
+            //     await companyRepository.save(company);
+            //     delete request.body.tags;
+            // }
             await companyRepository.update({ slug: request.params.slug }, request.body);
-            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug });
+            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['tags'] });
             delete company.profile;
             delete company.followers;
             return response.status(200).send({ success: true, ...afterUpdate });
