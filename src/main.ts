@@ -44,7 +44,7 @@ createConnection().then(async connection => {
     //app.use(cors());
     app.use(fileupload());
 
-    // app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
+    app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
 
@@ -65,8 +65,8 @@ createConnection().then(async connection => {
     //     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
     // });
 
-    // app.get('*', (req, res) => {
-    //     res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
-    // });
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
+    });
 
 }).catch(error => console.log(error));
