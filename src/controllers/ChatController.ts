@@ -6,6 +6,7 @@ import { Profile } from '../models/newModels/users_profile';
 import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
 import { Chat } from '../models/newModels/chat';
+import { ApplyPagination } from 'src/helpers/pagination';
 
 export class ChatController {
 
@@ -46,42 +47,28 @@ export class ChatController {
     async getAllMessage(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
         const ChatRepository = getRepository(Chat);
-        try {
-            const user = await profileRepository.findOne({ slug: request['user'].username });
-            const q = ChatRepository.createQueryBuilder('chat')
-                .leftJoin('chat.sender', 'sender')
-                .addSelect(['sender.id', 'sender.slug', 'sender.avatar'])
-                .where(`chat.room like '${request.params.room}'`)
-                .orderBy('chat.id', 'DESC');
+        const user = await profileRepository.findOne({ slug: request['user'].username });
+        const q = ChatRepository.createQueryBuilder('chat')
+            .leftJoin('chat.sender', 'sender')
+            .addSelect(['sender.id', 'sender.slug', 'sender.avatar'])
+            .where(`chat.room like '${request.params.room}'`)
+            .orderBy('chat.id', 'DESC');
 
-            let limit = 10;
-            let page = 1;
-            if (request.query.page) { page = parseInt(request.query.page, 10); }
-            if (request.query.limit) { limit = parseInt(request.query.limit, 10); }
-            q.take(limit);
-            q.skip(limit * (page - 1));
+        return ApplyPagination(request, response, q);
 
-            const [data, count] = await q.getManyAndCount();
+        // // make isRead is true 
+        // let [isNotSender, countIsNotSender] = await ChatRepository.createQueryBuilder('chat')
+        //     .leftJoin('chat.sender', 'sender')
+        //     .addSelect(['sender.id', 'sender.slug', 'sender.avatar'])
+        //     .where(`chat.room like '${request.params.room}' and sender.id != ${user.id}`)
+        //     .getManyAndCount();
 
-            // make isRead is true 
-            let [isNotSender, countIsNotSender] = await ChatRepository.createQueryBuilder('chat')
-                .leftJoin('chat.sender', 'sender')
-                .addSelect(['sender.id', 'sender.slug', 'sender.avatar'])
-                .where(`chat.room like '${request.params.room}' and sender.id != ${user.id}`)
-                .getManyAndCount();
+        // if (isNotSender) {
+        //     // destruct categories id in one array
+        //     const ids = isNotSender.map(m => m.id);
+        //     await ChatRepository.update({ id: In(ids) }, { readRecipient: true });
+        // }
 
-            if (isNotSender) {
-                // destruct categories id in one array
-                const ids = isNotSender.map(m => m.id);
-                await ChatRepository.update({ id: In(ids) }, { readRecipient: true });
-            }
-
-            return response.status(200).send({ success: true, data, count });
-        } catch (error) {
-            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
-
-        }
     }
 
 }

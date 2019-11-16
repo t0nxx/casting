@@ -4,11 +4,13 @@ import { CompanyController } from '../controllers/CompanyController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 import { UploadToS3 } from '../helpers/awsUploader';
 import { FriendsController } from '../controllers/FriendsController';
+import { ActivityController } from '../controllers/ActivityController';
 
 const router = Router();
 const profileController = new ProfileController();
 const companyController = new CompanyController();
 const friendsController = new FriendsController();
+const activityController = new ActivityController();
 
 router.get('/lookups', profileController.getLookups);
 router.get('/:slug', AuthMiddleWare, profileController.getProfile);
@@ -30,7 +32,7 @@ router.get('/:slug/album/profile', AuthMiddleWare, async (req, res) => {
     res.status(200).send({ s: true });
 });
 
-// router.get('/:slug/activity', );
+router.get('/:slug/activity', AuthMiddleWare, activityController.getActivityOfUser);
 // router.get('/:slug/companies', );
 // router.get('/:slug/album', );
 // router.get('/:slug/album/:id', );

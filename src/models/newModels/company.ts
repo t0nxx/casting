@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { Profile } from './users_profile';
 import { TalentCategories } from './talent_categories';
+import { Activity } from './activity';
 // import {users_profile} from "./users_profile";
 // import {activity} from "./activity";
 // import {company_tags} from "./company_tags";
@@ -55,6 +56,9 @@ export class Company {
     @ManyToMany(type => Profile, { onDelete: 'CASCADE' })
     @JoinTable()
     followers: Profile[];
+
+    @OneToMany(type => Activity, a => a.company)
+    activity: Activity[];
 
     // @OneToMany(()=>activity, (activity: activity)=>activity.company)
     // activitys:activity[];

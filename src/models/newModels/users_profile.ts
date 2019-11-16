@@ -12,6 +12,8 @@ import { Courses } from './profile_courses';
 import { ProfileSocialNetworks } from './profile_social';
 import { Company } from './company';
 import { ProfileAlbum } from './profile_album';
+import { ActivityAttachment } from './activity_attachment';
+import { Activity } from './activity';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -113,10 +115,22 @@ export class Profile {
     @ManyToOne(type => EthnicitiesLookup, { eager: true })
     ethnicity: EthnicitiesLookup;
 
+    @OneToMany(type => ActivityAttachment, ac => ac.profile)
+    activity_attachment: ActivityAttachment[];
 
-    // @OneToMany(() => company, (company: company) => company.profile)
-    // companys: company[];
+    @OneToMany(type => Activity, a => a.profile)
+    activity: Activity[];
 
+    @ManyToMany(type => Activity, ac => ac.activity_likers)
+    likes: Activity[];
+
+    @ManyToMany(type => Activity, ac => ac.activity_dislikers)
+    dislikes: Activity[];
+
+    @ManyToMany(type => Activity, ac => ac.activity_bookmarks)
+    bookmarks: Activity[];
+    
+    
     // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.profile)
     // jobApplicantss: job_applicants[];
 

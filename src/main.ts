@@ -40,7 +40,7 @@ io.use((socket, next) => {
 createConnection().then(async connection => {
 
     app.use(bodyParser.json());
-    app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost','http://localhost:3000','http://castingsecret.com:3000','http://www.castingsecret.com:3000','http://castingsecret.com'] }));
+    app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost','http://localhost:3000','http://castingsecret.com:3000','http://www.castingsecret.com:3000','http://castingsecret.com','http://www.castingsecret.com'] }));
     //app.use(cors());
     app.use(fileupload());
 
@@ -65,8 +65,8 @@ createConnection().then(async connection => {
     //     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
     // });
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
-    });
+    // app.get('*', (req, res) => {
+    //     res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
+    // });
 
 }).catch(error => console.log(error));
