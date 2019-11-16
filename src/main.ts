@@ -44,8 +44,8 @@ createConnection().then(async connection => {
     //app.use(cors());
     app.use(fileupload());
 
-    app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
-    app.use(express.static(path.join(__dirname, '..', 'admin')));
+    // app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
+    // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
 
     io.on('connection', socket => {
