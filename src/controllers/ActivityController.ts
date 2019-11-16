@@ -28,7 +28,8 @@ export class ActivityController {
 
             const q = ActivityRepository.createQueryBuilder('activity')
                 .innerJoin('activity.profile', 'profile')
-                .innerJoinAndSelect('activity.activityMention', 'activity_mention')
+                .leftJoinAndSelect('activity.activityMention', 'activity_mention')
+                .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
                 .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
                 .where(`activity.profileId IN (${friendsArray})`)
                 .orderBy('activity.publish_date', 'DESC')
@@ -154,12 +155,17 @@ export class ActivityController {
             const activity = new Activity();
             activity.content = request.body.content || '';
             activity.profile = profile;
+            const mentions: any = [];
             if (request.body.mentions) {
-                Promise.all(request.body.mentions.map(async e => {
-                    const user = await profileRepository.findOne({ id: e.auth_user });
-                    activity.activityMention = [...activity.activityMention, user];
-                }));
+                request.body.mentions.forEach(element => {
+                    mentions.push(element.auth_user);
+                });
+                if (mentions.length > 0) {
+                    const users = await profileRepository.find({ where: { id: In(mentions) } });
+                    activity.activityMention = [...users];
+                }
             }
+
             const save = await ActivityRepository.save(activity);
             const auth_user = {
                 pk: profile.id,
