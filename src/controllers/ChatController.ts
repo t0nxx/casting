@@ -6,7 +6,7 @@ import { Profile } from '../models/newModels/users_profile';
 import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
 import { Chat } from '../models/newModels/chat';
-import { ApplyPagination } from 'src/helpers/pagination';
+import { ApplyPagination } from '../helpers/pagination';
 
 export class ChatController {
 
