@@ -1,4 +1,4 @@
-export async function ApplyPagination(request, response, q) {
+export async function ApplyPagination(request, response, q, sendToClient: boolean) {
     let limit = 10;
     let page = 1;
     if (request.query.page) { page = parseInt(request.query.page, 10); }
@@ -18,8 +18,10 @@ export async function ApplyPagination(request, response, q) {
         if (endIndex < count) {
             responseObject.next = `${request.protocol}://${request.get('host')}${request.baseUrl}${request.path}?page=${page + 1}&limit=${limit}`;
         }
-
-        return response.status(200).send({ ...responseObject });
+        if (sendToClient == true) {
+            return response.status(200).send({ ...responseObject });
+        }
+        return responseObject;
     } catch (error) {
         const err = error[0] ? Object.values(error[0].constraints) : [error.message];
         return response.status(400).send({ success: false, error: err });

@@ -9,6 +9,7 @@ import { Chat } from '../models/newModels/chat';
 import { ApplyPagination } from '../helpers/pagination';
 import { Activity } from '../models/newModels/activity';
 import { ProfileSettings } from '../models/newModels/profile_settings';
+import { getAllFriendSharedBtwnApp } from './FriendsController';
 
 export class ActivityController {
     // till now i'll make it get all for the same user
@@ -22,42 +23,57 @@ export class ActivityController {
                     relations: ['user', 'likes', 'dislikes', 'bookmarks'],
                 });
 
-            const [results, count] = await ActivityRepository.findAndCount({
-                relations: ['activity_attachment', 'profile', 'company'],
-                order: { publish_date: 'DESC' }
-            });
-            const responseObject: any = {};
+            const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
+            const friendsArray = friends.map(e => e.pk);
+
+            const q = ActivityRepository.createQueryBuilder('activity')
+                .innerJoin('activity.profile', 'profile')
+                .innerJoinAndSelect('activity.activityMention', 'activity_mention')
+                .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
+                .where(`activity.profileId IN (${friendsArray})`)
+                .orderBy('activity.publish_date', 'DESC')
+                .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+
+            const responseObject = await ApplyPagination(request, response, q, false);
+
             const myLikes = profile.likes.map(ac => ac.id);
             const myDisLikes = profile.dislikes.map(ac => ac.id);
             const myBookMarks = profile.bookmarks.map(ac => ac.id);
-            // temp setting for front end
-            const author_settings = await profileSettingsRepository.findOne({ profile });
-            responseObject.results = results.map(ac => {
+
+            responseObject.results = await Promise.all(responseObject.results.map(async ac => {
+                // temp setting for front end
+                const author_settings: any = await profileSettingsRepository.findOne({ profile: ac.profile },
+                    { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
                 const liked = myLikes.includes(ac.id);
                 const disliked = myDisLikes.includes(ac.id);
                 const bookmarked = myBookMarks.includes(ac.id);
                 const auth_user = {
-                    pk: profile.id,
-                    first_name: profile.user.first_name,
-                    last_name: profile.user.last_name,
-                    email: profile.user.email,
-                    username: profile.user.username,
-                    slug: profile.slug,
-                    avatar: profile.avatar,
+                    pk: ac.profile.id,
+                    first_name: ac['user'].first_name,
+                    last_name: ac['user'].last_name,
+                    email: ac['user'].email,
+                    username: ac['user'].username,
+                    slug: ac.profile.slug,
+                    avatar: ac.profile.avatar,
                 }
-                delete ac.profile;
-                return {
-                    ...ac, auth_user, author_settings, activity_mention: [{
+
+                ac.activity_mention = await Promise.all(ac.activityMention.map(async p => {
+                    let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                    return {
                         auth_user: {
-                            first_name: 'Mahmoud',
-                            last_name: 'Ahmed',
+                            first_name: profile.user.first_name,
+                            last_name: profile.user.last_name,
                             slug: profile.slug,
                         }
-                    }], liked, disliked, bookmarked,
-                };
-            })
-            responseObject.count = count;
-            // responseObject.next = 'hhhhh';
+                    }
+                })
+                ).then(rez => rez);
+                delete ac.profile;
+                delete ac['user'];
+                delete ac.activityMention;
+                return { ...ac, auth_user, author_settings, liked, disliked, bookmarked };
+            }),
+            ).then(rez => rez);
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -138,6 +154,12 @@ export class ActivityController {
             const activity = new Activity();
             activity.content = request.body.content || '';
             activity.profile = profile;
+            if (request.body.mentions) {
+                Promise.all(request.body.mentions.map(async e => {
+                    const user = await profileRepository.findOne({ id: e.auth_user });
+                    activity.activityMention = [...activity.activityMention, user];
+                }));
+            }
             const save = await ActivityRepository.save(activity);
             const auth_user = {
                 pk: profile.id,

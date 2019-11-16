@@ -19,18 +19,7 @@ export class Activity {
     // PostComment: string,
     // comments: any[],
     // nextComments: string,
-    // auth_user: {
-    //         pk: string,
-    //         first_name: string,
-    //         last_name: string,
-    //         email: string,
-    //         username: string,
-    //         slug: string,
-    //         avatar: string
-    // },
     // activity_attachment: { IMG: any[] },
-    // liked: boolean,
-    // disLiked: boolean,
     // blocked: string
 
     @PrimaryGeneratedColumn()
@@ -83,6 +72,11 @@ export class Activity {
     @ManyToMany(type => Profile, p => p.bookmarks)
     @JoinTable()
     activity_bookmarks: Profile[];
+
+    @ManyToMany(type => Profile, p => p.activity_mentions)
+    @JoinTable()
+    activityMention: Profile[];
+    
 
     // @OneToMany(() => activity_bookmark, (activity_bookmark: activity_bookmark) => activity_bookmark.activity)
     // activityBookmarks: activity_bookmark[];

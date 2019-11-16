@@ -5,7 +5,7 @@ import { User } from '../models/newModels/auth_user';
 import { Profile } from '../models/newModels/users_profile';
 import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
-import { Socket } from 'net';
+import { ApplyPagination } from '../helpers/pagination';
 
 export class FriendsController {
 
@@ -256,7 +256,7 @@ export class FriendsController {
                 const socketID = request.cookies.io;
                 console.log('from friends');
                 console.log(socketID);
-               // console.log(io);
+                // console.log(io);
                 if (socketID) {
                     results.forEach(f => {
                         io.sockets.connected[socketID].join(f.room, () => {
@@ -275,5 +275,87 @@ export class FriendsController {
             return response.status(400).send({ success: false, error: err });
 
         }
+    }
+
+
+}
+
+
+
+/////////////////////////////////////// reuseable ///////////////////
+/**
+   * @Get 
+   */
+export async function getAllFriendSharedBtwnApp(request, response: Response, slug) {
+    const profileRepository = getRepository(Profile);
+    const friendsRepository = getRepository(FriendshipFriend).createQueryBuilder('f');
+    try {
+        const profile = await profileRepository.findOne({ slug });
+
+        const q1 = friendsRepository
+            .innerJoin('f.fromUser', 'senderUser')
+            .innerJoin('f.toUser', 'reciverUser')
+            .innerJoinAndMapOne('f.senderUserObject', User, 'autherSender', 'autherSender.id = senderUser.userId')
+            .innerJoinAndMapOne('f.reciverUserObject', User, 'autherReciver', 'autherReciver.id = reciverUser.userId')
+            .addSelect(
+                ['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'senderUser.user', 'f.room',
+                    'reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'reciverUser.user', 'f.room'
+                ])
+            .where(`f.toUser = ${profile.id}`)
+            .orWhere(`f.fromUser = ${profile.id}`);
+
+        // // search friends 
+        // if (request.query.query) {
+        //     const query = request.query.query;
+        //     q1.andWhere(`autherSender.username like '%${query}%' or autherSender.first_name like '%${query}%' or autherSender.last_name like '%${query}%' or senderUser.location like '%${query}%'`);
+        //     q1.andWhere(`autherReciver.username like '%${query}%' or autherReciver.first_name like '%${query}%' or autherReciver.last_name like '%${query}%' or reciverUser.location like '%${query}%'`)
+
+        // }
+
+
+        const [friends, count] = await q1.getManyAndCount();
+        const results = friends.map(e => {
+            const notSameUser = profile.slug === e.fromUser.slug ? e.toUser : e.fromUser;
+            const formatedREsponse = {
+                pk: 0,
+                first_name: '',
+                last_name: '',
+                email: '',
+                username: '',
+                avatar: '',
+                slug: '',
+                room: '',
+            };
+            const senderUserObject: any = e['senderUserObject'];
+            const reciverUserObject: any = e['reciverUserObject'];
+            if (senderUserObject.username === profile.slug) {
+                // auther1 is the same profile searched ... no not wanted here
+                formatedREsponse.username = reciverUserObject.username;
+                formatedREsponse.first_name = reciverUserObject.first_name;
+                formatedREsponse.last_name = reciverUserObject.last_name;
+                formatedREsponse.email = reciverUserObject.email;
+                formatedREsponse.username = reciverUserObject.username;
+                formatedREsponse.pk = notSameUser.id;
+                formatedREsponse.avatar = notSameUser.avatar;
+                formatedREsponse.slug = notSameUser.slug;
+                formatedREsponse.room = e.room;
+            } else {
+                formatedREsponse.username = senderUserObject.username;
+                formatedREsponse.first_name = senderUserObject.first_name;
+                formatedREsponse.last_name = senderUserObject.last_name;
+                formatedREsponse.email = senderUserObject.email;
+                formatedREsponse.username = senderUserObject.username;
+                formatedREsponse.pk = notSameUser.id;
+                formatedREsponse.avatar = notSameUser.avatar;
+                formatedREsponse.slug = notSameUser.slug;
+                formatedREsponse.room = e.room;
+            }
+            return formatedREsponse;
+        });
+        return results;
+    } catch (error) {
+        const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+        return response.status(400).send({ success: false, error: err });
+
     }
 }

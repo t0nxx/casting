@@ -54,7 +54,7 @@ export class ChatController {
             .where(`chat.room like '${request.params.room}'`)
             .orderBy('chat.id', 'DESC');
 
-        return ApplyPagination(request, response, q);
+        return ApplyPagination(request, response, q, true);
 
         // // make isRead is true 
         // let [isNotSender, countIsNotSender] = await ChatRepository.createQueryBuilder('chat')

@@ -6,7 +6,7 @@ module.exports = {
    "password": "Gs1tf3Raah35tBW7r3Iq",
    "database": "casting_dev",
    "synchronize": true,
-   "logging": false,
+   "logging": true,
    "charset": "UTF8_GENERAL_CI",
    "entities": [
       // for dev i'll use src folder , in prod i'll user dist folder , it 'll be set as DB_Dir in package.json

@@ -129,6 +129,9 @@ export class Profile {
 
     @ManyToMany(type => Activity, ac => ac.activity_bookmarks)
     bookmarks: Activity[];
+
+    @ManyToMany(type => Activity, ac => ac.activityMention)
+    activity_mentions: Activity[];
     
     
     // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.profile)
