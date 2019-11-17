@@ -10,6 +10,8 @@ import { ApplyPagination } from '../helpers/pagination';
 import { Activity } from '../models/newModels/activity';
 import { ProfileSettings } from '../models/newModels/profile_settings';
 import { getAllFriendSharedBtwnApp } from './FriendsController';
+import { ActivityAttachment } from '../models/newModels/activity_attachment';
+import { UploadToS3 } from '../helpers/awsUploader';
 
 export class ActivityController {
     // till now i'll make it get all for the same user
@@ -173,6 +175,10 @@ export class ActivityController {
             // const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
             // const friendsArray = friends.map(e => e.pk);
             const myBookMarkedArray = profile.bookmarks.map(ac => ac.id);
+
+            if (myBookMarkedArray.length < 1) {
+                return response.status(200).send({ results: [], count: 0 });
+            }
 
             const q = ActivityRepository.createQueryBuilder('activity')
                 .innerJoin('activity.profile', 'profile')
@@ -384,11 +390,46 @@ export class ActivityController {
 
             const bookmarked = myBookMarks.includes(activity.id);
             if (bookmarked) {
+                // then , unbookmark
+                profile.bookmarks = profile.bookmarks.filter(p => p.id !== activity.id);
+                await profileRepository.save(profile);
                 return response.status(200).send({ success: true });
             }
 
             profile.bookmarks = [...profile.bookmarks, activity];
             await profileRepository.save(profile);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+    async UpdateMediaToActivity(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const ActivityAttachmentRepository = getRepository(ActivityAttachment);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+            if (!activity) { throw new Error('activivty not found'); }
+
+            const file: any = request.files.file;
+            const mime = file.mimetype;
+            const splited = mime.split('/')[0];
+
+            const uploadAndGetUrl = await UploadToS3(request.files.file, splited);
+            const type = splited === 'image' ? 'IMG' : splited === 'audio' ? 'AUDIO' : splited === 'video' ? 'VIDEO' : 'IMG'
+            console.log(type);
+            console.log(splited);
+            const media = new ActivityAttachment();
+            media.profile = profile;
+            media.activity = activity;
+            media.type = type;
+            media.path = uploadAndGetUrl;
+            const saved = await ActivityAttachmentRepository.save(media);
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

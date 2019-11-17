@@ -33,6 +33,8 @@ router.get('/:slug/album/profile', AuthMiddleWare, async (req, res) => {
 });
 
 router.get('/:slug/activity', AuthMiddleWare, activityController.getActivityOfUser);
+router.get('/:slug/video', AuthMiddleWare, activityController.getActivityOfUser);
+router.get('/:slug/audio', AuthMiddleWare, activityController.getActivityOfUser);
 // router.get('/:slug/companies', );
 // router.get('/:slug/album', );
 // router.get('/:slug/album/:id', );

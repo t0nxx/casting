@@ -12,6 +12,8 @@ router.post('/:id/like', AuthMiddleWare, activityController.LikeActivity);
 router.post('/:id/unlike', AuthMiddleWare, activityController.DisLikeActivity);
 router.post('/:id/bookmark', AuthMiddleWare, activityController.BookmarkActivity);
 
+router.put('/:id/media', AuthMiddleWare, activityController.UpdateMediaToActivity);
+
 
 
 export default router;

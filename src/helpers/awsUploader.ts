@@ -11,7 +11,7 @@ const s3 = new AWS.S3();
 const bucketName = 'casting-secret';
 
 export const UploadToS3 = (file, type) => {
-    const folder = type === 'image' ? 'images' : type === 'video' ? 'videos' : type === 'voice' ? 'voices' : 'videos';
+    const folder = type === 'image' ? 'images' : type === 'video' ? 'videos' : type === 'audio' ? 'voices' : 'videos';
     return s3.upload({
         Body: file.data,
         Bucket: `${bucketName}/${folder}`,
