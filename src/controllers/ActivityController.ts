@@ -22,11 +22,13 @@ export class ActivityController {
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username },
                 {
-                    relations: ['user', 'likes', 'dislikes', 'bookmarks'],
+                    relations: ['user', 'likes', 'dislikes', 'bookmarks', 'hidden'],
                 });
 
             const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
             const friendsArray = friends.map(e => e.pk);
+            const myHiddenActivity = profile.hidden.map(e => e.id);
+            console.log(myHiddenActivity.length);
 
             const q = ActivityRepository.createQueryBuilder('activity')
                 .innerJoin('activity.profile', 'profile')
@@ -36,6 +38,10 @@ export class ActivityController {
                 .where(`activity.profileId IN (${friendsArray})`)
                 .orderBy('activity.publish_date', 'DESC')
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+            if (myHiddenActivity.length > 0) {
+                q.andWhere(`activity.id NOT IN (${myHiddenActivity})`);
+            }
+
 
             const responseObject = await ApplyPagination(request, response, q, false);
 
@@ -397,6 +403,37 @@ export class ActivityController {
             }
 
             profile.bookmarks = [...profile.bookmarks, activity];
+            await profileRepository.save(profile);
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+    async HideActivity(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username },
+                {
+                    relations: ['hidden'],
+                });
+            const myHiddenActivity = profile.hidden.map(ac => ac.id);
+
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+            if (!activity) { throw new Error('activivty not found'); }
+
+            const hidden = myHiddenActivity.includes(activity.id);
+            if (hidden) {
+                // then , unhidden
+                profile.hidden = profile.hidden.filter(p => p.id !== activity.id);
+                await profileRepository.save(profile);
+                return response.status(200).send({ success: true });
+            }
+
+            profile.hidden = [...profile.hidden, activity];
             await profileRepository.save(profile);
             return response.status(200).send({ success: true });
         } catch (error) {

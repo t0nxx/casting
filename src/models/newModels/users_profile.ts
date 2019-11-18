@@ -130,6 +130,9 @@ export class Profile {
     @ManyToMany(type => Activity, ac => ac.activity_bookmarks)
     bookmarks: Activity[];
 
+    @ManyToMany(type => Activity, ac => ac.activity_hidden)
+    hidden: Activity[];
+
     @ManyToMany(type => Activity, ac => ac.activityMention)
     activity_mentions: Activity[];
     

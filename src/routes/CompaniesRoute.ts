@@ -11,6 +11,8 @@ router.get('/:slug', AuthMiddleWare, companyController.GetOneCompany);
 
 router.patch('/:slug', AuthMiddleWare, companyController.updateCompany);
 
+router.patch('/:slug/removetags', AuthMiddleWare, companyController.removeTagsCompany);
+
 router.patch('/:slug/avatar', AuthMiddleWare, companyController.updateCompanyAvatar);
 
 router.patch('/:slug/cover', AuthMiddleWare, companyController.updateCompanyCover);

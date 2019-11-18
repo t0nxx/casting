@@ -33,7 +33,7 @@ export class CompanyController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile'] });
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!company) { throw new Error('company Not Found'); }
             let is_follow = false;
@@ -144,14 +144,16 @@ export class CompanyController {
             if (newData < 1) { throw new Error('no data provided to update'); }
             delete request.body.is_admin;
             delete request.body.is_follow;
-            // if (request.body.tags) {
-            //     const tags = await talentCategoryRepository.findByIds(request.body.tags);
-            //     company.tags = [...company.tags, ...tags];
-            //     await companyRepository.save(company);
-            //     delete request.body.tags;
-            // }
+            /////////////
+            if (request.body.tags) {
+                const tags = await talentCategoryRepository.findByIds(request.body.tags);
+                company.tags = [...company.tags, ...tags];
+                await companyRepository.save(company);
+                delete request.body.tags;
+            }
+            //////////////
             await companyRepository.update({ slug: request.params.slug }, request.body);
-            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'followers'] });
+            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'followers', 'tags'] });
             let is_follow = false;
             let is_admin = false;
             if (afterUpdate.profile.id === profile.id) { is_admin = true; }
@@ -165,6 +167,45 @@ export class CompanyController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+
+    /**
+    * @Patch Company
+    */
+    async removeTagsCompany(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const companyRepository = getRepository(Company);
+        const talentCategoryRepository = getRepository(TalentCategories);
+        try {
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'tags'] });
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!company) { throw new Error('company Not Found'); }
+            if (company.profile.id !== profile.id) { throw new Error('Not authorize to edit this company'); }
+            let newData = Object.keys(request.body).length;
+            if (newData < 1) { throw new Error('no data provided to update'); }
+            delete request.body.is_admin;
+            delete request.body.is_follow;
+            if (request.body.tags) {
+                let { tags } = request.body;
+                company.tags = company.tags.filter(e => tags.indexOf(e.id) === -1);
+                await companyRepository.save(company);
+                delete request.body.tags;
+            }
+            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'followers', 'tags'] });
+            let is_follow = false;
+            let is_admin = false;
+            if (afterUpdate.profile.id === profile.id) { is_admin = true; }
+            const isfollowCompany = afterUpdate.followers.find(f => f.id === profile.id);
+            if (isfollowCompany) { is_follow = true; }
+            delete afterUpdate.followers;
+            delete afterUpdate.profile;
+            return response.status(200).send({ ...afterUpdate, is_follow, is_admin });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
     /**
     * @Patch Company

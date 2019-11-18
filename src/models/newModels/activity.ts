@@ -73,6 +73,10 @@ export class Activity {
     @JoinTable()
     activity_bookmarks: Profile[];
 
+    @ManyToMany(type => Profile, p => p.hidden)
+    @JoinTable()
+    activity_hidden: Profile[];
+    
     @ManyToMany(type => Profile, p => p.activity_mentions)
     @JoinTable()
     activityMention: Profile[];
