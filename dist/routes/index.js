@@ -7,7 +7,6 @@ const ApiRoute_1 = require("./ApiRoute");
 const CompaniesRoute_1 = require("./CompaniesRoute");
 const ChatRoute_1 = require("./ChatRoute");
 const AdminRoute_1 = require("./AdminRoute");
-const ActivityRoute_1 = require("./ActivityRoute");
 const AuthController_1 = require("../controllers/AuthController");
 const ActivityController_1 = require("../controllers/ActivityController");
 const routes = express_1.Router();
@@ -22,6 +21,5 @@ routes.use('/api', ApiRoute_1.default);
 routes.use('/companies', CompaniesRoute_1.default);
 routes.use('/chat', ChatRoute_1.default);
 routes.use('/admin', AdminRoute_1.default);
-routes.use('/activity', ActivityRoute_1.default);
 exports.default = routes;
 //# sourceMappingURL=index.js.map

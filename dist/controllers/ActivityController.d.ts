@@ -9,4 +9,5 @@ export declare class ActivityController {
     BookmarkActivity(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
     HideActivity(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
     UpdateMediaToActivity(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
+    getAllActivityTest(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
 }

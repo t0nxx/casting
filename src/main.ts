@@ -14,7 +14,7 @@ import routes from './routes/index';
 // tslint:disable-next-line: no-var-requires
 // create express app
 const app = express();
-const server = app.listen(3000, () => 'running on port 3000');
+const server = app.listen(process.env.PORT, () => 'running on port 3000');
 const io = socketio(server);
 app.set('io', io);
 // get it from any place 
@@ -40,26 +40,26 @@ io.use((socket, next) => {
 createConnection().then(async connection => {
 
     app.use(bodyParser.json());
-    app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost','http://localhost:3000','http://castingsecret.com:3000','http://www.castingsecret.com:3000','http://castingsecret.com','http://www.castingsecret.com'] }));
-    //app.use(cors());
+    // app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost','http://localhost:3000','http://castingsecret.com:3000','http://www.castingsecret.com:3000','http://castingsecret.com','http://www.castingsecret.com'] }));
+    app.use(cors());
     app.use(fileupload());
 
     app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
 
-    io.on('connection', socket => {
+    // io.on('connection', socket => {
 
-        console.log(`socket.io connected: ${socket.id}`);
+    //     console.log(`socket.io connected: ${socket.id}`);
 
-        // save socket.io socket in the session
-        socket.request.session.socketio = socket.id;
-        //socket.request.session.save();
-        console.log('new socket session', socket.request.session);
-        socket.on('disconnect', () => {
-            console.log('user disconnected');
-        });
-    });
+    //     // save socket.io socket in the session
+    //     socket.request.session.socketio = socket.id;
+    //     //socket.request.session.save();
+    //     console.log('new socket session', socket.request.session);
+    //     socket.on('disconnect', () => {
+    //         console.log('user disconnected');
+    //     });
+    // });
 
     // app.get('/dashboard', (req, res) => {
     //     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
