@@ -474,4 +474,88 @@ export class ActivityController {
 
         }
     }
+
+    async getAllActivityTest(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username },
+                {
+                    relations: ['user', 'likes', 'dislikes', 'bookmarks', 'hidden'],
+                });
+
+            const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
+            const friendsArray = friends.map(e => e.pk);
+            const myHiddenActivity = profile.hidden.map(e => e.id);
+            console.time('q');
+
+            const q = ActivityRepository.createQueryBuilder('activity')
+                .innerJoin('activity.profile', 'profile')
+                .leftJoinAndSelect('activity.activityMention', 'activity_mention')
+                .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
+                .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
+                .where(`activity.profileId IN (${friendsArray})`)
+                .orderBy('activity.publish_date', 'DESC')
+                .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+            if (myHiddenActivity.length > 0) {
+                q.andWhere(`activity.id NOT IN (${myHiddenActivity})`);
+            }
+
+            // const newq = ActivityRepository.query(
+            //     `select * from activity`
+            // )
+
+            console.timeEnd('q');
+            console.time('pag')
+            const responseObject = await ApplyPagination(request, response, q, false);
+
+            console.timeEnd('pag')
+
+            const myLikes = profile.likes.map(ac => ac.id);
+            const myDisLikes = profile.dislikes.map(ac => ac.id);
+            const myBookMarks = profile.bookmarks.map(ac => ac.id);
+console.time('loop');
+            responseObject.results = await Promise.all(responseObject.results.map(async ac => {
+                // temp setting for front end
+                const author_settings: any = await profileSettingsRepository.findOne({ profile: ac.profile },
+                    { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+                const liked = myLikes.includes(ac.id);
+                const disliked = myDisLikes.includes(ac.id);
+                const bookmarked = myBookMarks.includes(ac.id);
+                const auth_user = {
+                    pk: ac.profile.id,
+                    first_name: ac['user'].first_name,
+                    last_name: ac['user'].last_name,
+                    email: ac['user'].email,
+                    username: ac['user'].username,
+                    slug: ac.profile.slug,
+                    avatar: ac.profile.avatar,
+                }
+
+                ac.activity_mention = await Promise.all(ac.activityMention.map(async p => {
+                    let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                    return {
+                        auth_user: {
+                            first_name: profile.user.first_name,
+                            last_name: profile.user.last_name,
+                            slug: profile.slug,
+                        }
+                    }
+                })
+                ).then(rez => rez);
+                delete ac.profile;
+                delete ac['user'];
+                delete ac.activityMention;
+                return { ...ac, auth_user, author_settings, liked, disliked, bookmarked };
+            }),
+            ).then(rez => rez);
+            console.timeEnd('loop');
+            return response.status(200).send({ ...responseObject });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
 }

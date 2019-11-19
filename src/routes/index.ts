@@ -28,6 +28,6 @@ routes.use('/api', ApiRouter);
 routes.use('/companies', CompaniesRouter);
 routes.use('/chat', ChatRouter);
 routes.use('/admin', AdminRouter);
-routes.use('/activity', ActivityRouter);
+// routes.use('/activity', ActivityRouter);
 
 export default routes;
