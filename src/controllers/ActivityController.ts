@@ -37,7 +37,8 @@ export class ActivityController {
                 .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
                 .where(`activity.profileId IN (${friendsArray})`)
                 .orderBy('activity.publish_date', 'DESC')
-                .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+                .addSelect(['profile.id', 'profile.avatar', 'profile.slug'])
+                .cache(true,60000);
             if (myHiddenActivity.length > 0) {
                 q.andWhere(`activity.id NOT IN (${myHiddenActivity})`);
             }
