@@ -160,15 +160,13 @@ class FriendsController {
             }
         });
     }
-    getAllFriends(request, response) {
+    getAllFriends(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             const friendsRepository = typeorm_1.getRepository(friendship_friend_1.FriendshipFriend).createQueryBuilder('f');
             const friendsRepository2 = typeorm_1.getRepository(friendship_friend_1.FriendshipFriend).createQueryBuilder('f2');
             try {
-                console.log('***********');
-                console.time();
-                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const profile = yield profileRepository.findOne({ slug: request.params.slug });
                 const q1 = friendsRepository2
                     .innerJoin('f2.fromUser', 'senderUser')
                     .innerJoinAndMapOne('f2.Auther', auth_user_1.User, 'auther', 'auther.id = senderUser.userId')
@@ -218,9 +216,20 @@ class FriendsController {
                     return formatedREsponse1;
                 });
                 const results = [...res1, ...res2];
+                if (profile.slug === request['user'].username) {
+                    const io = request.app.get('io');
+                    const socketID = request.cookies.io;
+                    console.log('from friends');
+                    console.log(socketID);
+                    if (socketID) {
+                        results.forEach(f => {
+                            io.sockets.connected[socketID].join(f.room, () => {
+                                console.log('joined ' + f.room);
+                            });
+                        });
+                    }
+                }
                 const count = count1 + count2;
-                console.log('**********');
-                console.timeEnd();
                 return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
             }
             catch (error) {
@@ -231,4 +240,68 @@ class FriendsController {
     }
 }
 exports.FriendsController = FriendsController;
+function getAllFriendSharedBtwnApp(request, response, slug) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+        const friendsRepository = typeorm_1.getRepository(friendship_friend_1.FriendshipFriend).createQueryBuilder('f');
+        try {
+            const profile = yield profileRepository.findOne({ slug });
+            const q1 = friendsRepository
+                .innerJoin('f.fromUser', 'senderUser')
+                .innerJoin('f.toUser', 'reciverUser')
+                .innerJoinAndMapOne('f.senderUserObject', auth_user_1.User, 'autherSender', 'autherSender.id = senderUser.userId')
+                .innerJoinAndMapOne('f.reciverUserObject', auth_user_1.User, 'autherReciver', 'autherReciver.id = reciverUser.userId')
+                .addSelect(['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'senderUser.user', 'f.room',
+                'reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'reciverUser.user', 'f.room'
+            ])
+                .where(`f.toUser = ${profile.id}`)
+                .orWhere(`f.fromUser = ${profile.id}`);
+            const [friends, count] = yield q1.getManyAndCount();
+            const results = friends.map(e => {
+                const notSameUser = profile.slug === e.fromUser.slug ? e.toUser : e.fromUser;
+                const formatedREsponse = {
+                    pk: 0,
+                    first_name: '',
+                    last_name: '',
+                    email: '',
+                    username: '',
+                    avatar: '',
+                    slug: '',
+                    room: '',
+                };
+                const senderUserObject = e['senderUserObject'];
+                const reciverUserObject = e['reciverUserObject'];
+                if (senderUserObject.username === profile.slug) {
+                    formatedREsponse.username = reciverUserObject.username;
+                    formatedREsponse.first_name = reciverUserObject.first_name;
+                    formatedREsponse.last_name = reciverUserObject.last_name;
+                    formatedREsponse.email = reciverUserObject.email;
+                    formatedREsponse.username = reciverUserObject.username;
+                    formatedREsponse.pk = notSameUser.id;
+                    formatedREsponse.avatar = notSameUser.avatar;
+                    formatedREsponse.slug = notSameUser.slug;
+                    formatedREsponse.room = e.room;
+                }
+                else {
+                    formatedREsponse.username = senderUserObject.username;
+                    formatedREsponse.first_name = senderUserObject.first_name;
+                    formatedREsponse.last_name = senderUserObject.last_name;
+                    formatedREsponse.email = senderUserObject.email;
+                    formatedREsponse.username = senderUserObject.username;
+                    formatedREsponse.pk = notSameUser.id;
+                    formatedREsponse.avatar = notSameUser.avatar;
+                    formatedREsponse.slug = notSameUser.slug;
+                    formatedREsponse.room = e.room;
+                }
+                return formatedREsponse;
+            });
+            return results;
+        }
+        catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    });
+}
+exports.getAllFriendSharedBtwnApp = getAllFriendSharedBtwnApp;
 //# sourceMappingURL=FriendsController.js.map

@@ -19,7 +19,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Jobs.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
 ], Jobs.prototype, "publish_date", void 0);
 __decorate([
@@ -63,11 +63,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Jobs.prototype, "space_rest_budget", void 0);
 __decorate([
-    typeorm_1.Column({ default: false }),
+    typeorm_1.Column({ default: true }),
     __metadata("design:type", Boolean)
 ], Jobs.prototype, "is_male", void 0);
 __decorate([
-    typeorm_1.Column({ default: false }),
+    typeorm_1.Column({ default: true }),
     __metadata("design:type", Boolean)
 ], Jobs.prototype, "is_female", void 0);
 __decorate([

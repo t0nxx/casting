@@ -11,6 +11,8 @@ import { Courses } from './profile_courses';
 import { ProfileSocialNetworks } from './profile_social';
 import { Company } from './company';
 import { ProfileAlbum } from './profile_album';
+import { ActivityAttachment } from './activity_attachment';
+import { Activity } from './activity';
 export declare class Profile {
     id: number;
     avatar: string;
@@ -35,4 +37,11 @@ export declare class Profile {
     hair: HairLookup;
     build: BuildLookup;
     ethnicity: EthnicitiesLookup;
+    activity_attachment: ActivityAttachment[];
+    activity: Activity[];
+    likes: Activity[];
+    dislikes: Activity[];
+    bookmarks: Activity[];
+    hidden: Activity[];
+    activity_mentions: Activity[];
 }

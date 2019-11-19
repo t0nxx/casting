@@ -81,7 +81,7 @@ __decorate([
     __metadata("design:type", String)
 ], ProfileSettings.prototype, "my_status", void 0);
 __decorate([
-    typeorm_1.OneToOne(type => users_profile_1.Profile),
+    typeorm_1.OneToOne(type => users_profile_1.Profile, { onDelete: 'CASCADE' }),
     typeorm_1.JoinColumn(),
     __metadata("design:type", users_profile_1.Profile)
 ], ProfileSettings.prototype, "profile", void 0);

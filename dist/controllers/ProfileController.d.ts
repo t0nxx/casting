@@ -16,4 +16,5 @@ export declare class ProfileController {
     updateTaninig(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     updateSocialNetwork(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     deleteTaninig(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    deleteHobbies(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
 }

@@ -15,18 +15,40 @@ const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
 const cors = require("cors");
 const path = require("path");
+const socketio = require("socket.io");
+const expsession = require('cookie-session');
+const cookieParser = require("cookie-parser");
 const index_1 = require("./routes/index");
+const app = express();
+const server = app.listen(3000, () => 'running on port 3000');
+const io = socketio(server);
+app.set('io', io);
+const sessionMiddleware = expsession({
+    secret: 'CastingSec',
+    secure: false,
+    expires: new Date(Date.now() + 3600000),
+});
+app.use(sessionMiddleware);
+app.use(cookieParser());
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, socket.request.res, next);
+});
 typeorm_1.createConnection().then((connection) => __awaiter(this, void 0, void 0, function* () {
-    const app = express();
     app.use(bodyParser.json());
-    app.use(cors());
+    app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost', 'http://localhost:3000', 'http://castingsecret.com:3000', 'http://www.castingsecret.com:3000', 'http://castingsecret.com', 'http://www.castingsecret.com'] }));
     app.use(fileupload());
     app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     app.use(index_1.default);
+    io.on('connection', socket => {
+        console.log(`socket.io connected: ${socket.id}`);
+        socket.request.session.socketio = socket.id;
+        console.log('new socket session', socket.request.session);
+        socket.on('disconnect', () => {
+            console.log('user disconnected');
+        });
+    });
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
     });
-    app.listen(3000);
-    console.log('Express server has started on port 3000. Open http://localhost:3000/ to see results');
 })).catch(error => console.log(error));
 //# sourceMappingURL=main.js.map

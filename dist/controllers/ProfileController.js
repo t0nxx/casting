@@ -24,6 +24,7 @@ const profile_social_1 = require("../models/newModels/profile_social");
 const awsUploader_1 = require("../helpers/awsUploader");
 const auth_user_1 = require("../models/newModels/auth_user");
 const profile_album_1 = require("../models/newModels/profile_album");
+const friendship_friendshiprequest_1 = require("../models/newModels/friendship_friendshiprequest");
 class ProfileController {
     all(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -41,24 +42,47 @@ class ProfileController {
         return __awaiter(this, void 0, void 0, function* () {
             const friendsRepository = typeorm_1.getRepository(friendship_friend_1.FriendshipFriend);
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const friendRequestRepository = typeorm_1.getRepository(friendship_friendshiprequest_1.FriendshipFriendshipRequest);
             try {
                 const data = yield profileRepository.findOne({ slug: request.params.slug }, {
                     relations: ['user']
                 });
                 const Myprofile = yield profileRepository.findOne({ slug: request['user'].username });
                 let is_friends = false;
+                let is_IreceivedReqFromHim = false;
+                let is_IsendReqToHim = false;
                 const isFriendWithMe = yield friendsRepository.findOne({
                     where: [
                         { fromUser: data, toUser: Myprofile },
                         { fromUser: Myprofile, toUser: data }
                     ],
                 });
+                const me = yield profileRepository.findOne({ slug: request['user'].username });
+                const him = yield profileRepository.findOne({ slug: request.params.slug });
+                const is_IreceivefromHim = yield friendRequestRepository.findOne({
+                    where: {
+                        toUser: me,
+                        fromUser: him,
+                    }
+                });
+                const is_IsendtoHim = yield friendRequestRepository.findOne({
+                    where: {
+                        toUser: him,
+                        fromUser: me,
+                    }
+                });
                 if (isFriendWithMe) {
                     is_friends = true;
                 }
+                if (is_IreceivefromHim) {
+                    is_IreceivedReqFromHim = true;
+                }
+                if (is_IsendtoHim) {
+                    is_IsendReqToHim = true;
+                }
                 const { first_name, last_name, email, username, id } = data.user;
                 delete data.user;
-                const responseObject = Object.assign({}, data, { is_friends, auth_user: { pk: id, first_name, last_name, email, username } });
+                const responseObject = Object.assign({}, data, { is_friends, is_IreceivedReqFromHim, is_IsendReqToHim, auth_user: { pk: id, first_name, last_name, email, username } });
                 if (!data) {
                     throw new Error('profile Not Found');
                 }
@@ -75,7 +99,7 @@ class ProfileController {
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             const profileSettingsRepository = typeorm_1.getRepository(profile_settings_1.ProfileSettings);
             try {
-                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const profile = yield profileRepository.findOne({ slug: request.params.slug });
                 const settings = yield profileSettingsRepository.findOne({ profile });
                 if (!profile) {
                     throw new Error('profile Not Found');
@@ -302,8 +326,7 @@ class ProfileController {
                 const newNetwork = yield socialRepository.save(network);
                 profile.users_profile_social = [...profile.users_profile_social, newNetwork];
                 yield profileRepository.save(profile);
-                const savedAfterUpdateSocial = yield profileRepository.findOne({ slug: request['user'].username });
-                return response.status(200).send(...savedAfterUpdateSocial.users_profile_social);
+                return response.status(200).send(newNetwork);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -347,9 +370,8 @@ class ProfileController {
                     throw new Error('network Not Found');
                 }
                 const saved = yield socialRepository.update({ id: parseInt(request.params.id, 10) }, request.body);
-                const profileAfterSocialUpdate = yield profileRepository.findOne({ slug: request['user'].username });
-                console.log(profileAfterSocialUpdate.users_profile_social);
-                return response.status(200).send(profileAfterSocialUpdate.users_profile_social);
+                const networkAfterUpdate = yield socialRepository.findOne({ id: parseInt(request.params.id, 10) });
+                return response.status(200).send(networkAfterUpdate);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -371,6 +393,29 @@ class ProfileController {
                     throw new Error('course Not Found');
                 }
                 const remove = yield trainingRepository.remove(course);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    deleteHobbies(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const hobbyRepository = typeorm_1.getRepository(profile_hobbies_1.Hobbies);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!profile) {
+                    throw new Error('profile Not Found');
+                }
+                const hobby = yield hobbyRepository.findOne({ id: parseInt(request.params.id, 10) });
+                if (!hobby) {
+                    throw new Error('hoby Not Found');
+                }
+                profile.users_profile_hobbies = profile.users_profile_hobbies.filter(element => element.id != hobby.id);
+                const save = yield profileRepository.save(profile);
                 return response.status(200).send({ success: true });
             }
             catch (error) {

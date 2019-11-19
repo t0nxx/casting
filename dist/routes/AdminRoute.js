@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const AdminLookups_1 = require("../controllers/dashboard/AdminLookups");
+const AdminAddition_1 = require("../controllers/dashboard/AdminAddition");
+const AuthController_1 = require("../controllers/AuthController");
+const router = express_1.Router();
+const adminLookupsController = new AdminLookups_1.AdminLookupsController();
+const adminAdditionController = new AdminAddition_1.AdminAdditionController();
+const authController = new AuthController_1.AuthController();
+router.post('/login', authController.adminLogin);
+router.get('/user', adminAdditionController.getAllUsers);
+router.get('/user/:id', adminAdditionController.getOneUser);
+router.put('/user/:id', adminAdditionController.updateUser);
+router.delete('/user/:id', adminAdditionController.deleteUser);
+router.get('/:lookupRepo', adminLookupsController.getAllTemplate);
+router.get('/:lookupRepo/:id', adminLookupsController.getOneTemplate);
+router.post('/:lookupRepo', adminLookupsController.createNewTemplate);
+router.put('/:lookupRepo/:id', adminLookupsController.updateOneTemplate);
+router.delete('/:lookupRepo/:id', adminLookupsController.deleteOneTemplate);
+exports.default = router;
+//# sourceMappingURL=AdminRoute.js.map

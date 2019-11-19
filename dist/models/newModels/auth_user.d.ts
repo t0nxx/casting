@@ -10,6 +10,7 @@ export declare class User {
     password1: string;
     password2: string;
     about: string;
+    resetPassCode: string;
     isAdmin: boolean;
     is_active: boolean;
     date_joined: Date;

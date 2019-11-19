@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const users_profile_1 = require("./users_profile");
 const talent_categories_1 = require("./talent_categories");
+const activity_1 = require("./activity");
 let Company = class Company {
 };
 __decorate([
@@ -19,7 +20,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Company.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/avatar.png' }),
+    typeorm_1.Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/company-avatar.png' }),
     __metadata("design:type", String)
 ], Company.prototype, "avatar", void 0);
 __decorate([
@@ -43,11 +44,11 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Company.prototype, "is_address_public", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'no data provided' }),
+    typeorm_1.Column({ default: 'castingsecret.com' }),
     __metadata("design:type", String)
 ], Company.prototype, "website", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'no data provided' }),
+    typeorm_1.Column({ default: '2000' }),
     __metadata("design:type", String)
 ], Company.prototype, "since", void 0);
 __decorate([
@@ -71,6 +72,15 @@ __decorate([
     typeorm_1.JoinTable(),
     __metadata("design:type", Array)
 ], Company.prototype, "tags", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinTable(),
+    __metadata("design:type", Array)
+], Company.prototype, "followers", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_1.Activity, a => a.company),
+    __metadata("design:type", Array)
+], Company.prototype, "activity", void 0);
 Company = __decorate([
     typeorm_1.Entity('company')
 ], Company);

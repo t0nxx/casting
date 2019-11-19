@@ -57,6 +57,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "about", void 0);
 __decorate([
+    typeorm_1.Column({ default: 'noResetPass' }),
+    __metadata("design:type", String)
+], User.prototype, "resetPassCode", void 0);
+__decorate([
     typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isAdmin", void 0);
@@ -69,11 +73,11 @@ __decorate([
     __metadata("design:type", Date)
 ], User.prototype, "date_joined", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => account_emailaddress_1.AccountEmailaddresss, account => account.user),
+    typeorm_1.OneToMany(() => account_emailaddress_1.AccountEmailaddresss, account => account.user, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)
 ], User.prototype, "accountEmailaddresss", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => users_profile_1.Profile, profile => profile.user),
+    typeorm_1.OneToMany(type => users_profile_1.Profile, profile => profile.user, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)
 ], User.prototype, "profiles", void 0);
 User = __decorate([

@@ -13,10 +13,12 @@ const ProfileController_1 = require("../controllers/ProfileController");
 const CompanyController_1 = require("../controllers/CompanyController");
 const AuthMiddleWare_1 = require("../middlewares/AuthMiddleWare");
 const FriendsController_1 = require("../controllers/FriendsController");
+const ActivityController_1 = require("../controllers/ActivityController");
 const router = express_1.Router();
 const profileController = new ProfileController_1.ProfileController();
 const companyController = new CompanyController_1.CompanyController();
 const friendsController = new FriendsController_1.FriendsController();
+const activityController = new ActivityController_1.ActivityController();
 router.get('/lookups', profileController.getLookups);
 router.get('/:slug', AuthMiddleWare_1.AuthMiddleWare, profileController.getProfile);
 router.get('/:slug/settings', AuthMiddleWare_1.AuthMiddleWare, profileController.getProfileSettings);
@@ -27,6 +29,9 @@ router.get('/:slug/album', AuthMiddleWare_1.AuthMiddleWare, profileController.ge
 router.get('/:slug/album/profile', AuthMiddleWare_1.AuthMiddleWare, (req, res) => __awaiter(this, void 0, void 0, function* () {
     res.status(200).send({ s: true });
 }));
+router.get('/:slug/activity', AuthMiddleWare_1.AuthMiddleWare, activityController.getActivityOfUser);
+router.get('/:slug/video', AuthMiddleWare_1.AuthMiddleWare, activityController.getActivityOfUser);
+router.get('/:slug/audio', AuthMiddleWare_1.AuthMiddleWare, activityController.getActivityOfUser);
 router.post('/:slug/hobbies', AuthMiddleWare_1.AuthMiddleWare, profileController.addHobbies);
 router.post('/:slug/training', AuthMiddleWare_1.AuthMiddleWare, profileController.addTaninig);
 router.post('/:slug/social', AuthMiddleWare_1.AuthMiddleWare, profileController.addSocialNetwork);
@@ -43,5 +48,6 @@ router.patch('/:slug/avatar', AuthMiddleWare_1.AuthMiddleWare, profileController
 router.patch('/:slug/cover', AuthMiddleWare_1.AuthMiddleWare, profileController.updateCover);
 router.post('/:slug/cover/reset', AuthMiddleWare_1.AuthMiddleWare, profileController.resetCover);
 router.delete('/:slug/training/:id', AuthMiddleWare_1.AuthMiddleWare, profileController.deleteTaninig);
+router.delete('/:slug/hobbies/:id', AuthMiddleWare_1.AuthMiddleWare, profileController.deleteHobbies);
 exports.default = router;
 //# sourceMappingURL=ProfileRoute.js.map

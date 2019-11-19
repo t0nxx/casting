@@ -22,6 +22,8 @@ const profile_hobbies_1 = require("./profile_hobbies");
 const profile_courses_1 = require("./profile_courses");
 const profile_social_1 = require("./profile_social");
 const company_1 = require("./company");
+const activity_attachment_1 = require("./activity_attachment");
+const activity_1 = require("./activity");
 let Profile = class Profile {
 };
 __decorate([
@@ -29,15 +31,15 @@ __decorate([
     __metadata("design:type", Number)
 ], Profile.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'https://news-app-uploads.s3.eu-central-1.amazonaws.com/1567899027453 - download.png' }),
+    typeorm_1.Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/avatar1.png' }),
     __metadata("design:type", String)
 ], Profile.prototype, "avatar", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'https://news-app-uploads.s3.eu-central-1.amazonaws.com/1567899027453 - download.png' }),
+    typeorm_1.Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg' }),
     __metadata("design:type", String)
 ], Profile.prototype, "cover", void 0);
 __decorate([
-    typeorm_1.Column({ default: 'Not Provided' }),
+    typeorm_1.Column({ default: 'male' }),
     __metadata("design:type", String)
 ], Profile.prototype, "gender", void 0);
 __decorate([
@@ -120,6 +122,34 @@ __decorate([
     typeorm_1.ManyToOne(type => ethnicities_lookup_1.EthnicitiesLookup, { eager: true }),
     __metadata("design:type", ethnicities_lookup_1.EthnicitiesLookup)
 ], Profile.prototype, "ethnicity", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_attachment_1.ActivityAttachment, ac => ac.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity_attachment", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_1.Activity, a => a.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_likers),
+    __metadata("design:type", Array)
+], Profile.prototype, "likes", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_dislikers),
+    __metadata("design:type", Array)
+], Profile.prototype, "dislikes", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_bookmarks),
+    __metadata("design:type", Array)
+], Profile.prototype, "bookmarks", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_hidden),
+    __metadata("design:type", Array)
+], Profile.prototype, "hidden", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activityMention),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity_mentions", void 0);
 Profile = __decorate([
     typeorm_1.Entity('users_profile')
 ], Profile);

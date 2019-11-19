@@ -15,6 +15,9 @@ const auth_user_1 = require("../models/newModels/auth_user");
 exports.AuthMiddleWare = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     const userRepository = typeorm_1.getRepository(auth_user_1.User);
     try {
+        if (!req.headers.authorization) {
+            throw new Error('Not Token Provided');
+        }
         const token = req.headers.authorization.split(' ')[1];
         if (!token) {
             throw new Error('Not authorized');
