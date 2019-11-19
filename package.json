@@ -49,7 +49,7 @@
       "typeorm": "0.2.19"
    },
    "scripts": {
-      "start:dev": "set DB_Dir=src && nodemon",
+      "start:dev": "DB_Dir=src nodemon",
       "start:debug": "DB_Dir=src nodemon --config nodemon-debug.json",
       "build": "tsc -p tsconfig.build.json",
       "prestart:prod": "rimraf dist && npm run build",
