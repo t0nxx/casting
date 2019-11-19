@@ -424,6 +424,76 @@ class ActivityController {
             }
         });
     }
+    getAllActivityTest(request, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const ActivityRepository = typeorm_1.getRepository(activity_1.Activity);
+            const profileSettingsRepository = typeorm_1.getRepository(profile_settings_1.ProfileSettings);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username }, {
+                    relations: ['user', 'likes', 'dislikes', 'bookmarks', 'hidden'],
+                });
+                const friends = yield FriendsController_1.getAllFriendSharedBtwnApp(request, response, profile.slug);
+                const friendsArray = friends.map(e => e.pk);
+                const myHiddenActivity = profile.hidden.map(e => e.id);
+                console.time('q');
+                const q = ActivityRepository.createQueryBuilder('activity')
+                    .innerJoin('activity.profile', 'profile')
+                    .leftJoinAndSelect('activity.activityMention', 'activity_mention')
+                    .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
+                    .innerJoinAndMapOne('activity.user', auth_user_1.User, 'user', 'user.id = profile.userId')
+                    .where(`activity.profileId IN (${friendsArray})`)
+                    .orderBy('activity.publish_date', 'DESC')
+                    .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+                if (myHiddenActivity.length > 0) {
+                    q.andWhere(`activity.id NOT IN (${myHiddenActivity})`);
+                }
+                console.timeEnd('q');
+                console.time('pag');
+                const responseObject = yield pagination_1.ApplyPagination(request, response, q, false);
+                console.timeEnd('pag');
+                const myLikes = profile.likes.map(ac => ac.id);
+                const myDisLikes = profile.dislikes.map(ac => ac.id);
+                const myBookMarks = profile.bookmarks.map(ac => ac.id);
+                console.time('loop');
+                responseObject.results = yield Promise.all(responseObject.results.map((ac) => __awaiter(this, void 0, void 0, function* () {
+                    const author_settings = yield profileSettingsRepository.findOne({ profile: ac.profile }, { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+                    const liked = myLikes.includes(ac.id);
+                    const disliked = myDisLikes.includes(ac.id);
+                    const bookmarked = myBookMarks.includes(ac.id);
+                    const auth_user = {
+                        pk: ac.profile.id,
+                        first_name: ac['user'].first_name,
+                        last_name: ac['user'].last_name,
+                        email: ac['user'].email,
+                        username: ac['user'].username,
+                        slug: ac.profile.slug,
+                        avatar: ac.profile.avatar,
+                    };
+                    ac.activity_mention = yield Promise.all(ac.activityMention.map((p) => __awaiter(this, void 0, void 0, function* () {
+                        let profile = yield profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                        return {
+                            auth_user: {
+                                first_name: profile.user.first_name,
+                                last_name: profile.user.last_name,
+                                slug: profile.slug,
+                            }
+                        };
+                    }))).then(rez => rez);
+                    delete ac.profile;
+                    delete ac['user'];
+                    delete ac.activityMention;
+                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked });
+                }))).then(rez => rez);
+                console.timeEnd('loop');
+                return response.status(200).send(Object.assign({}, responseObject));
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
 }
 exports.ActivityController = ActivityController;
 //# sourceMappingURL=ActivityController.js.map
