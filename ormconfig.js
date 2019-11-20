@@ -15,7 +15,7 @@ module.exports = {
    "synchronize": true,
    "logging": false,
    "cache" : true,
-   "charset": "UTF8_GENERAL_CI",
+   "charset": "UTF8MB4_GENERAL_CI",
    "entities": [
       // for dev i'll use src folder , in prod i'll user dist folder , it 'll be set as DB_Dir in package.json
       `${__dirname}/${process.env.DB_Dir}/models/newModels/*.{ts,js}`,

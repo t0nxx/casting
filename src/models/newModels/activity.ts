@@ -2,6 +2,7 @@ import { BaseEntity, Column, Entity, Index, ManyToOne, OneToMany, PrimaryGenerat
 import { Company } from './company';
 import { ActivityAttachment } from './activity_attachment';
 import { Profile } from './users_profile';
+import { Comment } from './comments';
 // import {auth_user} from "./auth_user";
 // import {company} from "./company";
 // import {activity_attachment} from "./activity_attachment";
@@ -61,6 +62,9 @@ export class Activity {
     @OneToMany(type => ActivityAttachment, ac => ac.activity)
     activity_attachment: ActivityAttachment[];
 
+    @OneToMany(type => Comment, ac => ac.activity)
+    activity_Comments: Comment[];
+
     @ManyToMany(type => Profile, p => p.likes)
     @JoinTable()
     activity_likers: Profile[];
@@ -76,11 +80,11 @@ export class Activity {
     @ManyToMany(type => Profile, p => p.hidden)
     @JoinTable()
     activity_hidden: Profile[];
-    
+
     @ManyToMany(type => Profile, p => p.activity_mentions)
     @JoinTable()
     activityMention: Profile[];
-    
+
 
     // @OneToMany(() => activity_bookmark, (activity_bookmark: activity_bookmark) => activity_bookmark.activity)
     // activityBookmarks: activity_bookmark[];
