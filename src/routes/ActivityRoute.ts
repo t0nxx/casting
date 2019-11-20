@@ -5,7 +5,7 @@ import { ActivityController } from '../controllers/ActivityController';
 const router = Router();
 const activityController = new ActivityController();
 
-router.get('/', AuthMiddleWare, activityController.getAllActivity);
+router.get('/', AuthMiddleWare, activityController.getAllActivityTest);
 router.post('/', AuthMiddleWare, activityController.AddNewActivity);
 router.get('/saved', AuthMiddleWare, activityController.getAllBookmarkedActivity);
 router.post('/:id/like', AuthMiddleWare, activityController.LikeActivity);
