@@ -33,8 +33,8 @@ router.get('/:slug/album/profile', AuthMiddleWare, async (req, res) => {
 });
 
 router.get('/:slug/activity', AuthMiddleWare, activityController.getActivityOfUser);
-router.get('/:slug/video', AuthMiddleWare, activityController.getActivityOfUser);
-router.get('/:slug/audio', AuthMiddleWare, activityController.getActivityOfUser);
+router.get('/:slug/video', AuthMiddleWare, activityController.getAllVideoOfUser);
+router.get('/:slug/audio', AuthMiddleWare, activityController.getAllAudioOfUser);
 // router.get('/:slug/companies', );
 // router.get('/:slug/album', );
 // router.get('/:slug/album/:id', );
@@ -69,6 +69,11 @@ router.post('/:slug/friends/accept', AuthMiddleWare, friendsController.acceptFri
 
 // reject friend request
 router.post('/:slug/friends/reject', AuthMiddleWare, friendsController.rejectFriendRequest);
+
+// add video or audio in profile page
+
+router.post('/:slug/video', AuthMiddleWare, activityController.AddNewVideoOrAudio);
+router.post('/:slug/audio', AuthMiddleWare, activityController.AddNewVideoOrAudio);
 
 // delete friend / unfriend
 router.delete('/:slug/friends', AuthMiddleWare, friendsController.deleteFriend);

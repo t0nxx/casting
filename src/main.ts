@@ -48,18 +48,18 @@ createConnection().then(async connection => {
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
 
-    io.on('connection', socket => {
+    // io.on('connection', socket => {
 
-        console.log(`socket.io connected: ${socket.id}`);
+    //     console.log(`socket.io connected: ${socket.id}`);
 
-        // save socket.io socket in the session
-        socket.request.session.socketio = socket.id;
-        //socket.request.session.save();
-        console.log('new socket session', socket.request.session);
-        socket.on('disconnect', () => {
-            console.log('user disconnected');
-        });
-    });
+    //     // save socket.io socket in the session
+    //     socket.request.session.socketio = socket.id;
+    //     //socket.request.session.save();
+    //     console.log('new socket session', socket.request.session);
+    //     socket.on('disconnect', () => {
+    //         console.log('user disconnected');
+    //     });
+    // });
 
     // app.get('/dashboard', (req, res) => {
     //     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
