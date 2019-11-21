@@ -27,6 +27,8 @@ router.post('/:slug/switch', AuthMiddleWare, companyController.switchToCompany);
 
 router.get('/:slug/jobs', AuthMiddleWare, jobsController.getAllJobs);
 
+router.get('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.getOneJob);
+
 // create new job
 router.post('/:slug/jobs', AuthMiddleWare, jobsController.createJob);
 

@@ -8,7 +8,7 @@ export class FriendshipFriendshipRequest {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ default: '' })
     message: string;
 
     @CreateDateColumn()

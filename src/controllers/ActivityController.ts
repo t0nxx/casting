@@ -183,7 +183,7 @@ export class ActivityController {
             const profile = await profileRepository.findOne({ id: activity.profile.id }, { relations: ['user'] });
             const author_settings = await profileSettingsRepository.findOne({ profile },
                 { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
-                
+
             let activity_mention = [];
             activity_mention = await Promise.all(activity.activityMention.map(async p => {
                 let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
@@ -601,10 +601,10 @@ export class ActivityController {
         try {
             const profile = await profileRepository.createQueryBuilder('p')
                 .innerJoin('p.user', 'user')
-                .innerJoin('p.likes', 'likes')
-                .innerJoin('p.dislikes', 'dislikes')
-                .innerJoin('p.bookmarks', 'bookmarks')
-                .innerJoin('p.hidden', 'hidden')
+                .leftJoin('p.likes', 'likes')
+                .leftJoin('p.dislikes', 'dislikes')
+                .leftJoin('p.bookmarks', 'bookmarks')
+                .leftJoin('p.hidden', 'hidden')
                 .select([
                     'p.id', 'p.avatar', 'p.slug',
                     'user.first_name', 'user.last_name', 'user.email', 'user.username',
@@ -612,7 +612,6 @@ export class ActivityController {
                 ])
                 .where(`p.slug like '${request['user'].username}'`)
                 .getOne();
-
 
             const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
             const friendsArray = friends.map(e => e.pk);
@@ -627,6 +626,11 @@ export class ActivityController {
                 .where(`activity.profileId IN (${friendsArray})`)
                 .orderBy('activity.publish_date', 'DESC')
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+
+            if (friendsArray.length < 1) {
+                // no friends , no posts in wall
+                return response.status(200).send({ results: [], count: 0 });
+            }
             if (myHiddenActivity.length > 0) {
                 q.andWhere(`activity.id NOT IN (${myHiddenActivity})`);
             }
