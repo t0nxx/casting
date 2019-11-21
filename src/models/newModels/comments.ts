@@ -28,6 +28,9 @@ export class Comment {
     @JoinColumn()
     thread: Comment;
 
+    @Column({ default: 0 })
+    comments_count: number;
+
     // @ManyToOne(() => auth_user, (auth_user: auth_user) => auth_user.commentss, { nullable: false, })
     // @JoinColumn({ name: 'auth_user_id' })
     // authUser: auth_user | null;

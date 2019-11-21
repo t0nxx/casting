@@ -251,8 +251,11 @@ export class ActivityController {
     async AddNewActivity(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
         const ActivityRepository = getRepository(Activity);
+        const profileSettingsRepository = getRepository(ProfileSettings);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const author_settings = await profileSettingsRepository.findOne({ profile },
+                { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
             const activity = new Activity();
             activity.content = request.body.content || '';
             activity.profile = profile;
@@ -268,6 +271,23 @@ export class ActivityController {
             }
 
             const save = await ActivityRepository.save(activity);
+            const getAfterSave = await ActivityRepository.findOne({ id: save.id }, {
+                relations: ['activityMention', 'activity_attachment']
+            });
+
+            let activity_mention = [];
+            activity_mention = await Promise.all(getAfterSave.activityMention.map(async p => {
+                let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                return {
+                    auth_user: {
+                        first_name: profile.user.first_name,
+                        last_name: profile.user.last_name,
+                        slug: profile.slug,
+                    }
+                }
+            })
+            ).then(rez => rez);
+            delete getAfterSave.activityMention;
             const auth_user = {
                 pk: profile.id,
                 first_name: profile.user.first_name,
@@ -278,8 +298,11 @@ export class ActivityController {
                 avatar: profile.avatar,
             }
 
-            delete save.profile;
-            return response.status(200).send({ ...save, auth_user });
+            return response.status(200).send({
+                ...getAfterSave, auth_user, author_settings,
+                activity_mention,
+                liked: false, disliked: false, bookmarked: false,
+            });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -452,8 +475,11 @@ export class ActivityController {
         const profileRepository = getRepository(Profile);
         const ActivityRepository = getRepository(Activity);
         const ActivityAttachmentRepository = getRepository(ActivityAttachment);
+        const profileSettingsRepository = getRepository(ProfileSettings);
         try {
-            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const profile = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const author_settings = await profileSettingsRepository.findOne({ profile },
+                { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
             if (!activity) { throw new Error('activivty not found'); }
@@ -472,6 +498,42 @@ export class ActivityController {
             media.type = type;
             media.path = uploadAndGetUrl;
             const saved = await ActivityAttachmentRepository.save(media);
+
+            /////////// it's too long , but the exist front won't update :'(
+
+            const getAfterSave = await ActivityRepository.findOne({ id: activity.id }, {
+                relations: ['activityMention', 'activity_attachment']
+            });
+
+            let activity_mention = [];
+            activity_mention = await Promise.all(getAfterSave.activityMention.map(async p => {
+                let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                return {
+                    auth_user: {
+                        first_name: profile.user.first_name,
+                        last_name: profile.user.last_name,
+                        slug: profile.slug,
+                    }
+                }
+            })
+            ).then(rez => rez);
+            delete getAfterSave.activityMention;
+            const auth_user = {
+                pk: profile.id,
+                first_name: profile.user.first_name,
+                last_name: profile.user.last_name,
+                email: profile.user.email,
+                username: profile.user.username,
+                slug: profile.slug,
+                avatar: profile.avatar,
+            }
+
+            return response.status(200).send({
+                ...getAfterSave, auth_user, author_settings,
+                activity_mention,
+                liked: false, disliked: false, bookmarked: false,
+            });
+
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

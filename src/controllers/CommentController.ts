@@ -10,6 +10,7 @@ import { Activity } from '../models/newModels/activity';
 export class CommentController {
 
     async getAllCommentsOfACtivity(request: Request, response: Response) {
+        // this without replies
         const profileRepository = getRepository(Profile);
         const ActivityRepository = getRepository(Activity);
         const CommentRepository = getRepository(Comment);
@@ -19,7 +20,8 @@ export class CommentController {
                 .leftJoin('c.commentMention', 'commentMention')
                 .leftJoin('c.thread', 'thread')
                 .addSelect(['profile.id', 'profile.slug', 'commentMention.id', 'commentMention.slug', 'thread.id'])
-                .where(`c.activityId = ${request.params.id}`);
+                .where(`c.activityId = ${request.params.id}`)
+                .andWhere(`c.threadId is null`);
 
 
             const responseObject = await ApplyPagination(request, response, q, false);
@@ -150,6 +152,10 @@ export class CommentController {
                 const thread = await CommentRepository.findOne({ id: parseInt(request.body.thread, 10) });
                 if (thread) {
                     newComment.thread = thread;
+                    thread.comments_count = thread.comments_count + 1;
+                    await CommentRepository.save(thread);
+                    // cause it will be increased in every comment even if it reply
+                    activity.comments_count = activity.comments_count - 1;
                 }
             }
             const mentions: any = [];
