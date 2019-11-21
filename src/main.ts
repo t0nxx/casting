@@ -8,7 +8,7 @@ import * as cors from 'cors';
 import * as path from 'path';
 import * as socketio from 'socket.io';
 // import * as expsession from 'express-session';
-const  expsession = require('cookie-session');
+const expsession = require('cookie-session');
 import * as cookieParser from 'cookie-parser';
 import routes from './routes/index';
 // tslint:disable-next-line: no-var-requires
@@ -40,7 +40,14 @@ io.use((socket, next) => {
 createConnection().then(async connection => {
 
     app.use(bodyParser.json());
-    app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost','http://localhost:3000','http://castingsecret.com:3000','http://www.castingsecret.com:3000','http://castingsecret.com','http://www.castingsecret.com'] }));
+    app.use(cors({
+        credentials: true, origin: [
+            'http://localhost:4200', 'http://localhost', 'http://localhost:3000',
+            'http://castingsecret.com:3000', 'http://www.castingsecret.com:3000',
+            'http://castingsecret.com', 'http://www.castingsecret.com',
+            'http://casting-admin.s3-website.eu-central-1.amazonaws.com',
+        ],
+    }));
     //app.use(cors());
     app.use(fileupload());
 
