@@ -168,6 +168,59 @@ export class ActivityController {
         }
     }
 
+    async getOneActivity(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const ActivityAttachmentRepository = getRepository(ActivityAttachment);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        try {
+
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, {
+                relations: ['activityMention', 'activity_attachment', 'profile']
+            });
+            if (!activity) { throw new Error('activivty not found'); }
+
+            const profile = await profileRepository.findOne({ id: activity.profile.id }, { relations: ['user'] });
+            const author_settings = await profileSettingsRepository.findOne({ profile },
+                { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+                
+            let activity_mention = [];
+            activity_mention = await Promise.all(activity.activityMention.map(async p => {
+                let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                return {
+                    auth_user: {
+                        first_name: profile.user.first_name,
+                        last_name: profile.user.last_name,
+                        slug: profile.slug,
+                    }
+                }
+            })
+            ).then(rez => rez);
+            const auth_user = {
+                pk: profile.id,
+                first_name: profile.user.first_name,
+                last_name: profile.user.last_name,
+                email: profile.user.email,
+                username: profile.user.username,
+                slug: profile.slug,
+                avatar: profile.avatar,
+            }
+
+            delete activity.activityMention;
+            delete activity.profile;
+
+            return response.status(200).send({
+                ...activity, auth_user, author_settings,
+                activity_mention,
+                liked: false, disliked: false, bookmarked: false,
+            });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
     async getAllBookmarkedActivity(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
         const ActivityRepository = getRepository(Activity);
