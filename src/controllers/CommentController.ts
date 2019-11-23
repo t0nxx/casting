@@ -21,7 +21,8 @@ export class CommentController {
                 .leftJoin('c.thread', 'thread')
                 .addSelect(['profile.id', 'profile.slug', 'commentMention.id', 'commentMention.slug', 'thread.id'])
                 .where(`c.activityId = ${request.params.id}`)
-                .andWhere(`c.threadId is null`);
+                .andWhere(`c.threadId is null`)
+                .orderBy('c.id','DESC');
 
 
             const responseObject = await ApplyPagination(request, response, q, false);
@@ -83,7 +84,8 @@ export class CommentController {
                 .leftJoin('c.commentMention', 'commentMention')
                 .leftJoin('c.thread', 'thread')
                 .addSelect(['profile.id', 'profile.slug', 'commentMention.id', 'commentMention.slug', 'thread.id'])
-                .where(`c.threadId = ${request.params.comId}`);
+                .where(`c.threadId = ${request.params.comId}`)
+                .orderBy('c.id','DESC');
 
 
             const responseObject = await ApplyPagination(request, response, q, false);
