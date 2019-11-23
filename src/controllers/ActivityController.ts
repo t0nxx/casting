@@ -22,10 +22,11 @@ export class ActivityController {
         const profileSettingsRepository = getRepository(ProfileSettings);
         try {
 
-            const me = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const me = await profileRepository.findOne({ slug: request['user'].username },
+                { relations: ['user', 'likes', 'dislikes', 'bookmarks'], });
             const profile = await profileRepository.findOne({ slug: request.params.slug },
                 {
-                    relations: ['user', 'likes', 'dislikes', 'bookmarks'],
+                    relations: ['user'],
                 });
 
             // const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
