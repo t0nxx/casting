@@ -2,10 +2,12 @@ import { Router } from 'express';
 import { CompanyController } from '../controllers/CompanyController';
 import { JobsController } from '../controllers/JobsController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
+import { ActivityController } from '../controllers/ActivityController';
 
 const router = Router();
 const companyController = new CompanyController();
 const jobsController = new JobsController();
+const activityController = new ActivityController();
 
 router.get('/:slug', AuthMiddleWare, companyController.GetOneCompany);
 
@@ -25,8 +27,14 @@ router.delete('/:slug', AuthMiddleWare, companyController.deleteCompany);
 
 router.post('/:slug/switch', AuthMiddleWare, companyController.switchToCompany);
 
-router.get('/:slug/jobs', AuthMiddleWare, jobsController.getAllJobs);
 
+// activity
+
+router.get('/:slug/activity', AuthMiddleWare, activityController.getActivityOfCompany);
+router.post('/:slug/activity', AuthMiddleWare, activityController.AddNewActivityToCompany);
+
+// jobs
+router.get('/:slug/jobs', AuthMiddleWare, jobsController.getAllJobs);
 router.get('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.getOneJob);
 
 // create new job

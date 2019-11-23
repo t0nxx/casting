@@ -12,42 +12,39 @@ import { ProfileSettings } from '../models/newModels/profile_settings';
 import { getAllFriendSharedBtwnApp } from './FriendsController';
 import { ActivityAttachment } from '../models/newModels/activity_attachment';
 import { UploadToS3 } from '../helpers/awsUploader';
+import { Company } from '../models/newModels/company';
 
 export class ActivityController {
-    // till now i'll make it get all for the same user
-    async getAllActivity(request: Request, response: Response) {
+
+    async getActivityOfUser(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
         const ActivityRepository = getRepository(Activity);
         const profileSettingsRepository = getRepository(ProfileSettings);
         try {
-            const profile = await profileRepository.findOne({ slug: request['user'].username },
+
+            const me = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const profile = await profileRepository.findOne({ slug: request.params.slug },
                 {
-                    relations: ['user', 'likes', 'dislikes', 'bookmarks', 'hidden'],
+                    relations: ['user', 'likes', 'dislikes', 'bookmarks'],
                 });
 
-            const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
-            const friendsArray = friends.map(e => e.pk);
-            const myHiddenActivity = profile.hidden.map(e => e.id);
-            console.log(myHiddenActivity.length);
+            // const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
+            // const friendsArray = friends.map(e => e.pk);
 
             const q = ActivityRepository.createQueryBuilder('activity')
                 .innerJoin('activity.profile', 'profile')
                 .leftJoinAndSelect('activity.activityMention', 'activity_mention')
                 .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
                 .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
-                .where(`activity.profileId IN (${friendsArray})`)
+                .where(`activity.profileId = (${profile.id})`)
                 .orderBy('activity.publish_date', 'DESC')
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
-            if (myHiddenActivity.length > 0) {
-                q.andWhere(`activity.id NOT IN (${myHiddenActivity})`);
-            }
-
 
             const responseObject = await ApplyPagination(request, response, q, false);
 
-            const myLikes = profile.likes.map(ac => ac.id);
-            const myDisLikes = profile.dislikes.map(ac => ac.id);
-            const myBookMarks = profile.bookmarks.map(ac => ac.id);
+            const myLikes = me.likes.map(ac => ac.id);
+            const myDisLikes = me.dislikes.map(ac => ac.id);
+            const myBookMarks = me.bookmarks.map(ac => ac.id);
 
             responseObject.results = await Promise.all(responseObject.results.map(async ac => {
                 // temp setting for front end
@@ -77,10 +74,14 @@ export class ActivityController {
                     }
                 })
                 ).then(rez => rez);
+                let is_admin = false;
+                if (profile.id === me.id) {
+                    is_admin = true;
+                }
                 delete ac.profile;
                 delete ac['user'];
                 delete ac.activityMention;
-                return { ...ac, auth_user, author_settings, liked, disliked, bookmarked };
+                return { ...ac, auth_user, author_settings, liked, disliked, bookmarked, is_admin };
             }),
             ).then(rez => rez);
             return response.status(200).send({ ...responseObject });
@@ -91,17 +92,20 @@ export class ActivityController {
         }
     }
 
-
-    async getActivityOfUser(request: Request, response: Response) {
+    async getActivityOfCompany(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
+        const companyRepository = getRepository(Company);
         const ActivityRepository = getRepository(Activity);
         const profileSettingsRepository = getRepository(ProfileSettings);
         try {
 
-            const me = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
-            const profile = await profileRepository.findOne({ slug: request.params.slug },
+            const me = await profileRepository.findOne({ slug: request['user'].username },
+                { relations: ['user', 'likes', 'dislikes', 'bookmarks'] });
+
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile'] });
+            const profile = await profileRepository.findOne({ id: company.profile.id },
                 {
-                    relations: ['user', 'likes', 'dislikes', 'bookmarks'],
+                    relations: ['user'],
                 });
 
             // const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
@@ -109,18 +113,19 @@ export class ActivityController {
 
             const q = ActivityRepository.createQueryBuilder('activity')
                 .innerJoin('activity.profile', 'profile')
+                .innerJoinAndSelect('activity.company', 'company')
                 .leftJoinAndSelect('activity.activityMention', 'activity_mention')
                 .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
                 .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
-                .where(`activity.profileId = (${profile.id})`)
+                .where(`activity.companyId = (${company.id})`)
                 .orderBy('activity.publish_date', 'DESC')
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
 
             const responseObject = await ApplyPagination(request, response, q, false);
 
-            const myLikes = profile.likes.map(ac => ac.id);
-            const myDisLikes = profile.dislikes.map(ac => ac.id);
-            const myBookMarks = profile.bookmarks.map(ac => ac.id);
+            const myLikes = me.likes.map(ac => ac.id);
+            const myDisLikes = me.dislikes.map(ac => ac.id);
+            const myBookMarks = me.bookmarks.map(ac => ac.id);
 
             responseObject.results = await Promise.all(responseObject.results.map(async ac => {
                 // temp setting for front end
@@ -176,7 +181,7 @@ export class ActivityController {
         try {
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, {
-                relations: ['activityMention', 'activity_attachment', 'profile']
+                relations: ['activityMention', 'activity_attachment', 'profile', 'company']
             });
             if (!activity) { throw new Error('activivty not found'); }
 
@@ -241,6 +246,7 @@ export class ActivityController {
 
             const q = ActivityRepository.createQueryBuilder('activity')
                 .innerJoin('activity.profile', 'profile')
+                .leftJoinAndSelect('activity.company', 'company')
                 .leftJoinAndSelect('activity.activityMention', 'activity_mention')
                 .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
                 .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
@@ -326,6 +332,73 @@ export class ActivityController {
             const save = await ActivityRepository.save(activity);
             const getAfterSave = await ActivityRepository.findOne({ id: save.id }, {
                 relations: ['activityMention', 'activity_attachment']
+            });
+
+            let activity_mention = [];
+            activity_mention = await Promise.all(getAfterSave.activityMention.map(async p => {
+                let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                return {
+                    auth_user: {
+                        first_name: profile.user.first_name,
+                        last_name: profile.user.last_name,
+                        slug: profile.slug,
+                    }
+                }
+            })
+            ).then(rez => rez);
+            delete getAfterSave.activityMention;
+            const auth_user = {
+                pk: profile.id,
+                first_name: profile.user.first_name,
+                last_name: profile.user.last_name,
+                email: profile.user.email,
+                username: profile.user.username,
+                slug: profile.slug,
+                avatar: profile.avatar,
+            }
+
+            return response.status(200).send({
+                ...getAfterSave, auth_user, author_settings,
+                activity_mention,
+                liked: false, disliked: false, bookmarked: false,
+            });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+    async AddNewActivityToCompany(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const companyRepository = getRepository(Company);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const company = await companyRepository.findOne({ profile });
+            if (!company) { throw new Error('please create company first'); }
+
+            const author_settings = await profileSettingsRepository.findOne({ profile },
+                { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+            const activity = new Activity();
+            activity.content = request.body.content || '';
+            activity.profile = profile;
+            activity.company = company;
+            const mentions: any = [];
+            if (request.body.mentions) {
+                request.body.mentions.forEach(element => {
+                    mentions.push(element.auth_user);
+                });
+                if (mentions.length > 0) {
+                    const users = await profileRepository.find({ where: { id: In(mentions) } });
+                    activity.activityMention = [...users];
+                }
+            }
+
+            const save = await ActivityRepository.save(activity);
+            const getAfterSave = await ActivityRepository.findOne({ id: save.id }, {
+                relations: ['activityMention', 'activity_attachment', 'company']
             });
 
             let activity_mention = [];
