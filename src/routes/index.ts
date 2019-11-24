@@ -6,6 +6,7 @@ import CompaniesRouter from './CompaniesRoute';
 import ChatRouter from './ChatRoute';
 import AdminRouter from './AdminRoute';
 import ActivityRouter from './ActivityRoute';
+import SearchyRouter from './SearchRoute';
 import { AuthController } from '../controllers/AuthController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 import { ActivityController } from '../controllers/ActivityController';
@@ -29,5 +30,6 @@ routes.use('/companies', CompaniesRouter);
 routes.use('/chat', ChatRouter);
 routes.use('/admin', AdminRouter);
 routes.use('/activity', ActivityRouter);
+routes.use('/search', SearchyRouter);
 
 export default routes;

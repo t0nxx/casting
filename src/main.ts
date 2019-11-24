@@ -43,6 +43,7 @@ createConnection().then(async connection => {
     app.use(cors({
         credentials: true, origin: [
             'http://localhost:4200', 'http://localhost', 'http://localhost:3000',
+            'http://localhost:5001',
             'http://castingsecret.com:3000', 'http://www.castingsecret.com:3000',
             'http://castingsecret.com', 'http://www.castingsecret.com',
             'http://casting-admin.s3-website.eu-central-1.amazonaws.com',
