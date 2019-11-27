@@ -5,6 +5,7 @@ module.exports = {
    // "username": "admin",
    // "password": "Gs1tf3Raah35tBW7r3Iq",
    // "database": "casting_dev",
+//
 
    "host": "localhost",
    "port": 3306,
