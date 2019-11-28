@@ -95,7 +95,7 @@ export class Profile {
     companies: Company[];
 
     // albums
-    @OneToMany(type => Company, c => c.profile)
+    @OneToMany(type => ProfileAlbum, p => p.profile)
     albums: ProfileAlbum[];
 
     @ManyToOne(type => WeightRangeLookup, { eager: true })

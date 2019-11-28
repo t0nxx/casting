@@ -11,6 +11,7 @@ module.exports = {
    "port": 3306,
    "username": "root",
    "password": "tonitonitoni",
+   // "password": "123456",
    "database": "casting_dev",
 
    "synchronize": true,

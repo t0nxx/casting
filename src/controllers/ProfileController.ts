@@ -122,7 +122,7 @@ export class ProfileController {
                 relations: ['albums']
             });
             if (!profile) { throw new Error('profile Not Found'); }
-            return response.status(200).send(...profile.albums);
+            return response.status(200).send(profile.albums);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
