@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, OneToMany } from "typeorm";
 import { Profile } from "./users_profile";
+import { ActivityAttachment } from "./activity_attachment";
 
 @Entity("profile_album")
 
@@ -19,11 +20,11 @@ export class ProfileAlbum {
 
     @ManyToOne(type => Profile, p => p.albums, { onDelete: 'CASCADE' })
     profile: Profile;
-    // @ManyToOne(() => users_profile, (users_profile: users_profile) => users_profile.profileAlbums, { nullable: false, })
-    // @JoinColumn({ name: 'user_profile_id' })
-    // userProfile: users_profile | null;
+    
 
 
+    @OneToMany(type => ActivityAttachment, ac => ac.album)
+    activity_attachment: ActivityAttachment[];
 
     // @OneToMany(() => activity_attachment, (activity_attachment: activity_attachment) => activity_attachment.album)
     // activityAttachments: activity_attachment[];

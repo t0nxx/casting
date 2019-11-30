@@ -28,31 +28,22 @@ router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
 // test album
 router.get('/:slug/album', AuthMiddleWare, profileController.getProfileAlbums);
 
-router.get('/:slug/album/profile', AuthMiddleWare, async (req, res) => {
-    res.status(200).send([]);
-});
 router.get('/:slug/album/profile?limit=ture', AuthMiddleWare, async (req, res) => {
     res.status(200).send([]);
 });
 
+router.get('/:slug/album/profile', AuthMiddleWare, activityController.getAllImagesOfUser);
+
+
+router.get('/:slug/album/:id', AuthMiddleWare, activityController.getAllImagesOfAlbum);
+
 router.get('/:slug/activity', AuthMiddleWare, activityController.getActivityOfUser);
 router.get('/:slug/video', AuthMiddleWare, activityController.getAllVideoOfUser);
 router.get('/:slug/audio', AuthMiddleWare, activityController.getAllAudioOfUser);
-// router.get('/:slug/companies', );
 // router.get('/:slug/album', );
 // router.get('/:slug/album/:id', );
 // router.get('/:slug/album/profile', );
-// router.get('/:slug/settings', );
 // router.get('/:slug/album/profile?limit=ture', );
-// router.get('/lookups', );
-// /${slug}/friends?query=${searchValue}
-// /${slug}/activity/bookmark
-// /${slug}/friends-request
-// /${slug}/friends
-// /${slug}/audio
-// /${slug}/video
-// 
-//
 
 
 /**
@@ -101,6 +92,9 @@ router.patch('/:slug/avatar', AuthMiddleWare, profileController.updateAvatar);
 router.patch('/:slug/cover', AuthMiddleWare, profileController.updateCover);
 router.post('/:slug/cover/reset', AuthMiddleWare, profileController.resetCover);
 
+router.post('/:slug/album/image', AuthMiddleWare, activityController.AddNewVideoOrAudio);
+
+router.put('/:slug/album/:id/image', AuthMiddleWare, activityController.addImageToAlbum);
 // router.delete('/:id', profileController.remove);
 // delete
 router.delete('/:slug/training/:id', AuthMiddleWare, profileController.deleteTaninig);

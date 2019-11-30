@@ -958,4 +958,182 @@ export class ActivityController {
         }
     }
 
+    async getAllImagesOfUser(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        try {
+
+            const me = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const profile = await profileRepository.findOne({ slug: request.params.slug },
+                {
+                    relations: ['user', 'likes', 'dislikes', 'bookmarks'],
+                });
+
+            // const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
+            // const friendsArray = friends.map(e => e.pk);
+
+            const q = ActivityRepository.createQueryBuilder('activity')
+                .innerJoin('activity.profile', 'profile')
+                .leftJoinAndSelect('activity.activityMention', 'activity_mention')
+                .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
+                .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
+                .where(`activity.profileId = (${profile.id})`)
+                .andWhere(`activity_attachment.type like 'IMG' `)
+                .orderBy('activity.publish_date', 'DESC')
+                .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+
+
+            // const responseObject = await ApplyPagination(request, response, q, false);
+            let responseObject: any = {};
+            responseObject.results = await q.getMany();
+
+            const myLikes = profile.likes.map(ac => ac.id);
+            const myDisLikes = profile.dislikes.map(ac => ac.id);
+            const myBookMarks = profile.bookmarks.map(ac => ac.id);
+
+            responseObject.results = await Promise.all(responseObject.results.map(async ac => {
+                // temp setting for front end
+                const author_settings: any = await profileSettingsRepository.findOne({ profile: ac.profile },
+                    { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+                const liked = myLikes.includes(ac.id);
+                const disliked = myDisLikes.includes(ac.id);
+                const bookmarked = myBookMarks.includes(ac.id);
+                const auth_user = {
+                    pk: ac.profile.id,
+                    first_name: ac['user'].first_name,
+                    last_name: ac['user'].last_name,
+                    email: ac['user'].email,
+                    username: ac['user'].username,
+                    slug: ac.profile.slug,
+                    avatar: ac.profile.avatar,
+                }
+
+                ac.activity_mention = await Promise.all(ac.activityMention.map(async p => {
+                    let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                    return {
+                        auth_user: {
+                            first_name: profile.user.first_name,
+                            last_name: profile.user.last_name,
+                            slug: profile.slug,
+                        }
+                    }
+                })
+                ).then(rez => rez);
+                let is_admin = false;
+                if (profile.id === me.id) {
+                    is_admin = true;
+                }
+                delete ac.profile;
+                delete ac['user'];
+                delete ac.activityMention;
+                return { ...ac, auth_user, author_settings, liked, disliked, bookmarked, is_admin };
+            }),
+            ).then(rez => rez);
+            return response.status(200).send({ ...responseObject });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+    async getAllImagesOfAlbum(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        try {
+
+            const me = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const profile = await profileRepository.findOne({ slug: request.params.slug },
+                {
+                    relations: ['user', 'likes', 'dislikes', 'bookmarks'],
+                });
+
+            // const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
+            // const friendsArray = friends.map(e => e.pk);
+
+            const q = ActivityRepository.createQueryBuilder('activity')
+                .innerJoin('activity.profile', 'profile')
+                .leftJoinAndSelect('activity.activityMention', 'activity_mention')
+                .leftJoinAndSelect('activity.activity_attachment', 'activity_attachment')
+                .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
+                .where(`activity.profileId = (${profile.id})`)
+                .andWhere(`activity_attachment.type like 'IMG' `)
+                .andWhere(`activity_attachment.album_id = ${parseInt(request.params.id, 10)}`)
+                .orderBy('activity.publish_date', 'DESC')
+                .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
+
+
+            const responseObject = await ApplyPagination(request, response, q, false);
+
+            const myLikes = profile.likes.map(ac => ac.id);
+            const myDisLikes = profile.dislikes.map(ac => ac.id);
+            const myBookMarks = profile.bookmarks.map(ac => ac.id);
+
+            responseObject.results = await Promise.all(responseObject.results.map(async ac => {
+                // temp setting for front end
+                const author_settings: any = await profileSettingsRepository.findOne({ profile: ac.profile },
+                    { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+                const liked = myLikes.includes(ac.id);
+                const disliked = myDisLikes.includes(ac.id);
+                const bookmarked = myBookMarks.includes(ac.id);
+                const auth_user = {
+                    pk: ac.profile.id,
+                    first_name: ac['user'].first_name,
+                    last_name: ac['user'].last_name,
+                    email: ac['user'].email,
+                    username: ac['user'].username,
+                    slug: ac.profile.slug,
+                    avatar: ac.profile.avatar,
+                }
+
+                ac.activity_mention = await Promise.all(ac.activityMention.map(async p => {
+                    let profile = await profileRepository.findOne({ id: p.id }, { relations: ['user'] });
+                    return {
+                        auth_user: {
+                            first_name: profile.user.first_name,
+                            last_name: profile.user.last_name,
+                            slug: profile.slug,
+                        }
+                    }
+                })
+                ).then(rez => rez);
+                let is_admin = false;
+                if (profile.id === me.id) {
+                    is_admin = true;
+                }
+                delete ac.profile;
+                delete ac['user'];
+                delete ac.activityMention;
+                return { ...ac, auth_user, author_settings, liked, disliked, bookmarked, is_admin };
+            }),
+            ).then(rez => rez);
+            return response.status(200).send(responseObject.results);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+    async addImageToAlbum(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const ActivityAttachmentRepository = getRepository(ActivityAttachment);
+        try {
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+
+            await ActivityAttachmentRepository.update({ activity }, { album_id: request.body.album_id });
+            activity.content = request.body.content;
+            await ActivityRepository.save(activity);
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+
 }

@@ -31,9 +31,12 @@ export class ActivityAttachment {
     @ManyToOne(type => Profile, p => p.activity_attachment, { onDelete: 'CASCADE' })
     profile: Profile;
 
-    // @ManyToOne(() => profile_album, (profile_album: profile_album) => profile_album.activityAttachments, {})
-    // @JoinColumn({ name: 'album_id' })
-    // album: profile_album | null;
+
+    @ManyToOne(type => ProfileAlbum, p => p.activity_attachment, { onDelete: 'CASCADE' })
+    album: ProfileAlbum;
+
+    @Column({ nullable: true })
+    album_id: number;
 
     // @Column("character varying", {
     //     nullable: false,
