@@ -1141,5 +1141,26 @@ export class ActivityController {
         }
     }
 
+    async deleteActivity(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const ActivityAttachmentRepository = getRepository(ActivityAttachment);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
+
+            if (activity.profile.id === profile.id) {
+                await ActivityRepository.remove(activity);
+                return response.status(200).send({ success: true });
+            }
+            throw new Error('you are no allowed to delete this post');
+
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
 }
