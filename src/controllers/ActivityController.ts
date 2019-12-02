@@ -41,6 +41,11 @@ export class ActivityController {
                 .orderBy('activity.publish_date', 'DESC')
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
 
+            if (profile.id === me.id) {
+                q.leftJoinAndSelect('activity.company', 'company');
+            }
+
+
             const responseObject = await ApplyPagination(request, response, q, false);
 
             const myLikes = me.likes.map(ac => ac.id);
