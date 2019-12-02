@@ -94,6 +94,7 @@ router.patch('/:slug/update', AuthMiddleWare, profileController.updateProfile);
 router.patch('/:slug/avatar', AuthMiddleWare, profileController.updateAvatar);
 router.patch('/:slug/cover', AuthMiddleWare, profileController.updateCover);
 router.post('/:slug/cover/reset', AuthMiddleWare, profileController.resetCover);
+router.post('/:slug/album', AuthMiddleWare, profileController.addNewlbum);
 
 router.post('/:slug/album/image', AuthMiddleWare, activityController.AddNewVideoOrAudio);
 

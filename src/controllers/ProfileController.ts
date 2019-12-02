@@ -152,6 +152,31 @@ export class ProfileController {
     * @Get
     */
 
+    async addNewlbum(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const albumRepository = getRepository(ProfileAlbum);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            // const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10) }, {
+            //     relations: ['activity_attachment']
+            // });
+            const album = new ProfileAlbum();
+            album.album_name = request.body.album_name;
+            album.profile = profile ;
+            const newAlbum =  await albumRepository.save(album);
+            delete newAlbum.profile;
+            return response.status(200).send(newAlbum);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+    * @Get
+    */
+
     async getLookups(request: Request, response: Response, next: NextFunction) {
 
         const heightRepository = getRepository(HeightRangeLookup);
