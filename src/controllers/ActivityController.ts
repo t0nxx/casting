@@ -703,6 +703,7 @@ export class ActivityController {
                 .innerJoinAndMapOne('activity.user', User, 'user', 'user.id = profile.userId')
                 .innerJoinAndMapOne('activity.author_settings', ProfileSettings, 'settings', 'profile.id = settings.profileId')
                 .where(`activity.profileId IN (${friendsArray})`)
+                .andWhere('activity.companyId is null')
                 .orderBy('activity.publish_date', 'DESC')
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
 
