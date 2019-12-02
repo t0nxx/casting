@@ -21,6 +21,9 @@ router.get('/:slug/companies', companyController.getAllCompanies);
 // get all friends request
 router.get('/:slug/friends-request', AuthMiddleWare, friendsController.getAllFriendsRequest);
 
+// get Suggested  friends
+router.get('/:slug/friends-suggested', AuthMiddleWare, friendsController.getSuggestedFriends);
+
 // get all friends
 router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
 

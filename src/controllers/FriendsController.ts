@@ -1,4 +1,4 @@
-import { getRepository } from 'typeorm';
+import { getRepository, Not } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import * as randomString from 'randomstring';
 import { User } from '../models/newModels/auth_user';
@@ -277,6 +277,43 @@ export class FriendsController {
         }
     }
 
+    /**
+    * @Get 
+    */
+    async getSuggestedFriends(request, response: Response, next: NextFunction) {
+        const profileRepository = getRepository(Profile);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
+            const friendsArray = friends.map(e => e.pk);
+            // not get my profile
+            friendsArray.push(profile.id);
+            const [notFriends, count] = await profileRepository.createQueryBuilder('p')
+                .innerJoin('p.user', 'user')
+                .select(['p.id', 'p.slug', 'p.avatar', 'user.first_name', 'user.last_name', 'user.email'])
+                .where(`p.id NOT IN (${friendsArray})`)
+                .orderBy('p.id','DESC')
+                .getManyAndCount();
+
+            const results: any = notFriends.map(e => {
+                const resObject = {
+                    pk: e.id,
+                    slug: e.slug,
+                    avatar: e.avatar,
+                    auth_user: { ...e.user }
+                }
+                delete e.user;
+                return resObject;
+            });
+            return response.status(200).send({ results, count });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+
 
 }
 
@@ -358,4 +395,6 @@ export async function getAllFriendSharedBtwnApp(request, response: Response, slu
         return response.status(400).send({ success: false, error: err });
 
     }
+
+
 }
