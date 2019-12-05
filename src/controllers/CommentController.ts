@@ -43,7 +43,7 @@ export class CommentController {
                 ).then(rez => rez);
                 const commenterProfile = await profileRepository.findOne({ id: e.profile.id }, {
                     relations: ['user'],
-                    select: ['id', 'avatar', 'user']
+                    select: ['id', 'avatar', 'user','slug']
                 })
                 const auth_user = {
                     pk: commenterProfile.id,
@@ -106,7 +106,7 @@ export class CommentController {
                 ).then(rez => rez);
                 const commenterProfile = await profileRepository.findOne({ id: e.profile.id }, {
                     relations: ['user'],
-                    select: ['id', 'avatar', 'user']
+                    select: ['id', 'avatar', 'user','slug']
                 })
                 const auth_user = {
                     pk: commenterProfile.id,
