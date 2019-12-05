@@ -158,7 +158,7 @@ export class SearchController {
                     first_name, last_name, email, username,
                 };
                 delete e['user'];
-                return { ...e, auth_user }
+                return { ...e, auth_user, pk: e.id }
             })
             return response.status(200).send(people);
         } catch (error) {
