@@ -116,6 +116,12 @@ export class SearchController {
         try {
             const q = profileRepository.createQueryBuilder('p')
                 .innerJoinAndMapOne('p.user', User, 'user', 'user.id = p.userId')
+                .leftJoinAndSelect('p.weight', 'weight')
+                .leftJoinAndSelect('p.height', 'height')
+                .leftJoinAndSelect('p.eye', 'eye')
+                .leftJoinAndSelect('p.hair', 'hair')
+                .leftJoinAndSelect('p.build', 'build')
+                .leftJoinAndSelect('p.ethnicity', 'ethnicity');
 
             if (request.query.search) {
                 /// come from navbar
@@ -145,8 +151,16 @@ export class SearchController {
                 // else for get all categories like normal , not for search
                 // q.leftJoinAndSelect('c.tags', 'tags')
             }
-            const jobs = await ApplyPagination(request, response, q, false);
-            return response.status(200).send(jobs);
+            const people = await ApplyPagination(request, response, q, false);
+            people.results = people.results.map(e => {
+                const { first_name, last_name, email, username } = e['user'];
+                const auth_user = {
+                    first_name, last_name, email, username,
+                };
+                delete e['user'];
+                return { ...e, auth_user }
+            })
+            return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
