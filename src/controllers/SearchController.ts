@@ -155,10 +155,10 @@ export class SearchController {
             people.results = people.results.map(e => {
                 const { first_name, last_name, email, username } = e['user'];
                 const auth_user = {
-                    first_name, last_name, email, username,
+                    first_name, last_name, email, username, pk: e.id,
                 };
                 delete e['user'];
-                return { ...e, auth_user, pk: e.id }
+                return { ...e, auth_user }
             })
             return response.status(200).send(people);
         } catch (error) {
