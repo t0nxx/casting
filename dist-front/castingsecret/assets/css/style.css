@@ -6538,3 +6538,8 @@ img.zoom-img {
         flex-direction: row
     }
 }
+
+[routerlinkactive="router-link-active"] {
+  cursor: pointer;
+  color: red !important;
+}

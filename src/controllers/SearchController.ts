@@ -20,25 +20,24 @@ export class SearchController {
                 .innerJoinAndSelect('j.company', 'company')
 
                 .orderBy('j.id', 'DESC');
+
+            if (request.query.search) {
+                // come from navbar
+                q.andWhere(`j.title like '%${request.query.search}%' `);
+            }
             if (request.query.title) {
                 q.andWhere(`j.title like '%${request.query.title}%' `);
             }
             if (request.query.description) {
-                console.log('yaaaa')
-
                 q.andWhere(`j.description like '%${request.query.description}%' `);
             }
             if (request.query.have_daily_perks) {
-                console.log('yaaaa')
                 q.andWhere(`j.have_daily_perks = 1`);
             }
             if (request.query.have_meal) {
-                console.log('yaaaa')
                 q.andWhere(`j.have_meal = 1`);
             }
             if (request.query.have_space_rest) {
-                console.log('yaaaa')
-
                 q.andWhere(`j.have_space_rest = 1`);
             }
             if (request.query.have_transportation) {
@@ -72,11 +71,19 @@ export class SearchController {
     }
 
     async searchCompaines(request: any, response: Response, next: NextFunction) {
-
+        const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
+            const user = await profileRepository.findOne({ slug: request['user'].username });
             const q = companyRepository.createQueryBuilder('c')
+                .leftJoin('c.followers', 'followers')
+                // .where(`followers.id NOT IN (${user.id})`)
                 .orderBy('c.id', 'DESC');
+
+            if (request.query.search) {
+                // come from navbar
+                q.andWhere(`c.name like '%${request.query.search}%' `);
+            }
             if (request.query.name) {
                 q.andWhere(`c.name like '%${request.query.name}%' `);
             }
@@ -94,8 +101,8 @@ export class SearchController {
                 // else for get all categories like normal , not for search
                 q.leftJoinAndSelect('c.tags', 'tags')
             }
-            const jobs = await ApplyPagination(request, response, q, false);
-            return response.status(200).send(jobs);
+            const compaines = await ApplyPagination(request, response, q, false);
+            return response.status(200).send(compaines);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -109,6 +116,11 @@ export class SearchController {
         try {
             const q = profileRepository.createQueryBuilder('p')
                 .innerJoinAndMapOne('p.user', User, 'user', 'user.id = p.userId')
+
+            if (request.query.search) {
+                /// come from navbar
+                q.andWhere(`user.first_name like '%${request.query.search}%' `);
+            }
 
             if (request.query.first_name) {
                 q.andWhere(`user.first_name like '%${request.query.first_name}%' `);
@@ -141,5 +153,21 @@ export class SearchController {
         }
     }
 
+    async searchMYFollowedCompaines(request: any, response: Response, next: NextFunction) {
+        const profileRepository = getRepository(Profile);
+        const companyRepository = getRepository(Company);
+        try {
+            const user = await profileRepository.findOne({ slug: request['user'].username });
+            const q = companyRepository.createQueryBuilder('c')
+                .leftJoin('c.followers', 'followers')
+                .leftJoinAndSelect('c.tags', 'tags')
+                .where(`followers.id IN (${user.id})`);
+            const myFollowed = await ApplyPagination(request, response, q, false);
+            return response.status(200).send(myFollowed);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
 
 }

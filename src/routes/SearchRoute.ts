@@ -7,7 +7,10 @@ const searchController = new SearchController();
 
 router.get('/jobs', AuthMiddleWare, searchController.searchJobs);
 router.get('/companies', AuthMiddleWare, searchController.searchCompaines);
-router.get('/people', AuthMiddleWare, searchController.searchPeople);
+router.get('/profile', AuthMiddleWare, searchController.searchPeople);
+
+
+router.get('/companies/followed', AuthMiddleWare, searchController.searchMYFollowedCompaines);
 
 
 export default router;

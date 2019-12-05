@@ -36,6 +36,7 @@ router.post('/:slug/activity', AuthMiddleWare, activityController.AddNewActivity
 // jobs
 router.get('/:slug/jobs', AuthMiddleWare, jobsController.getAllJobs);
 router.get('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.getOneJob);
+router.get('/:slug/jobs/:jobSlug/info', AuthMiddleWare, jobsController.getOneJob);
 
 // create new job
 router.post('/:slug/jobs', AuthMiddleWare, jobsController.createJob);
