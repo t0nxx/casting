@@ -6,6 +6,7 @@ import { Profile } from '../models/newModels/users_profile';
 import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
 import { ApplyPagination } from '../helpers/pagination';
+import * as _ from 'underscore';
 
 export class FriendsController {
 
@@ -292,10 +293,10 @@ export class FriendsController {
                 .innerJoin('p.user', 'user')
                 .select(['p.id', 'p.slug', 'p.avatar', 'user.first_name', 'user.last_name', 'user.email'])
                 .where(`p.id NOT IN (${friendsArray})`)
-                .orderBy('p.id','DESC')
+                .orderBy('p.id', 'DESC')
                 .getManyAndCount();
 
-            const results: any = notFriends.map(e => {
+            let results: any = notFriends.map(e => {
                 const resObject = {
                     pk: e.id,
                     slug: e.slug,
@@ -305,7 +306,8 @@ export class FriendsController {
                 delete e.user;
                 return resObject;
             });
-            return response.status(200).send({ results, count });
+            results = _.sample(results,10);
+            return response.status(200).send({ results, count : 10 });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
