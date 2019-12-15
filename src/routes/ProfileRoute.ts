@@ -31,9 +31,9 @@ router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
 // test album
 router.get('/:slug/album', AuthMiddleWare, profileController.getProfileAlbums);
 
-router.get('/:slug/album/profile?limit=ture', AuthMiddleWare, async (req, res) => {
-    res.status(200).send([]);
-});
+// router.get('/:slug/album/profile?limit=ture', AuthMiddleWare, async (req, res) => {
+//     res.status(200).send([]);
+// });
 
 router.get('/:slug/album/profile', AuthMiddleWare, activityController.getAllImagesOfUser);
 

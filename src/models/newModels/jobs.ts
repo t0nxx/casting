@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable,CreateDateColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn, OneToMany } from 'typeorm';
 import { Company } from './company';
 import { TalentCategories } from './talent_categories';
+import { Profile } from './users_profile';
 
 @Entity('jobs')
 export class Jobs {
@@ -69,8 +70,16 @@ export class Jobs {
     @JoinTable()
     category: TalentCategories[];
 
-    // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.job)
-    // jobApplicantss: job_applicants[];
+    @Column({ default: 'Not Provided' })
+    location: string;
+
+
+    @ManyToMany(type => Profile, p => p.applied_jobs)
+    applicants: Profile[];
+
+
+    @ManyToMany(type => Profile, p => p.shortListed_jobs)
+    short_listed: Profile[];
 
     // @OneToMany(() => job_schedules, (job_schedules: job_schedules) => job_schedules.job)
     // jobScheduless: job_schedules[];

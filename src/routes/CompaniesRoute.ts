@@ -36,7 +36,13 @@ router.post('/:slug/activity', AuthMiddleWare, activityController.AddNewActivity
 // jobs
 router.get('/:slug/jobs', AuthMiddleWare, jobsController.getAllJobs);
 router.get('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.getOneJob);
-router.get('/:slug/jobs/:jobSlug/info', AuthMiddleWare, jobsController.getOneJob);
+router.get('/:slug/jobs/:jobSlug/info', jobsController.getOneJobForNotLOgin);
+router.post('/:slug/jobs/:jobSlug/apply', AuthMiddleWare, jobsController.applyJob);
+
+router.get('/:slug/jobs/:jobSlug/applied', AuthMiddleWare, jobsController.getApplicants);
+
+router.patch('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.updateJob);
+router.delete('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.deleteJob);
 
 // create new job
 router.post('/:slug/jobs', AuthMiddleWare, jobsController.createJob);

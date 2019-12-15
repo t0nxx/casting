@@ -122,6 +122,10 @@ export class ProfileController {
                 relations: ['albums']
             });
             if (!profile) { throw new Error('profile Not Found'); }
+            if (request.params.some) {
+                // return only 4
+                profile.albums = profile.albums.slice(0, 4);
+            }
             return response.status(200).send(profile.albums);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -163,8 +167,8 @@ export class ProfileController {
             // });
             const album = new ProfileAlbum();
             album.album_name = request.body.album_name;
-            album.profile = profile ;
-            const newAlbum =  await albumRepository.save(album);
+            album.profile = profile;
+            const newAlbum = await albumRepository.save(album);
             delete newAlbum.profile;
             return response.status(200).send(newAlbum);
         } catch (error) {

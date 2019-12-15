@@ -15,6 +15,7 @@ import { ProfileAlbum } from './profile_album';
 import { ActivityAttachment } from './activity_attachment';
 import { Activity } from './activity';
 import { Comment } from './comments';
+import { Jobs } from './jobs';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -142,6 +143,15 @@ export class Profile {
 
     @OneToMany(type => Comment, c => c.profile)
     activity_Comments: Comment[];
+
+
+    @ManyToMany(type => Jobs, j => j.applicants)
+    @JoinTable()
+    applied_jobs: Jobs[];
+
+    @ManyToMany(type => Jobs, j => j.short_listed)
+    @JoinTable()
+    shortListed_jobs: Jobs[];
     
     
     // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.profile)
