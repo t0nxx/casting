@@ -1036,6 +1036,10 @@ export class ActivityController {
                 return { ...ac, auth_user, author_settings, liked, disliked, bookmarked, is_admin };
             }),
             ).then(rez => rez);
+
+            if(request.query.some){
+                responseObject.results = responseObject.results.slice(0, 10);
+            }
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -1115,9 +1119,6 @@ export class ActivityController {
                 return { ...ac, auth_user, author_settings, liked, disliked, bookmarked, is_admin };
             }),
             ).then(rez => rez);
-            if(request.params.some){
-                responseObject.results = responseObject.results.slice(0, 4);
-            }
             return response.status(200).send(responseObject.results);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

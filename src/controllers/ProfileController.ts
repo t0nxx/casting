@@ -122,7 +122,7 @@ export class ProfileController {
                 relations: ['albums']
             });
             if (!profile) { throw new Error('profile Not Found'); }
-            if (request.params.some) {
+            if (request.query.some) {
                 // return only 4
                 profile.albums = profile.albums.slice(0, 4);
             }
@@ -146,6 +146,55 @@ export class ProfileController {
             });
             if (!album) { throw new Error('album Not Found'); }
             return response.status(200).send(album);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+    * @Patch
+    */
+
+    async updateAlbum(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const albumRepository = getRepository(ProfileAlbum);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10)}, { relations: ['profile'] });
+            if (!album) { throw new Error('album Not Found'); }
+            if (album.profile.id !== profile.id) {
+                throw new Error('You are Not Allowed to edit this album');
+            }
+            album.album_name = request.body.album_name;
+            await albumRepository.save(album);
+
+            const afterUpdate = await albumRepository.findOne({ id: parseInt(request.params.id, 10) });
+            return response.status(200).send(afterUpdate);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+    /**
+   * @Delete
+   */
+
+    async deleteAlbum(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const albumRepository = getRepository(ProfileAlbum);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10)});
+            if (!album) { throw new Error('album Not Found'); }
+            if (album.profile.id !== profile.id) {
+                throw new Error('You are Not Allowed to edit this album');
+            }
+            await albumRepository.remove(album);
+
+            return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -484,8 +533,8 @@ export class ProfileController {
     }
 
     /**
-   * @Delete
-   */
+    * @Delete
+    */
 
     async deleteHobbies(request: Request, response: Response, next: NextFunction) {
 

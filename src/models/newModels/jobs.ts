@@ -2,6 +2,9 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, ManyToMany, JoinTabl
 import { Company } from './company';
 import { TalentCategories } from './talent_categories';
 import { Profile } from './users_profile';
+import { JobInterview } from './jobs_interview';
+import { JobShortlist } from './jobs_shortlisted';
+import { JobApplicants } from './jobs_applicants';
 
 @Entity('jobs')
 export class Jobs {
@@ -74,17 +77,20 @@ export class Jobs {
     location: string;
 
 
-    @ManyToMany(type => Profile, p => p.applied_jobs)
-    applicants: Profile[];
+    // @ManyToMany(type => Profile, p => p.applied_jobs)
+    // applicants: Profile[];
 
 
-    @ManyToMany(type => Profile, p => p.shortListed_jobs)
-    short_listed: Profile[];
+    // @ManyToMany(type => Profile, p => p.shortListed_jobs)
+    // short_listed: Profile[];
 
-    // @OneToMany(() => job_schedules, (job_schedules: job_schedules) => job_schedules.job)
-    // jobScheduless: job_schedules[];
+    @OneToMany(type => JobInterview, jI => jI.job)
+    interviews: JobInterview[];
 
-    // @OneToMany(() => job_shortlisted, (job_shortlisted: job_shortlisted) => job_shortlisted.job)
-    // jobShortlisteds: job_shortlisted[];
+    @OneToMany(type => JobShortlist, jI => jI.job)
+    shortlisted: JobShortlist[];
+
+    @OneToMany(type => JobApplicants, jI => jI.job)
+    applicants: JobApplicants[];
 
 }

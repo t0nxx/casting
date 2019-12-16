@@ -7,6 +7,10 @@ import { Jobs } from '../models/newModels/jobs';
 import { ApplyPagination } from '../helpers/pagination';
 import { Profile } from '../models/newModels/users_profile';
 import { User } from '../models/newModels/auth_user';
+import { JobInterview } from '../models/newModels/jobs_interview';
+import { JobApplicants } from '../models/newModels/jobs_applicants';
+import { JobShortlist } from '../models/newModels/jobs_shortlisted';
+import { transformAndValidate } from 'class-transformer-validator';
 export class JobsController {
 
     /**
@@ -186,21 +190,23 @@ export class JobsController {
     async applyJob(request: Request, response: Response, next: NextFunction) {
         const profileRepository = getRepository(Profile);
         const JobRepository = getRepository(Jobs);
+        const JobApplicantRepository = getRepository(JobApplicants);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             const job = await JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['applicants'] });
             if (!job) { throw new Error('job Not Found'); }
 
-            const tempArr = job.applicants.map(e => e.id);
-            const isAlreadyApplied = tempArr.includes(profile.id);
+            const isAlreadyApplied = await JobApplicantRepository.findOne({ job, profile });
 
             if (isAlreadyApplied) {
                 throw new Error('You are already applied to this job');
             }
 
-            job.applicants = [...job.applicants, profile];
+            const newApplicant = new JobApplicants();
+            newApplicant.job = job;
+            newApplicant.profile = profile;
 
-            await JobRepository.save(job);
+            await JobApplicantRepository.save(newApplicant);
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -211,32 +217,202 @@ export class JobsController {
     async getApplicants(request: any, response: Response, next: NextFunction) {
 
         const profileRepository = getRepository(Profile);
-        const userRepository = getRepository(User);
         const JobRepository = getRepository(Jobs);
+        const JobApplicantRepository = getRepository(JobApplicants);
         try {
             const job = await JobRepository.findOne({ slug: request.params.jobSlug });
+            if (!job) { throw new Error('job Not Found'); }
 
-            const applied = await profileRepository.createQueryBuilder('p')
-                // .innerJoin('p.user', 'user')
-                .innerJoinAndSelect('p.applied_jobs', 'applied_jobs')
-                .where('p.applied_jobs = 10')
-                // .where(`p.applied_jobs = 1`)
+            const q = JobApplicantRepository.createQueryBuilder('a')
+                .innerJoin('a.profile', 'profile')
+                .select(['a.id', 'profile.id'])
+                .orderBy('a.id', 'DESC');
+
+            const people = await ApplyPagination(request, response, q, false);
+            people.results = people.results.map(e => e.profile.id);
+
+            const users = await profileRepository.findByIds(people.results, {
+                relations: ['user']
+            });
+
+            people.results = users.map(e => {
+                const { first_name, last_name, email } = e.user;
+                const auth_user = { first_name, last_name, email };
+                delete e['user'];
+                return { ...e, auth_user }
+            });
+
+            return response.status(200).send(people);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    async getShortListed(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const JobRepository = getRepository(Jobs);
+        const JobShortListedRepository = getRepository(JobShortlist);
+        try {
+            const job = await JobRepository.findOne({ slug: request.params.jobSlug });
+            if (!job) { throw new Error('job Not Found'); }
+
+            const q = JobShortListedRepository.createQueryBuilder('a')
+                .innerJoin('a.profile', 'profile')
+                .select(['a.id', 'profile.id'])
+                .orderBy('a.id', 'DESC');
+
+            const people = await ApplyPagination(request, response, q, false);
+            people.results = people.results.map(e => e.profile.id);
+
+            const users = await profileRepository.findByIds(people.results, {
+                relations: ['user']
+            });
+
+            people.results = users.map(e => {
+                const { first_name, last_name, email } = e.user;
+                const auth_user = { first_name, last_name, email };
+                delete e['user'];
+                return { ...e, auth_user }
+            });
+
+            return response.status(200).send(people);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    async getInterviews(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const JobRepository = getRepository(Jobs);
+        const JobInterviewRepository = getRepository(JobInterview);
+        try {
+            const job = await JobRepository.findOne({ slug: request.params.jobSlug });
+            if (!job) { throw new Error('job Not Found'); }
+
+            const q = JobInterviewRepository.createQueryBuilder('a')
+                .innerJoin('a.profile', 'profile')
+                .innerJoinAndMapOne('a.user', User, 'user', 'user.id = profile.userId')
+                .orderBy('a.id', 'DESC');
+
+            const people = await ApplyPagination(request, response, q, false);
+            people.results = people.results.map(e => {
+                const { first_name, last_name, email } = e.user;
+                const auth_user = { first_name, last_name, email };
+                delete e.user;
+                return { ...e, auth_user };
+            });
+
+            return response.status(200).send(people);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    async addApplicantsToShortList(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const JobRepository = getRepository(Jobs);
+        const JobshortlistRepository = getRepository(JobShortlist);
+        try {
+            const job = await JobRepository.findOne({ slug: request.params.jobSlug });
+            if (!job) { throw new Error('job Not Found'); }
+
+            const people = await profileRepository.findByIds(request.body.users);
+
+            const shortlistedUsers = await JobshortlistRepository.createQueryBuilder('s')
+                .innerJoin('s.profile', 'profile')
+                .select(['s.id', 'profile.id'])
+                .where(`s.jobId = ${job.id}`)
                 .getMany();
-            // const q = JobRepository.createQueryBuilder('j')
-            //     .leftJoinAndSelect('j.applicants','applicants')
-            //     // .innerJoinAndMapOne('j.user', User, 'user', 'user.id = j.applicants.userId');
 
-            // const people = await ApplyPagination(request, response, q, false);
-            // people.results = people.results.map(e => {
-            //     const { first_name, last_name, email, username } = e['user'];
-            //     const auth_user = {
-            //         first_name, last_name, email, username, pk: e.id,
-            //     };
-            //     delete e['user'];
-            //     return { ...e, auth_user }
-            // })
+            const shortlistedUsersFormated = shortlistedUsers.map(e => e.profile.id);
 
-            return response.status(200).send(applied);
+
+            people.forEach(async p => {
+                if (!shortlistedUsersFormated.includes(p.id)) {
+                    const newShorlisted = new JobShortlist();
+                    newShorlisted.job = job;
+                    newShorlisted.profile = p;
+                    await JobshortlistRepository.save(newShorlisted);
+                }
+
+            });
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    async removeApplicantFromShortList(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const JobRepository = getRepository(Jobs);
+        const JobshortlistRepository = getRepository(JobShortlist);
+        try {
+            const job = await JobRepository.findOne({ slug: request.params.jobSlug });
+            if (!job) { throw new Error('job Not Found'); }
+
+            const profile = await profileRepository.findOne({ slug: request.params.userSlug });
+
+            const findOne = await JobshortlistRepository.findOne({ job, profile });
+            if (!findOne) { throw new Error('user is already Not shortlisted '); }
+
+            await JobshortlistRepository.remove(findOne);
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    async createInterviewForapplicants(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const JobRepository = getRepository(Jobs);
+        const JobInterviewRepository = getRepository(JobInterview);
+        const JobshortlistRepository = getRepository(JobShortlist);
+        try {
+            const job = await JobRepository.findOne({ slug: request.params.jobSlug },
+                {
+                    relations: ['interviews'],
+                });
+            if (!job) { throw new Error('job Not Found'); }
+
+            const profile = await profileRepository.findOne({ slug: request.params.userSlug });
+
+            const isAlreadyHaveInterview = await JobInterviewRepository.findOne({
+                where: { job, profile }
+            });
+
+            if (isAlreadyHaveInterview) {
+                throw new Error('user already have an interview for this job');
+            }
+            const interview = new JobInterview();
+
+            const validateBody = await transformAndValidate(JobInterview, request.body);
+
+            Object.assign(interview, validateBody);
+
+            interview.job = job;
+            interview.profile = profile;
+
+            await JobInterviewRepository.save(interview);
+            // remove from shortlist after create interview
+
+            const findOne = await JobshortlistRepository.findOne({ job, profile });
+            if (!findOne) { throw new Error('user is already Not shortlisted '); }
+
+            await JobshortlistRepository.remove(findOne);
+
+            return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });

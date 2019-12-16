@@ -16,6 +16,9 @@ import { ActivityAttachment } from './activity_attachment';
 import { Activity } from './activity';
 import { Comment } from './comments';
 import { Jobs } from './jobs';
+import { JobInterview } from './jobs_interview';
+import { JobApplicants } from './jobs_applicants';
+import { JobShortlist } from './jobs_shortlisted';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -145,13 +148,23 @@ export class Profile {
     activity_Comments: Comment[];
 
 
-    @ManyToMany(type => Jobs, j => j.applicants)
-    @JoinTable()
-    applied_jobs: Jobs[];
+    // @ManyToMany(type => Jobs, j => j.applicants)
+    // @JoinTable()
+    // applied_jobs: Jobs[];
 
-    @ManyToMany(type => Jobs, j => j.short_listed)
-    @JoinTable()
-    shortListed_jobs: Jobs[];
+    // @ManyToMany(type => Jobs, j => j.short_listed)
+    // @JoinTable()
+    // shortListed_jobs: Jobs[];
+    
+
+    @OneToMany(type => JobInterview, j => j.profile)
+    interview_jobs: JobInterview[];
+
+    @OneToMany(type => JobApplicants, j => j.profile)
+    applied_jobs: JobApplicants[];
+
+    @OneToMany(type => JobShortlist, j => j.profile)
+    shortlisted_jobs: JobShortlist[];
     
     
     // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.profile)

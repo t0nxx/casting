@@ -37,14 +37,24 @@ router.post('/:slug/activity', AuthMiddleWare, activityController.AddNewActivity
 router.get('/:slug/jobs', AuthMiddleWare, jobsController.getAllJobs);
 router.get('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.getOneJob);
 router.get('/:slug/jobs/:jobSlug/info', jobsController.getOneJobForNotLOgin);
+router.get('/:slug/jobs/:jobSlug/applied', AuthMiddleWare, jobsController.getApplicants);
+router.get('/:slug/jobs/:jobSlug/shortlisted', AuthMiddleWare, jobsController.getShortListed);
+router.get('/:slug/jobs/:jobSlug/interview', AuthMiddleWare, jobsController.getInterviews);
+
+router.post('/:slug/jobs', AuthMiddleWare, jobsController.createJob);
+
 router.post('/:slug/jobs/:jobSlug/apply', AuthMiddleWare, jobsController.applyJob);
 
-router.get('/:slug/jobs/:jobSlug/applied', AuthMiddleWare, jobsController.getApplicants);
+router.post('/:slug/jobs/:jobSlug/shortlisted', AuthMiddleWare, jobsController.addApplicantsToShortList);
+
+router.post('/:slug/jobs/:jobSlug/un-shortlisted/:userSlug', AuthMiddleWare, jobsController.removeApplicantFromShortList);
+
+router.post('/:slug/jobs/:jobSlug/interview/:userSlug', AuthMiddleWare, jobsController.createInterviewForapplicants);
 
 router.patch('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.updateJob);
 router.delete('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.deleteJob);
 
 // create new job
-router.post('/:slug/jobs', AuthMiddleWare, jobsController.createJob);
+
 
 export default router;
