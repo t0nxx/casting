@@ -9,10 +9,18 @@ export class AdminAdditionController {
     async getAllUsers(request: Request, response: Response) {
         const userRepository = getRepository(User);
         try {
-            const [data, count] = await userRepository.findAndCount({
-                select: ['id', 'isAdmin', 'first_name', 'last_name', 'email', 'username'],
-                order: { id: 'DESC' }
-            })
+            // const [data, count] = await userRepository.findAndCount({
+            //     select: ['id', 'isAdmin', 'first_name', 'last_name', 'email', 'username'],
+            //     order: { id: 'DESC' }
+            // });
+            const q = await userRepository.createQueryBuilder('u')
+                .select(['u.id', 'u.isAdmin', 'u.first_name', 'u.last_name', 'u.email', 'u.username'])
+                .orderBy('u.id', 'DESC');
+            if (request.query.query) {
+                q.andWhere(`u.first_name like '%${request.query.query}%' or u.last_name like '%${request.query.query}%' or u.username like '%${request.query.query}%' or u.email like '%${request.query.query}%'`);
+            }
+
+            const [data, count] = await q.getManyAndCount();
 
             return response.status(200).send({ data, count });
         } catch (error) {

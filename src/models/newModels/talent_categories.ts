@@ -14,8 +14,7 @@ export class TalentCategories {
     @Column({ unique: true })
     name_en: string;
 
-    @IsNotEmpty({ message: 'name_ar is required' })
-    @Column({ unique: true })
+    @Column({ default : '' })
     name_ar: string;
 
     // @OneToMany(() => company_tags, (company_tags: company_tags) => company_tags.category)

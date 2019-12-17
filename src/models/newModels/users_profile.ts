@@ -19,6 +19,7 @@ import { Jobs } from './jobs';
 import { JobInterview } from './jobs_interview';
 import { JobApplicants } from './jobs_applicants';
 import { JobShortlist } from './jobs_shortlisted';
+import { ActivityReports } from './activity_reports';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -165,6 +166,9 @@ export class Profile {
 
     @OneToMany(type => JobShortlist, j => j.profile)
     shortlisted_jobs: JobShortlist[];
+
+    @OneToMany(type => ActivityReports, a => a.profile)
+    activity_reports: ActivityReports[];
     
     
     // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.profile)

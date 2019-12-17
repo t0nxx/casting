@@ -3,6 +3,7 @@ import { Company } from './company';
 import { ActivityAttachment } from './activity_attachment';
 import { Profile } from './users_profile';
 import { Comment } from './comments';
+import { ActivityReports } from './activity_reports';
 // import {auth_user} from "./auth_user";
 // import {company} from "./company";
 // import {activity_attachment} from "./activity_attachment";
@@ -53,6 +54,9 @@ export class Activity {
     @Column({ default: 0 })
     dislike_count: number;
 
+    @Column({ default: 0 })
+    resports_count: number;
+
     @ManyToOne(type => Profile, p => p.activity, { onDelete: 'CASCADE' })
     profile: Profile;
 
@@ -64,6 +68,9 @@ export class Activity {
 
     @OneToMany(type => Comment, ac => ac.activity)
     activity_Comments: Comment[];
+
+    @OneToMany(type => ActivityReports, ac => ac.activity)
+    reports: ActivityReports[];
 
     @ManyToMany(type => Profile, p => p.likes)
     @JoinTable()

@@ -14,6 +14,7 @@ router.get('/:id', AuthMiddleWare, activityController.getOneActivity);
 router.post('/:id/like', AuthMiddleWare, activityController.LikeActivity);
 router.post('/:id/unlike', AuthMiddleWare, activityController.DisLikeActivity);
 router.post('/:id/bookmark', AuthMiddleWare, activityController.BookmarkActivity);
+router.post('/:id/report', AuthMiddleWare, activityController.reportActivity);
 router.post('/:id/hide', AuthMiddleWare, activityController.HideActivity);
 router.delete('/:id/delete', AuthMiddleWare, activityController.deleteActivity);
 router.get('/:id/comments', AuthMiddleWare, commentController.getAllCommentsOfACtivity);

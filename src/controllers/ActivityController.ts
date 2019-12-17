@@ -13,6 +13,7 @@ import { getAllFriendSharedBtwnApp } from './FriendsController';
 import { ActivityAttachment } from '../models/newModels/activity_attachment';
 import { UploadToS3 } from '../helpers/awsUploader';
 import { Company } from '../models/newModels/company';
+import { ActivityReports } from '../models/newModels/activity_reports';
 
 export class ActivityController {
 
@@ -571,6 +572,37 @@ export class ActivityController {
 
         }
     }
+    async reportActivity(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const ActivityReportsRepository = getRepository(ActivityReports);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+            if (!activity) { throw new Error('activivty not found'); }
+
+            if (!request.body.reason) { throw new Error('you must enter reason'); }
+
+            const activivtyReport = new ActivityReports();
+            activivtyReport.activity = activity;
+            activivtyReport.profile = profile;
+            activivtyReport.reason = request.body.reason;
+
+            activity.resports_count = activity.resports_count + 1;
+
+            await ActivityReportsRepository.save(activivtyReport);
+            await ActivityRepository.save(activity);
+
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
 
     async HideActivity(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
@@ -1037,7 +1069,7 @@ export class ActivityController {
             }),
             ).then(rez => rez);
 
-            if(request.query.some){
+            if (request.query.some) {
                 responseObject.results = responseObject.results.slice(0, 10);
             }
             return response.status(200).send({ ...responseObject });
