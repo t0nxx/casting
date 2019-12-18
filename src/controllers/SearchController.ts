@@ -268,12 +268,13 @@ export class SearchController {
             const user = await profileRepository.findOne({ slug: request['user'].username })
             const q = JobApplicantsRepository.createQueryBuilder('j')
                 .innerJoinAndSelect('j.job', 'job')
+                .innerJoinAndMapOne('j.company', Company, 'company', 'company.id = job.companyId')
                 .where(`j.profileId = ${user.id}`)
                 .orderBy('j.id', 'DESC');
 
             const jobs = await ApplyPagination(request, response, q, false);
             jobs.results = jobs.results.map(element => {
-                return { ...element.job }
+                return { ...element.job, company: element.company }
             });
             return response.status(200).send(jobs);
         } catch (error) {
