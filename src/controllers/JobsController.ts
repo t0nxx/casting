@@ -191,15 +191,27 @@ export class JobsController {
         const profileRepository = getRepository(Profile);
         const JobRepository = getRepository(Jobs);
         const JobApplicantRepository = getRepository(JobApplicants);
+        const JobShortListedRepository = getRepository(JobShortlist);
+        const JobInterviewRepository = getRepository(JobInterview);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             const job = await JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['applicants'] });
             if (!job) { throw new Error('job Not Found'); }
 
             const isAlreadyApplied = await JobApplicantRepository.findOne({ job, profile });
+            const isAlreadyShortlisted = await JobShortListedRepository.findOne({ job, profile });
+            const isAlreadyHaveAnInterview = await JobInterviewRepository.findOne({ job, profile });
 
             if (isAlreadyApplied) {
                 throw new Error('You are already applied to this job');
+            }
+
+            if (isAlreadyShortlisted) {
+                throw new Error('You are already shortlisted to this job');
+            }
+
+            if (isAlreadyHaveAnInterview) {
+                throw new Error('You are already have interview to this job');
             }
 
             const newApplicant = new JobApplicants();
@@ -318,6 +330,7 @@ export class JobsController {
         const profileRepository = getRepository(Profile);
         const JobRepository = getRepository(Jobs);
         const JobshortlistRepository = getRepository(JobShortlist);
+        const JobApplicantRepository = getRepository(JobApplicants);
         try {
             const job = await JobRepository.findOne({ slug: request.params.jobSlug });
             if (!job) { throw new Error('job Not Found'); }
@@ -339,6 +352,12 @@ export class JobsController {
                     newShorlisted.job = job;
                     newShorlisted.profile = p;
                     await JobshortlistRepository.save(newShorlisted);
+                    // remove every shortlist from apply 
+                    const isAlreadyApplied = await JobApplicantRepository.findOne({ job, profile: p });
+                    if (isAlreadyApplied) {
+                        await JobApplicantRepository.remove(isAlreadyApplied);
+                    }
+
                 }
 
             });
