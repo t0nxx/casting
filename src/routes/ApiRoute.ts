@@ -17,5 +17,7 @@ router.post('/new-category', talentController.createNewCategory);
 router.post('/verifyusernameemail', authController.verifyEmailAndUsernamIsAvailable);
 
 router.post('/subscribe', newsLetterController.subscribeToNewsLetter);
+
+router.post('/invite', newsLetterController.inviteToCasting);
 // end verify username , email is available
 export default router;

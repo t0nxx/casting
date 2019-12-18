@@ -114,6 +114,7 @@ export class SearchController {
         const profileRepository = getRepository(Profile);
         const userRepository = getRepository(User);
         try {
+            const user = await profileRepository.findOne({ slug: request['user'].username });
             const q = profileRepository.createQueryBuilder('p')
                 .innerJoinAndMapOne('p.user', User, 'user', 'user.id = p.userId')
                 .leftJoinAndSelect('p.weight', 'weight')
@@ -123,34 +124,73 @@ export class SearchController {
                 .leftJoinAndSelect('p.build', 'build')
                 .leftJoinAndSelect('p.ethnicity', 'ethnicity');
 
+
             if (request.query.search) {
                 /// come from navbar
-                q.andWhere(`user.first_name like '%${request.query.search}%' `);
+                q.andWhere(`user.username like '%${request.query.search}%' `);
             }
 
-            if (request.query.first_name) {
-                q.andWhere(`user.first_name like '%${request.query.first_name}%' `);
+            if (request.query.fname) {
+                q.andWhere(`user.first_name like '%${request.query.fname}%' `);
             }
-            if (request.query.last_name) {
-                q.andWhere(`user.last_name like '%${request.query.last_name}%' `);
+            if (request.query.lname) {
+                q.andWhere(`user.last_name like '%${request.query.lname}%' `);
             }
-            if (request.query.username) {
-                q.andWhere(`user.username like '%${request.query.username}%' `);
+            if (request.query.Age) {
+                const age_from = parseInt(request.query.Age.split('__')[0], 10);
+                const age_to = parseInt(request.query.Age.split('__')[1], 10);
+                q.andWhere(`p.age_from >= ${age_from} and p.age_to <= ${age_to}`);
             }
-            // if (request.query.size_from) {
-            //     q.andWhere(`c.size_from >= ${request.query.size_from} `);
-            // }
-            // if (request.query.size_to) {
-            //     q.andWhere(`c.size_to <= ${request.query.size_to} `);
-            // }
+            //////////////////////////////////////////////////////////////////////////////////////////
+            if (request.query.ethnicity) {
+                const ethnicityArray: string = request.query.ethnicity.split(',');
+                q.andWhere(`p.ethnicity.id In (${ethnicityArray})`);
+            }
 
-            if (request.query.tags) {
-                const cateArray: string = request.query.tags.split(',')
-                q.innerJoinAndSelect('c.tags', 'tag', `tag.id In (${cateArray})`);
+            if (request.query.build) {
+                const buildArray: string = request.query.build.split(',');
+                q.andWhere(`p.build.id In (${buildArray})`);
+            }
+            if (request.query.hair) {
+                const hairArray: string = request.query.hair.split(',');
+                q.andWhere(`p.hair.id In (${hairArray})`);
+            }
+            // if (request.query.hobbies) {
+            //     const hobbiesArray: string = request.query.hobbies.split(',');
+            //     q.andWhere(`p.hobbies.id In (${hobbiesArray})`);
+            // }
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            if (request.query.tags__in) {
+                const cateArray: string = request.query.tags__in.split('__')
+                q.innerJoinAndSelect('p.categories', 'categories', `categories.id In (${cateArray})`);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////
+
+            if (request.query.has_photo || request.query.has_audio || request.query.has_video) {
+                if (request.query.has_photo) {
+                    q.innerJoin('p.activity_attachment', 'activity_attachment_photo')
+                        .andWhere(`activity_attachment_photo.type like 'IMG' `)
+                        .addSelect(['activity_attachment_photo.id', 'activity_attachment_photo.type']);
+
+
+                }
+                if (request.query.has_audio) {
+                    q.innerJoin('p.activity_attachment', 'activity_attachment_audio')
+                        .andWhere(`activity_attachment_audio.type like 'AUDIO' `)
+                        .addSelect(['activity_attachment_audio.id', 'activity_attachment_audio.type']);
+                }
+                if (request.query.has_video) {
+                    q.innerJoin('p.activity_attachment', 'activity_attachment_video')
+                        .andWhere(`activity_attachment_video.type like 'VIDEO' `)
+                        .addSelect(['activity_attachment_video.id', 'activity_attachment_video.type']);
+                }
             } else {
-                // else for get all categories like normal , not for search
-                // q.leftJoinAndSelect('c.tags', 'tags')
+                // hase video , audi , imge ..etc 
+                q.leftJoin('p.activity_attachment', 'activity_attachment')
+                    .addSelect(['activity_attachment.id', 'activity_attachment.type']);
             }
+
+
             const people = await ApplyPagination(request, response, q, false);
             people.results = people.results.map(e => {
                 const { first_name, last_name, email, username } = e['user'];
@@ -158,8 +198,13 @@ export class SearchController {
                     first_name, last_name, email, username, pk: e.id,
                 };
                 delete e['user'];
-                return { ...e, auth_user }
-            })
+                const has_photo = e.activity_attachment.some(a => a.type === 'IMG');
+                const has_audio = e.activity_attachment.some(a => a.type === 'AUDIO');
+                const has_video = e.activity_attachment.some(a => a.type === 'VIDEO');
+                return { ...e, auth_user, has_photo, has_video, has_audio }
+            });
+            // not return the same user in search
+            people.results = people.results.filter(e => e.id !== user.id);
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

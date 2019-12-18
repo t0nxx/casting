@@ -49,4 +49,28 @@ export class NewsLetterController {
         }
 
     }
+
+    /**
+     * 
+     * @Post
+     */
+    async inviteToCasting(request: Request, response: Response, next: NextFunction) {
+
+        try {
+            if (!request.body.email) { throw new Error('email is required'); }
+
+            /**
+             * 
+             * 
+             * send mail logic 
+             */
+
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+
+    }
 }
