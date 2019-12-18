@@ -21,30 +21,30 @@ export class SearchController {
 
                 .orderBy('j.id', 'DESC');
 
-            if (request.query.search) {
+            if (request.query.search && request.query.search !== null) {
                 // come from navbar
                 q.andWhere(`j.title like '%${request.query.search}%' `);
             }
-            if (request.query.have_daily_perks) {
+            if (request.query.have_daily_perks && request.query.have_daily_perks !== null) {
                 q.andWhere(`j.have_daily_perks = 1`);
             }
-            if (request.query.have_meal) {
+            if (request.query.have_meal && request.query.have_meal !== null) {
                 q.andWhere(`j.have_meal = 1`);
             }
-            if (request.query.have_transportation) {
+            if (request.query.have_transportation && request.query.have_transportation !== null) {
                 q.andWhere(`j.have_transportation = 1`);
             }
-            if (request.query.is_male) {
+            if (request.query.is_male && request.query.is_male !== null) {
                 q.andWhere(`j.is_male = 1`);
             }
-            if (request.query.is_female) {
+            if (request.query.is_female && request.query.is_female !== null) {
                 q.andWhere(`j.is_female = 1`);
             }
 
-            if (request.query.city) {
+            if (request.query.city && request.query.city !== null) {
                 q.andWhere(`j.location like '%${request.query.city}%'`);
             }
-            if (request.query.tags__in) {
+            if (request.query.tags__in && request.query.tags__in !== null) {
                 const cateArray: string = request.query.tags__in.split('__');
                 q.innerJoinAndSelect('j.category', 'category', `category.id In (${cateArray})`);
             } else {
@@ -75,25 +75,25 @@ export class SearchController {
                 // .where(`followers.id NOT IN (${user.id})`)
                 .orderBy('c.id', 'DESC');
 
-            if (request.query.search) {
+            if (request.query.search && request.query.search !== null) {
                 // come from navbar
                 q.andWhere(`c.name like '%${request.query.search}%' `);
             }
-            if (request.query.name) {
+            if (request.query.name && request.query.name !== null) {
                 q.andWhere(`c.name like '%${request.query.name}%' `);
             }
 
-            if (request.query.city) {
+            if (request.query.city && request.query.city !== null) {
                 q.andWhere(`c.headquarter like '%${request.query.city}%' `);
             }
             // if (request.query.size_from) {
             //     q.andWhere(`c.size_from >= ${request.query.size_from} `);
             // }
-            if (request.query.companySize) {
+            if (request.query.companySize && request.query.companySize !== null) {
                 q.andWhere(`c.size_to <= ${request.query.companySize} `);
             }
 
-            if (request.query.tags__in) {
+            if (request.query.tags__in && request.query.tags__in !== null) {
                 const cateArray: string = request.query.tags__in.split('__');
                 q.innerJoinAndSelect('c.tags', 'tag', `tag.id In (${cateArray})`);
             } else {
@@ -124,37 +124,37 @@ export class SearchController {
                 .leftJoinAndSelect('p.ethnicity', 'ethnicity');
 
 
-            if (request.query.search) {
+            if (request.query.search && request.query.search !== null) {
                 /// come from navbar
                 q.andWhere(`user.username like '%${request.query.search}%' `);
             }
 
-            if (request.query.fname) {
+            if (request.query.fname && request.query.fname !== null) {
                 q.andWhere(`user.first_name like '%${request.query.fname}%' `);
             }
-            if (request.query.lname) {
+            if (request.query.lname && request.query.lname !== null) {
                 q.andWhere(`user.last_name like '%${request.query.lname}%' `);
             }
 
-            if (request.query.city) {
+            if (request.query.city && request.query.city !== null) {
                 q.andWhere(`p.location like '%${request.query.city}%' `);
             }
-            if (request.query.Age) {
+            if (request.query.Age && request.query.Age !== null) {
                 const age_from = parseInt(request.query.Age.split('__')[0], 10);
                 const age_to = parseInt(request.query.Age.split('__')[1], 10);
                 q.andWhere(`p.age_from >= ${age_from} and p.age_to <= ${age_to}`);
             }
             //////////////////////////////////////////////////////////////////////////////////////////
-            if (request.query.ethnicity) {
+            if (request.query.ethnicity && request.query.ethnicity !== null) {
                 const ethnicityArray: string = request.query.ethnicity.split(',');
                 q.andWhere(`p.ethnicity.id In (${ethnicityArray})`);
             }
 
-            if (request.query.build) {
+            if (request.query.build && request.query.build !== null) {
                 const buildArray: string = request.query.build.split(',');
                 q.andWhere(`p.build.id In (${buildArray})`);
             }
-            if (request.query.hair) {
+            if (request.query.hair && request.query.hair !== null) {
                 const hairArray: string = request.query.hair.split(',');
                 q.andWhere(`p.hair.id In (${hairArray})`);
             }
@@ -163,13 +163,14 @@ export class SearchController {
             //     q.andWhere(`p.hobbies.id In (${hobbiesArray})`);
             // }
             ///////////////////////////////////////////////////////////////////////////////////////////
-            if (request.query.tags__in) {
+            if (request.query.tags__in && request.query.tags__in !== null) {
                 const cateArray: string = request.query.tags__in.split('__');
                 q.innerJoinAndSelect('p.categories', 'categories', `categories.id In (${cateArray})`);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////
 
-            if (request.query.has_photo || request.query.has_audio || request.query.has_video) {
+            // tslint:disable-next-line: max-line-length
+            if ((request.query.has_photo && request.query.has_photo !== null) || (request.query.has_audio && request.query.has_audio !== null) || (request.query.has_video && request.query.has_video !== null)) {
                 if (request.query.has_photo) {
                     q.innerJoin('p.activity_attachment', 'activity_attachment_photo')
                         .andWhere(`activity_attachment_photo.type like 'IMG' `)
