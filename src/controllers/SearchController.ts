@@ -7,6 +7,7 @@ import { User } from '../models/newModels/auth_user';
 import { TalentCategories } from '../models/newModels/talent_categories';
 import { Jobs } from '../models/newModels/jobs';
 import { ApplyPagination } from '../helpers/pagination';
+import { JobApplicants } from '../models/newModels/jobs_applicants';
 export class SearchController {
 
 
@@ -14,7 +15,6 @@ export class SearchController {
 
         const companyRepository = getRepository(Company);
         const JobRepository = getRepository(Jobs);
-        let m = new Jobs()
         try {
             const q = JobRepository.createQueryBuilder('j')
                 .innerJoinAndSelect('j.company', 'company')
@@ -25,20 +25,11 @@ export class SearchController {
                 // come from navbar
                 q.andWhere(`j.title like '%${request.query.search}%' `);
             }
-            if (request.query.title) {
-                q.andWhere(`j.title like '%${request.query.title}%' `);
-            }
-            if (request.query.description) {
-                q.andWhere(`j.description like '%${request.query.description}%' `);
-            }
             if (request.query.have_daily_perks) {
                 q.andWhere(`j.have_daily_perks = 1`);
             }
             if (request.query.have_meal) {
                 q.andWhere(`j.have_meal = 1`);
-            }
-            if (request.query.have_space_rest) {
-                q.andWhere(`j.have_space_rest = 1`);
             }
             if (request.query.have_transportation) {
                 q.andWhere(`j.have_transportation = 1`);
@@ -49,8 +40,12 @@ export class SearchController {
             if (request.query.is_female) {
                 q.andWhere(`j.is_female = 1`);
             }
-            if (request.query.category) {
-                const cateArray: string = request.query.category.split(',')
+
+            if (request.query.city) {
+                q.andWhere(`j.location like '%${request.query.city}%'`);
+            }
+            if (request.query.tags__in) {
+                const cateArray: string = request.query.tags__in.split('__');
                 q.innerJoinAndSelect('j.category', 'category', `category.id In (${cateArray})`);
             } else {
                 // else for get all categories like normal , not for search
@@ -87,15 +82,19 @@ export class SearchController {
             if (request.query.name) {
                 q.andWhere(`c.name like '%${request.query.name}%' `);
             }
-            if (request.query.size_from) {
-                q.andWhere(`c.size_from >= ${request.query.size_from} `);
+
+            if (request.query.city) {
+                q.andWhere(`c.headquarter like '%${request.query.city}%' `);
             }
-            if (request.query.size_to) {
-                q.andWhere(`c.size_to <= ${request.query.size_to} `);
+            // if (request.query.size_from) {
+            //     q.andWhere(`c.size_from >= ${request.query.size_from} `);
+            // }
+            if (request.query.companySize) {
+                q.andWhere(`c.size_to <= ${request.query.companySize} `);
             }
 
-            if (request.query.tags) {
-                const cateArray: string = request.query.tags.split(',')
+            if (request.query.tags__in) {
+                const cateArray: string = request.query.tags__in.split('__');
                 q.innerJoinAndSelect('c.tags', 'tag', `tag.id In (${cateArray})`);
             } else {
                 // else for get all categories like normal , not for search
@@ -136,6 +135,10 @@ export class SearchController {
             if (request.query.lname) {
                 q.andWhere(`user.last_name like '%${request.query.lname}%' `);
             }
+
+            if (request.query.city) {
+                q.andWhere(`p.location like '%${request.query.city}%' `);
+            }
             if (request.query.Age) {
                 const age_from = parseInt(request.query.Age.split('__')[0], 10);
                 const age_to = parseInt(request.query.Age.split('__')[1], 10);
@@ -161,7 +164,7 @@ export class SearchController {
             // }
             ///////////////////////////////////////////////////////////////////////////////////////////
             if (request.query.tags__in) {
-                const cateArray: string = request.query.tags__in.split('__')
+                const cateArray: string = request.query.tags__in.split('__');
                 q.innerJoinAndSelect('p.categories', 'categories', `categories.id In (${cateArray})`);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,5 +231,55 @@ export class SearchController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+
+    async getSuitesMeJobs(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const JobRepository = getRepository(Jobs);
+        try {
+            const user = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['categories'] });
+            const myCate = user.categories.map(e => e.id);
+
+            const q = JobRepository.createQueryBuilder('j')
+                .innerJoinAndSelect('j.company', 'company')
+                .innerJoinAndSelect('j.category', 'category', `category.id In (${myCate})`)
+                .orderBy('j.id', 'DESC');
+
+            const jobs = await ApplyPagination(request, response, q, false);
+            jobs.results = jobs.results.map(element => {
+                let job_category = [];
+                job_category = element.category;
+                delete element.category;
+                return { ...element, job_category }
+            });
+            return response.status(200).send(jobs);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    async getMyAppliedJobs(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const JobApplicantsRepository = getRepository(JobApplicants);
+        try {
+            const user = await profileRepository.findOne({ slug: request['user'].username })
+            const q = JobApplicantsRepository.createQueryBuilder('j')
+                .innerJoinAndSelect('j.job', 'job')
+                .where(`j.profileId = ${user.id}`)
+                .orderBy('j.id', 'DESC');
+
+            const jobs = await ApplyPagination(request, response, q, false);
+            jobs.results = jobs.results.map(element => {
+                return { ...element.job }
+            });
+            return response.status(200).send(jobs);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 
 }
