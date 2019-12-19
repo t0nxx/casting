@@ -276,6 +276,7 @@ export class SearchController {
             jobs.results = jobs.results.map(element => {
                 return { ...element.job, company: element.company }
             });
+
             return response.status(200).send(jobs);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

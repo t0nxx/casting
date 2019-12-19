@@ -9,7 +9,14 @@ import * as path from 'path';
 import * as socketio from 'socket.io';
 // import * as expsession from 'express-session';
 const expsession = require('cookie-session');
+
+const { setQueues, UI } = require('bull-board');
+import notificationQueue from './Queue'
+
+setQueues(notificationQueue);
+
 import * as cookieParser from 'cookie-parser';
+
 import routes from './routes/index';
 // tslint:disable-next-line: no-var-requires
 // create express app
@@ -55,6 +62,10 @@ createConnection().then(async connection => {
     app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
+    app.use('/queue', UI);
+
+
+
 
     // io.on('connection', socket => {
 

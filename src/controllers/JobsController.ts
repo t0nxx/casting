@@ -11,6 +11,7 @@ import { JobInterview } from '../models/newModels/jobs_interview';
 import { JobApplicants } from '../models/newModels/jobs_applicants';
 import { JobShortlist } from '../models/newModels/jobs_shortlisted';
 import { transformAndValidate } from 'class-transformer-validator';
+import notificationQueue from '../../src/Queue';
 export class JobsController {
 
     /**
@@ -430,6 +431,15 @@ export class JobsController {
             if (!findOne) { throw new Error('user is already Not shortlisted '); }
 
             await JobshortlistRepository.remove(findOne);
+
+            /**
+             *  send notification to user 
+             * 
+             * 
+             * 
+             */
+
+            // await notificationQueue.add({ job: 'hhhhh', type: 'hhhh' }, { repeat: { cron: '*/1 * * * *' } });
 
             return response.status(200).send({ success: true });
         } catch (error) {
