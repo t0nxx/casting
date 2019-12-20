@@ -54,6 +54,7 @@ createConnection().then(async connection => {
             'http://castingsecret.com:3000', 'http://www.castingsecret.com:3000',
             'http://castingsecret.com', 'http://www.castingsecret.com',
             'http://casting-admin.s3-website.eu-central-1.amazonaws.com',
+            'https://casting-admin-panel.s3.eu-central-1.amazonaws.com',
         ],
     }));
     //app.use(cors());
