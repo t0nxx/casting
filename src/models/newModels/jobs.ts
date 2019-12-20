@@ -84,13 +84,13 @@ export class Jobs {
     // @ManyToMany(type => Profile, p => p.shortListed_jobs)
     // short_listed: Profile[];
 
-    @OneToMany(type => JobInterview, jI => jI.job)
+    @OneToMany(type => JobInterview, jI => jI.job, { onDelete: 'CASCADE' })
     interviews: JobInterview[];
 
-    @OneToMany(type => JobShortlist, jI => jI.job)
+    @OneToMany(type => JobShortlist, jI => jI.job, { onDelete: 'CASCADE' })
     shortlisted: JobShortlist[];
 
-    @OneToMany(type => JobApplicants, jI => jI.job)
+    @OneToMany(type => JobApplicants, jI => jI.job, { onDelete: 'CASCADE' })
     applicants: JobApplicants[];
 
 }
