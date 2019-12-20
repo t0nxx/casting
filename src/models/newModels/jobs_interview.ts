@@ -21,10 +21,10 @@ export class JobInterview {
     @Column()
     location: string;
 
-    @ManyToOne(type => Profile, p => p.interview_jobs)
+    @ManyToOne(type => Profile, p => p.interview_jobs, { onDelete: 'CASCADE' })
     profile: Profile;
 
-    @ManyToOne(type => Jobs, j => j.interviews)
+    @ManyToOne(type => Jobs, j => j.interviews, { onDelete: 'CASCADE' })
     job: Jobs;
 
 }

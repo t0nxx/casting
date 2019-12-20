@@ -8,10 +8,10 @@ export class JobApplicants {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => Profile, p => p.applied_jobs)
+    @ManyToOne(type => Profile, p => p.applied_jobs,{ onDelete: 'CASCADE' })
     profile: Profile;
 
-    @ManyToOne(type => Jobs, j => j.applicants)
+    @ManyToOne(type => Jobs, j => j.applicants,{ onDelete: 'CASCADE' })
     job: Jobs;
 
 }
