@@ -239,6 +239,7 @@ export class JobsController {
             const q = JobApplicantRepository.createQueryBuilder('a')
                 .innerJoin('a.profile', 'profile')
                 .select(['a.id', 'profile.id'])
+                .where(`a.job.id = ${job.id}`)
                 .orderBy('a.id', 'DESC');
 
             const people = await ApplyPagination(request, response, q, false);
