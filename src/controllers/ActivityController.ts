@@ -456,7 +456,7 @@ export class ActivityController {
             const myLikes = profile.likes.map(ac => ac.id);
             const myDisLikes = profile.dislikes.map(ac => ac.id);
 
-            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
             if (!activity) { throw new Error('activivty not found'); }
 
             const liked = myLikes.includes(activity.id);
@@ -487,19 +487,19 @@ export class ActivityController {
             let saveLikedActivity = await ActivityRepository.save(activity);
             await profileRepository.save(profile);
 
-             /**
-             *  send notification to user 
-             * 
-             * 
-             * 
-             */
+            /**
+            *  send notification to user 
+            * 
+            * 
+            * 
+            */
             const notiToQueu: NotificationShape = {
                 actor_first_name: profile.user.first_name,
                 actor_last_name: profile.user.last_name,
-                actor_avatar : profile.avatar, 
+                actor_avatar: profile.avatar,
                 type: NotificationTypeEnum.like,
                 target_id: activity.id,
-                recipient: profile.id,
+                recipient: activity.profile.id,
             }
             await notificationQueue.add(notiToQueu);
             return response.status(200).send({ success: true });
@@ -521,7 +521,7 @@ export class ActivityController {
             const myLikes = profile.likes.map(ac => ac.id);
             const myDisLikes = profile.dislikes.map(ac => ac.id);
 
-            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
             if (!activity) { throw new Error('activivty not found'); }
 
             const liked = myLikes.includes(activity.id);
@@ -552,6 +552,21 @@ export class ActivityController {
             activity.dislike_count = activity.dislike_count + 1;
             let saveLikedActivity = await ActivityRepository.save(activity);
             await profileRepository.save(profile);
+
+            /**
+            *  send notification to user 
+            * 
+            * 
+            * 
+            */
+            const notiToQueu: NotificationShape = {
+                actor_first_name: profile.user.first_name,
+                actor_last_name: profile.user.last_name,
+                actor_avatar: profile.avatar,
+                type: NotificationTypeEnum.dislike,
+                target_id: activity.id,
+                recipient: activity.profile.id,
+            }
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

@@ -192,13 +192,17 @@ export class JobsController {
     async applyJob(request: Request, response: Response, next: NextFunction) {
         const profileRepository = getRepository(Profile);
         const JobRepository = getRepository(Jobs);
+        const CompanyRepository = getRepository(Company);
         const JobApplicantRepository = getRepository(JobApplicants);
         const JobShortListedRepository = getRepository(JobShortlist);
         const JobInterviewRepository = getRepository(JobInterview);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
-            const job = await JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['applicants'] });
+            const job = await JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['applicants', 'company'] });
             if (!job) { throw new Error('job Not Found'); }
+
+
+            const companyAdmin = await CompanyRepository.findOne({ id: job.company.id }, { relations: ['profile'] });
 
             const isAlreadyApplied = await JobApplicantRepository.findOne({ job, profile });
             const isAlreadyShortlisted = await JobShortListedRepository.findOne({ job, profile });
@@ -221,6 +225,24 @@ export class JobsController {
             newApplicant.profile = profile;
 
             await JobApplicantRepository.save(newApplicant);
+
+            /**
+            *  send notification to user 
+            * 
+            * 
+            * 
+            */
+            const notiToQueu: NotificationShape = {
+                actor_first_name: request['user'].first_name,
+                actor_last_name: request['user'].last_name,
+                actor_avatar: profile.avatar,
+                type: NotificationTypeEnum.newAapplicantAdmin,
+                target_slug: job.slug,
+                target_company: job.company.slug,
+                recipient: companyAdmin.profile.id,
+            }
+            await notificationQueue.add(notiToQueu);
+
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -446,7 +468,7 @@ export class JobsController {
                 actor_avatar: job.company.avatar,
                 type: NotificationTypeEnum.interview,
                 target_slug: job.slug,
-                target_company : job.company.slug,
+                target_company: job.company.slug,
                 interviewName: saveInterview.interviewer,
                 interviewDate: saveInterview.interview_date,
                 recipient: profile.id,
