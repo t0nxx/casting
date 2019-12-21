@@ -11,7 +11,7 @@ import * as socketio from 'socket.io';
 const expsession = require('cookie-session');
 
 const { setQueues, UI } = require('bull-board');
-import notificationQueue from './Queue'
+import notificationQueue from './jobs/Queue'
 
 setQueues(notificationQueue);
 

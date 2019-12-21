@@ -11,7 +11,8 @@ import { JobInterview } from '../models/newModels/jobs_interview';
 import { JobApplicants } from '../models/newModels/jobs_applicants';
 import { JobShortlist } from '../models/newModels/jobs_shortlisted';
 import { transformAndValidate } from 'class-transformer-validator';
-import notificationQueue from '../../src/Queue';
+import notificationQueue from '../jobs/Queue';
+import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 export class JobsController {
 
     /**
@@ -404,7 +405,7 @@ export class JobsController {
         try {
             const job = await JobRepository.findOne({ slug: request.params.jobSlug },
                 {
-                    relations: ['interviews'],
+                    relations: ['interviews', 'company'],
                 });
             if (!job) { throw new Error('job Not Found'); }
 
@@ -426,7 +427,7 @@ export class JobsController {
             interview.job = job;
             interview.profile = profile;
 
-            await JobInterviewRepository.save(interview);
+            const saveInterview = await JobInterviewRepository.save(interview);
             // remove from shortlist after create interview
 
             const findOne = await JobshortlistRepository.findOne({ job, profile });
@@ -440,8 +441,17 @@ export class JobsController {
              * 
              * 
              */
-
-            // await notificationQueue.add({ job: 'hhhhh', type: 'hhhh' }, { repeat: { cron: '*/1 * * * *' } });
+            const notiToQueu: NotificationShape = {
+                actor_first_name: job.company.name,
+                actor_avatar: job.company.avatar,
+                type: NotificationTypeEnum.interview,
+                target_slug: job.slug,
+                target_company : job.company.slug,
+                interviewName: saveInterview.interviewer,
+                interviewDate: saveInterview.interview_date,
+                recipient: profile.id,
+            }
+            await notificationQueue.add(notiToQueu);
 
             return response.status(200).send({ success: true });
         } catch (error) {

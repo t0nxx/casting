@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Profile } from './users_profile';
 
 @Entity('notification')
 export class Notification {
@@ -6,29 +7,20 @@ export class Notification {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('integer')
-    actor_object_id: number | null;
-
-    @Column()
-    actor_text: string | null;
-
-    @Column()
-    actor_url_text: string | null;
-
     @Column()
     verb: string;
 
     @Column()
-    description: string | null;
+    type: number;
 
-    @Column()
-    nf_type: string;
+    @Column({ default: null })
+    target_slug: string;
 
-    @Column()
-    target_text: string ;
+    @Column({ default: null })
+    target_company: string;
 
-    @Column()
-    target_url: string ;
+    @Column({ default: null })
+    target_id: number;
 
     @CreateDateColumn()
     created: Date;
@@ -36,11 +28,15 @@ export class Notification {
     @Column({ default: false })
     read: boolean;
 
-    @Column({ default: false })
-    deleted: boolean;
+    @Column({ default: null })
+    actor_first_name: string;
 
-    // @ManyToOne(() => auth_user, (auth_user: auth_user) => auth_user.notifyNotifications, {  nullable: false })
-    // @JoinColumn({ name: 'recipient_id'})
-    // recipient: auth_user | null;
+    @Column({ default: null })
+    actor_last_name: string;
 
+    @Column({ default: null })
+    actor_avatar: string;
+
+    @ManyToOne(type => Profile, p => p.notifications, { onDelete: 'CASCADE' })
+    recipient: Profile;
 }

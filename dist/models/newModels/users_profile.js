@@ -22,8 +22,15 @@ const profile_hobbies_1 = require("./profile_hobbies");
 const profile_courses_1 = require("./profile_courses");
 const profile_social_1 = require("./profile_social");
 const company_1 = require("./company");
+const profile_album_1 = require("./profile_album");
 const activity_attachment_1 = require("./activity_attachment");
 const activity_1 = require("./activity");
+const comments_1 = require("./comments");
+const jobs_interview_1 = require("./jobs_interview");
+const jobs_applicants_1 = require("./jobs_applicants");
+const jobs_shortlisted_1 = require("./jobs_shortlisted");
+const activity_reports_1 = require("./activity_reports");
+const notify_notification_1 = require("./notify_notification");
 let Profile = class Profile {
 };
 __decorate([
@@ -95,7 +102,7 @@ __decorate([
     __metadata("design:type", Array)
 ], Profile.prototype, "companies", void 0);
 __decorate([
-    typeorm_1.OneToMany(type => company_1.Company, c => c.profile),
+    typeorm_1.OneToMany(type => profile_album_1.ProfileAlbum, p => p.profile),
     __metadata("design:type", Array)
 ], Profile.prototype, "albums", void 0);
 __decorate([
@@ -150,6 +157,34 @@ __decorate([
     typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activityMention),
     __metadata("design:type", Array)
 ], Profile.prototype, "activity_mentions", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => comments_1.Comment, c => c.commentMention),
+    __metadata("design:type", Array)
+], Profile.prototype, "comment_mentions", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => comments_1.Comment, c => c.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity_Comments", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => notify_notification_1.Notification, n => n.recipient),
+    __metadata("design:type", Array)
+], Profile.prototype, "notifications", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_interview_1.JobInterview, j => j.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "interview_jobs", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_applicants_1.JobApplicants, j => j.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "applied_jobs", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_shortlisted_1.JobShortlist, j => j.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "shortlisted_jobs", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_reports_1.ActivityReports, a => a.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity_reports", void 0);
 Profile = __decorate([
     typeorm_1.Entity('users_profile')
 ], Profile);

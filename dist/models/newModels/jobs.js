@@ -12,6 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const company_1 = require("./company");
 const talent_categories_1 = require("./talent_categories");
+const jobs_interview_1 = require("./jobs_interview");
+const jobs_shortlisted_1 = require("./jobs_shortlisted");
+const jobs_applicants_1 = require("./jobs_applicants");
 let Jobs = class Jobs {
 };
 __decorate([
@@ -99,6 +102,22 @@ __decorate([
     typeorm_1.JoinTable(),
     __metadata("design:type", Array)
 ], Jobs.prototype, "category", void 0);
+__decorate([
+    typeorm_1.Column({ default: 'Not Provided' }),
+    __metadata("design:type", String)
+], Jobs.prototype, "location", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_interview_1.JobInterview, jI => jI.job, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Jobs.prototype, "interviews", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_shortlisted_1.JobShortlist, jI => jI.job, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Jobs.prototype, "shortlisted", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_applicants_1.JobApplicants, jI => jI.job, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Jobs.prototype, "applicants", void 0);
 Jobs = __decorate([
     typeorm_1.Entity('jobs')
 ], Jobs);

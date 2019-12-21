@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const activity_1 = require("./activity");
+const profile_album_1 = require("./profile_album");
 const users_profile_1 = require("./users_profile");
 var AttachmentEnum;
 (function (AttachmentEnum) {
@@ -44,6 +45,14 @@ __decorate([
     typeorm_1.ManyToOne(type => users_profile_1.Profile, p => p.activity_attachment, { onDelete: 'CASCADE' }),
     __metadata("design:type", users_profile_1.Profile)
 ], ActivityAttachment.prototype, "profile", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => profile_album_1.ProfileAlbum, p => p.activity_attachment, { onDelete: 'CASCADE' }),
+    __metadata("design:type", profile_album_1.ProfileAlbum)
+], ActivityAttachment.prototype, "album", void 0);
+__decorate([
+    typeorm_1.Column({ nullable: true }),
+    __metadata("design:type", Number)
+], ActivityAttachment.prototype, "album_id", void 0);
 ActivityAttachment = __decorate([
     typeorm_1.Entity("activity_attachment")
 ], ActivityAttachment);

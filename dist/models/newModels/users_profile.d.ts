@@ -13,6 +13,12 @@ import { Company } from './company';
 import { ProfileAlbum } from './profile_album';
 import { ActivityAttachment } from './activity_attachment';
 import { Activity } from './activity';
+import { Comment } from './comments';
+import { JobInterview } from './jobs_interview';
+import { JobApplicants } from './jobs_applicants';
+import { JobShortlist } from './jobs_shortlisted';
+import { ActivityReports } from './activity_reports';
+import { Notification } from './notify_notification';
 export declare class Profile {
     id: number;
     avatar: string;
@@ -44,4 +50,11 @@ export declare class Profile {
     bookmarks: Activity[];
     hidden: Activity[];
     activity_mentions: Activity[];
+    comment_mentions: Comment[];
+    activity_Comments: Comment[];
+    notifications: Notification[];
+    interview_jobs: JobInterview[];
+    applied_jobs: JobApplicants[];
+    shortlisted_jobs: JobShortlist[];
+    activity_reports: ActivityReports[];
 }

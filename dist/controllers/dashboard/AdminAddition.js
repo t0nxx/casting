@@ -15,10 +15,13 @@ class AdminAdditionController {
         return __awaiter(this, void 0, void 0, function* () {
             const userRepository = typeorm_1.getRepository(auth_user_1.User);
             try {
-                const [data, count] = yield userRepository.findAndCount({
-                    select: ['id', 'isAdmin', 'first_name', 'last_name', 'email', 'username'],
-                    order: { id: 'DESC' }
-                });
+                const q = yield userRepository.createQueryBuilder('u')
+                    .select(['u.id', 'u.isAdmin', 'u.first_name', 'u.last_name', 'u.email', 'u.username'])
+                    .orderBy('u.id', 'DESC');
+                if (request.query.query) {
+                    q.andWhere(`u.first_name like '%${request.query.query}%' or u.last_name like '%${request.query.query}%' or u.username like '%${request.query.query}%' or u.email like '%${request.query.query}%'`);
+                }
+                const [data, count] = yield q.getManyAndCount();
                 return response.status(200).send({ data, count });
             }
             catch (error) {

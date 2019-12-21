@@ -123,7 +123,94 @@ class ProfileController {
                 if (!profile) {
                     throw new Error('profile Not Found');
                 }
-                return response.status(200).send(...profile.albums);
+                if (request.query.some) {
+                    profile.albums = profile.albums.slice(0, 4);
+                }
+                return response.status(200).send(profile.albums);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getOneAlbum(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const albumRepository = typeorm_1.getRepository(profile_album_1.ProfileAlbum);
+            try {
+                const album = yield albumRepository.findOne({ id: parseInt(request.params.id, 10) }, {
+                    relations: ['activity_attachment']
+                });
+                if (!album) {
+                    throw new Error('album Not Found');
+                }
+                return response.status(200).send(album);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    updateAlbum(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const albumRepository = typeorm_1.getRepository(profile_album_1.ProfileAlbum);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const album = yield albumRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
+                if (!album) {
+                    throw new Error('album Not Found');
+                }
+                if (album.profile.id !== profile.id) {
+                    throw new Error('You are Not Allowed to edit this album');
+                }
+                album.album_name = request.body.album_name;
+                yield albumRepository.save(album);
+                const afterUpdate = yield albumRepository.findOne({ id: parseInt(request.params.id, 10) });
+                return response.status(200).send(afterUpdate);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    deleteAlbum(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const albumRepository = typeorm_1.getRepository(profile_album_1.ProfileAlbum);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const album = yield albumRepository.findOne({ id: parseInt(request.params.id, 10) });
+                if (!album) {
+                    throw new Error('album Not Found');
+                }
+                if (album.profile.id !== profile.id) {
+                    throw new Error('You are Not Allowed to edit this album');
+                }
+                yield albumRepository.remove(album);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    addNewlbum(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const albumRepository = typeorm_1.getRepository(profile_album_1.ProfileAlbum);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const album = new profile_album_1.ProfileAlbum();
+                album.album_name = request.body.album_name;
+                album.profile = profile;
+                const newAlbum = yield albumRepository.save(album);
+                delete newAlbum.profile;
+                return response.status(200).send(newAlbum);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];

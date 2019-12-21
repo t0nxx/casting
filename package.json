@@ -57,11 +57,12 @@
    "scripts": {
       "dev": "npm-run-all -p start:dev:*",
       "start:dev:server": "DB_Dir=src nodemon",
-      "start:dev:queue": "ts-node -r tsconfig-paths/register ./src/Queue.ts",
+      "start:dev:queue": "ts-node -r tsconfig-paths/register ./src/jobs/Queue.ts",
       "start:debug": "DB_Dir=src nodemon --config nodemon-debug.json",
       "build": "tsc -p tsconfig.build.json",
       "prestart:prod": "rimraf dist && npm run build",
       "start:prod": "DB_Dir=dist pm2 start dist/main.js",
+      "start:prod:queue": "pm2 start dist/jobs/Queue.js",
       "start:win": "set DB_Dir=dist && node dist/main.js"
    }
 }

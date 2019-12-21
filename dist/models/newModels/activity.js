@@ -13,6 +13,8 @@ const typeorm_1 = require("typeorm");
 const company_1 = require("./company");
 const activity_attachment_1 = require("./activity_attachment");
 const users_profile_1 = require("./users_profile");
+const comments_1 = require("./comments");
+const activity_reports_1 = require("./activity_reports");
 let Activity = class Activity {
 };
 __decorate([
@@ -48,6 +50,10 @@ __decorate([
     __metadata("design:type", Number)
 ], Activity.prototype, "dislike_count", void 0);
 __decorate([
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Activity.prototype, "resports_count", void 0);
+__decorate([
     typeorm_1.ManyToOne(type => users_profile_1.Profile, p => p.activity, { onDelete: 'CASCADE' }),
     __metadata("design:type", users_profile_1.Profile)
 ], Activity.prototype, "profile", void 0);
@@ -59,6 +65,14 @@ __decorate([
     typeorm_1.OneToMany(type => activity_attachment_1.ActivityAttachment, ac => ac.activity),
     __metadata("design:type", Array)
 ], Activity.prototype, "activity_attachment", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => comments_1.Comment, ac => ac.activity),
+    __metadata("design:type", Array)
+], Activity.prototype, "activity_Comments", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_reports_1.ActivityReports, ac => ac.activity),
+    __metadata("design:type", Array)
+], Activity.prototype, "reports", void 0);
 __decorate([
     typeorm_1.ManyToMany(type => users_profile_1.Profile, p => p.likes),
     typeorm_1.JoinTable(),

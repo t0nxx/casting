@@ -1,5 +1,8 @@
 import { Company } from './company';
 import { TalentCategories } from './talent_categories';
+import { JobInterview } from './jobs_interview';
+import { JobShortlist } from './jobs_shortlisted';
+import { JobApplicants } from './jobs_applicants';
 export declare class Jobs {
     id: number;
     publish_date: Date;
@@ -22,4 +25,8 @@ export declare class Jobs {
     slug: string;
     company: Company;
     category: TalentCategories[];
+    location: string;
+    interviews: JobInterview[];
+    shortlisted: JobShortlist[];
+    applicants: JobApplicants[];
 }

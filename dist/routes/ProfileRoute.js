@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const ProfileController_1 = require("../controllers/ProfileController");
@@ -24,14 +16,14 @@ router.get('/:slug', AuthMiddleWare_1.AuthMiddleWare, profileController.getProfi
 router.get('/:slug/settings', AuthMiddleWare_1.AuthMiddleWare, profileController.getProfileSettings);
 router.get('/:slug/companies', companyController.getAllCompanies);
 router.get('/:slug/friends-request', AuthMiddleWare_1.AuthMiddleWare, friendsController.getAllFriendsRequest);
+router.get('/:slug/friends-suggested', AuthMiddleWare_1.AuthMiddleWare, friendsController.getSuggestedFriends);
 router.get('/:slug/friends', AuthMiddleWare_1.AuthMiddleWare, friendsController.getAllFriends);
 router.get('/:slug/album', AuthMiddleWare_1.AuthMiddleWare, profileController.getProfileAlbums);
-router.get('/:slug/album/profile', AuthMiddleWare_1.AuthMiddleWare, (req, res) => __awaiter(this, void 0, void 0, function* () {
-    res.status(200).send({ s: true });
-}));
+router.get('/:slug/album/profile', AuthMiddleWare_1.AuthMiddleWare, activityController.getAllImagesOfUser);
+router.get('/:slug/album/:id', AuthMiddleWare_1.AuthMiddleWare, activityController.getAllImagesOfAlbum);
 router.get('/:slug/activity', AuthMiddleWare_1.AuthMiddleWare, activityController.getActivityOfUser);
-router.get('/:slug/video', AuthMiddleWare_1.AuthMiddleWare, activityController.getActivityOfUser);
-router.get('/:slug/audio', AuthMiddleWare_1.AuthMiddleWare, activityController.getActivityOfUser);
+router.get('/:slug/video', AuthMiddleWare_1.AuthMiddleWare, activityController.getAllVideoOfUser);
+router.get('/:slug/audio', AuthMiddleWare_1.AuthMiddleWare, activityController.getAllAudioOfUser);
 router.post('/:slug/hobbies', AuthMiddleWare_1.AuthMiddleWare, profileController.addHobbies);
 router.post('/:slug/training', AuthMiddleWare_1.AuthMiddleWare, profileController.addTaninig);
 router.post('/:slug/social', AuthMiddleWare_1.AuthMiddleWare, profileController.addSocialNetwork);
@@ -39,6 +31,8 @@ router.post('/:slug/companies', AuthMiddleWare_1.AuthMiddleWare, companyControll
 router.post('/:slug/friends', AuthMiddleWare_1.AuthMiddleWare, friendsController.sendFriendRequest);
 router.post('/:slug/friends/accept', AuthMiddleWare_1.AuthMiddleWare, friendsController.acceptFriendRequest);
 router.post('/:slug/friends/reject', AuthMiddleWare_1.AuthMiddleWare, friendsController.rejectFriendRequest);
+router.post('/:slug/video', AuthMiddleWare_1.AuthMiddleWare, activityController.AddNewVideoOrAudio);
+router.post('/:slug/audio', AuthMiddleWare_1.AuthMiddleWare, activityController.AddNewVideoOrAudio);
 router.delete('/:slug/friends', AuthMiddleWare_1.AuthMiddleWare, friendsController.deleteFriend);
 router.put('/:slug/training/:id', AuthMiddleWare_1.AuthMiddleWare, profileController.updateTaninig);
 router.put('/:slug/social/:id', AuthMiddleWare_1.AuthMiddleWare, profileController.updateSocialNetwork);
@@ -47,6 +41,9 @@ router.patch('/:slug/update', AuthMiddleWare_1.AuthMiddleWare, profileController
 router.patch('/:slug/avatar', AuthMiddleWare_1.AuthMiddleWare, profileController.updateAvatar);
 router.patch('/:slug/cover', AuthMiddleWare_1.AuthMiddleWare, profileController.updateCover);
 router.post('/:slug/cover/reset', AuthMiddleWare_1.AuthMiddleWare, profileController.resetCover);
+router.post('/:slug/album', AuthMiddleWare_1.AuthMiddleWare, profileController.addNewlbum);
+router.post('/:slug/album/image', AuthMiddleWare_1.AuthMiddleWare, activityController.AddNewVideoOrAudio);
+router.put('/:slug/album/:id/image', AuthMiddleWare_1.AuthMiddleWare, activityController.addImageToAlbum);
 router.delete('/:slug/training/:id', AuthMiddleWare_1.AuthMiddleWare, profileController.deleteTaninig);
 router.delete('/:slug/hobbies/:id', AuthMiddleWare_1.AuthMiddleWare, profileController.deleteHobbies);
 exports.default = router;

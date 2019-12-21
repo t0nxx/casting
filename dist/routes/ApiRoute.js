@@ -2,12 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const TalentCategoriesController_1 = require("../controllers/api/TalentCategoriesController");
+const NewsLetterController_1 = require("../controllers/api/NewsLetterController");
+const Notifications_1 = require("../controllers/api/Notifications");
 const AuthController_1 = require("../controllers/AuthController");
 const router = express_1.Router();
 const talentController = new TalentCategoriesController_1.TalentCategoriesController();
 const authController = new AuthController_1.AuthController();
+const newsLetterController = new NewsLetterController_1.NewsLetterController();
+const notificationsController = new Notifications_1.NotificationsController();
 router.get('/talent-categories', talentController.getAllTalentCategories);
 router.post('/new-category', talentController.createNewCategory);
+router.get('/notification', notificationsController.getAllNotifications);
 router.post('/verifyusernameemail', authController.verifyEmailAndUsernamIsAvailable);
+router.post('/subscribe', newsLetterController.subscribeToNewsLetter);
+router.post('/invite', newsLetterController.inviteToCasting);
 exports.default = router;
 //# sourceMappingURL=ApiRoute.js.map

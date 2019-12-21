@@ -10,6 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
+const users_profile_1 = require("./users_profile");
+const activity_attachment_1 = require("./activity_attachment");
 let ProfileAlbum = class ProfileAlbum {
 };
 __decorate([
@@ -24,6 +26,14 @@ __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], ProfileAlbum.prototype, "album_name", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => users_profile_1.Profile, p => p.albums, { onDelete: 'CASCADE' }),
+    __metadata("design:type", users_profile_1.Profile)
+], ProfileAlbum.prototype, "profile", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_attachment_1.ActivityAttachment, ac => ac.album),
+    __metadata("design:type", Array)
+], ProfileAlbum.prototype, "activity_attachment", void 0);
 ProfileAlbum = __decorate([
     typeorm_1.Entity("profile_album")
 ], ProfileAlbum);

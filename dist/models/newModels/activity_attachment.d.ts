@@ -1,4 +1,5 @@
 import { Activity } from "./activity";
+import { ProfileAlbum } from './profile_album';
 import { Profile } from "./users_profile";
 export declare enum AttachmentEnum {
     VIEDO = "VIDEO",
@@ -12,4 +13,6 @@ export declare class ActivityAttachment {
     type: string;
     activity: Activity;
     profile: Profile;
+    album: ProfileAlbum;
+    album_id: number;
 }

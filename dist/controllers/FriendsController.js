@@ -14,6 +14,7 @@ const auth_user_1 = require("../models/newModels/auth_user");
 const users_profile_1 = require("../models/newModels/users_profile");
 const friendship_friend_1 = require("../models/newModels/friendship_friend");
 const friendship_friendshiprequest_1 = require("../models/newModels/friendship_friendshiprequest");
+const _ = require("underscore");
 class FriendsController {
     sendFriendRequest(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -231,6 +232,39 @@ class FriendsController {
                 }
                 const count = count1 + count2;
                 return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getSuggestedFriends(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const friends = yield getAllFriendSharedBtwnApp(request, response, profile.slug);
+                const friendsArray = friends.map(e => e.pk);
+                friendsArray.push(profile.id);
+                const [notFriends, count] = yield profileRepository.createQueryBuilder('p')
+                    .innerJoin('p.user', 'user')
+                    .select(['p.id', 'p.slug', 'p.avatar', 'user.first_name', 'user.last_name', 'user.email'])
+                    .where(`p.id NOT IN (${friendsArray})`)
+                    .orderBy('p.id', 'DESC')
+                    .getManyAndCount();
+                let results = notFriends.map(e => {
+                    const resObject = {
+                        pk: e.id,
+                        slug: e.slug,
+                        avatar: e.avatar,
+                        auth_user: Object.assign({}, e.user)
+                    };
+                    delete e.user;
+                    return resObject;
+                });
+                results = _.sample(results, 10);
+                return response.status(200).send({ results, count: 10 });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];

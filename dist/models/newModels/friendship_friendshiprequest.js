@@ -18,7 +18,7 @@ __decorate([
     __metadata("design:type", Number)
 ], FriendshipFriendshipRequest.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column({ default: '' }),
     __metadata("design:type", String)
 ], FriendshipFriendshipRequest.prototype, "message", void 0);
 __decorate([

@@ -23,8 +23,7 @@ __decorate([
     __metadata("design:type", String)
 ], TalentCategories.prototype, "name_en", void 0);
 __decorate([
-    class_validator_1.IsNotEmpty({ message: 'name_ar is required' }),
-    typeorm_1.Column({ unique: true }),
+    typeorm_1.Column({ default: '' }),
     __metadata("design:type", String)
 ], TalentCategories.prototype, "name_ar", void 0);
 TalentCategories = __decorate([

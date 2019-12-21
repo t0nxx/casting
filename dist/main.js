@@ -17,6 +17,9 @@ const cors = require("cors");
 const path = require("path");
 const socketio = require("socket.io");
 const expsession = require('cookie-session');
+const { setQueues, UI } = require('bull-board');
+const Queue_1 = require("./jobs/Queue");
+setQueues(Queue_1.default);
 const cookieParser = require("cookie-parser");
 const index_1 = require("./routes/index");
 const app = express();
@@ -35,18 +38,22 @@ io.use((socket, next) => {
 });
 typeorm_1.createConnection().then((connection) => __awaiter(this, void 0, void 0, function* () {
     app.use(bodyParser.json());
-    app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost', 'http://localhost:3000', 'http://castingsecret.com:3000', 'http://www.castingsecret.com:3000', 'http://castingsecret.com', 'http://www.castingsecret.com'] }));
+    app.use(cors({
+        credentials: true, origin: [
+            'http://localhost:4200', 'http://localhost', 'http://localhost:3000',
+            'http://localhost:5001',
+            'http://castingsecret.com:3000', 'http://www.castingsecret.com:3000',
+            'http://castingsecret.com', 'http://www.castingsecret.com',
+            'http://casting-admin.s3-website.eu-central-1.amazonaws.com',
+            'https://casting-admin-panel.s3.eu-central-1.amazonaws.com',
+            'http://casting-admin-panel.s3.eu-central-1.amazonaws.com',
+            'http://casting-admin-panel.s3-website.eu-central-1.amazonaws.com',
+        ],
+    }));
     app.use(fileupload());
     app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     app.use(index_1.default);
-    io.on('connection', socket => {
-        console.log(`socket.io connected: ${socket.id}`);
-        socket.request.session.socketio = socket.id;
-        console.log('new socket session', socket.request.session);
-        socket.on('disconnect', () => {
-            console.log('user disconnected');
-        });
-    });
+    app.use('/queue', UI);
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
     });

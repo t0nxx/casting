@@ -6,6 +6,7 @@ export declare class FriendsController {
     deleteFriend(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
     getAllFriendsRequest(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
     getAllFriends(request: any, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    getSuggestedFriends(request: any, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
 }
 export declare function getAllFriendSharedBtwnApp(request: any, response: Response, slug: any): Promise<import("express-serve-static-core").Response | {
     pk: number;

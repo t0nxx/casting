@@ -20,6 +20,7 @@ import { JobInterview } from './jobs_interview';
 import { JobApplicants } from './jobs_applicants';
 import { JobShortlist } from './jobs_shortlisted';
 import { ActivityReports } from './activity_reports';
+import { Notification } from './notify_notification';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";
@@ -148,6 +149,9 @@ export class Profile {
     @OneToMany(type => Comment, c => c.profile)
     activity_Comments: Comment[];
 
+    @OneToMany(type => Notification, n => n.recipient)
+    notifications: Notification[];
+
 
     // @ManyToMany(type => Jobs, j => j.applicants)
     // @JoinTable()
@@ -156,7 +160,7 @@ export class Profile {
     // @ManyToMany(type => Jobs, j => j.short_listed)
     // @JoinTable()
     // shortListed_jobs: Jobs[];
-    
+
 
     @OneToMany(type => JobInterview, j => j.profile)
     interview_jobs: JobInterview[];
@@ -169,8 +173,8 @@ export class Profile {
 
     @OneToMany(type => ActivityReports, a => a.profile)
     activity_reports: ActivityReports[];
-    
-    
+
+
     // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.profile)
     // jobApplicantss: job_applicants[];
 

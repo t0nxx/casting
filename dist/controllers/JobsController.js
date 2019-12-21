@@ -13,6 +13,15 @@ const randomString = require("randomstring");
 const company_1 = require("../models/newModels/company");
 const talent_categories_1 = require("../models/newModels/talent_categories");
 const jobs_1 = require("../models/newModels/jobs");
+const pagination_1 = require("../helpers/pagination");
+const users_profile_1 = require("../models/newModels/users_profile");
+const auth_user_1 = require("../models/newModels/auth_user");
+const jobs_interview_1 = require("../models/newModels/jobs_interview");
+const jobs_applicants_1 = require("../models/newModels/jobs_applicants");
+const jobs_shortlisted_1 = require("../models/newModels/jobs_shortlisted");
+const class_transformer_validator_1 = require("class-transformer-validator");
+const Queue_1 = require("../jobs/Queue");
+const SendNotification_1 = require("../jobs/SendNotification");
 class JobsController {
     getAllJobs(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -23,7 +32,14 @@ class JobsController {
                 if (!com) {
                     throw new Error('company Not Found');
                 }
-                const jobs = yield JobRepository.find({ where: { company: com } });
+                const q = JobRepository.createQueryBuilder('j')
+                    .where(`j.companyId = ${com.id}`)
+                    .orderBy('j.id', 'DESC');
+                if (request.query.search) {
+                    q.andWhere(`j.title like '%${request.query.search}%' `);
+                    q.andWhere(`j.description like '%${request.query.search}%' `);
+                }
+                const jobs = yield pagination_1.ApplyPagination(request, response, q, false);
                 return response.status(200).send(jobs);
             }
             catch (error) {
@@ -34,14 +50,45 @@ class JobsController {
     }
     getOneJob(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             const companyRepository = typeorm_1.getRepository(company_1.Company);
             const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
             try {
-                const job = yield JobRepository.findOne({ slug: request.params.slug });
+                let is_admin = false;
+                const profile = yield profileRepository.findOne({ slug: request['user'].username }, { relations: ['companies'] });
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['category', 'company'] });
                 if (!job) {
                     throw new Error('job Not Found');
                 }
-                return response.status(200).send(Object.assign({ success: true }, job));
+                if (profile && profile.companies.length > 0 && profile.companies[0].slug === job.company.slug) {
+                    is_admin = true;
+                }
+                let job_category = [];
+                job_category = job.category;
+                delete job.category;
+                delete job.company;
+                return response.status(200).send(Object.assign({}, job, { job_category, is_admin }));
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getOneJobForNotLOgin(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const companyRepository = typeorm_1.getRepository(company_1.Company);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            try {
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['category', 'company'] });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                let job_category = [];
+                job_category = job.category;
+                delete job.category;
+                delete job.company;
+                return response.status(200).send(Object.assign({}, job, { job_category, is_admin: false }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -69,6 +116,316 @@ class JobsController {
                 newJob.slug = newJob.title + '-' + randomString.generate({ length: 5 });
                 const save = yield JobRepository.save(newJob);
                 return response.status(200).send({ success: true, slug: save.slug });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    updateJob(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const talentCategoryRepository = typeorm_1.getRepository(talent_categories_1.TalentCategories);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username }, { relations: ['companies'] });
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['category', 'company'] });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                if (profile && profile.companies.length > 0 && profile.companies[0].slug === job.company.slug) {
+                    let newData = Object.keys(request.body).length;
+                    if (newData < 1) {
+                        throw new Error('no data provided to update');
+                    }
+                    if (request.body.category) {
+                        const category = yield talentCategoryRepository.findByIds(request.body.category);
+                        job.category = [...job.category, ...category];
+                        yield JobRepository.save(job);
+                        delete request.body.category;
+                    }
+                    let newDataWitoutTags = Object.keys(request.body).length;
+                    if (newDataWitoutTags > 1) {
+                        yield JobRepository.update({ slug: request.params.jobSlug }, request.body);
+                    }
+                    const jobAfterUpdate = yield JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['category'] });
+                    delete jobAfterUpdate.company;
+                    return response.status(200).send(Object.assign({}, jobAfterUpdate, { is_admin: true }));
+                }
+                else {
+                    throw new Error('You are not allowed to edit this job');
+                }
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    deleteJob(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const talentCategoryRepository = typeorm_1.getRepository(talent_categories_1.TalentCategories);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username }, { relations: ['companies'] });
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['category', 'company'] });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                if (profile && profile.companies.length > 0 && profile.companies[0].slug === job.company.slug) {
+                    yield JobRepository.remove(job);
+                    return response.status(200).send({ success: true });
+                }
+                else {
+                    throw new Error('You are not allowed to remove this job');
+                }
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    applyJob(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const JobApplicantRepository = typeorm_1.getRepository(jobs_applicants_1.JobApplicants);
+            const JobShortListedRepository = typeorm_1.getRepository(jobs_shortlisted_1.JobShortlist);
+            const JobInterviewRepository = typeorm_1.getRepository(jobs_interview_1.JobInterview);
+            try {
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['applicants'] });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                const isAlreadyApplied = yield JobApplicantRepository.findOne({ job, profile });
+                const isAlreadyShortlisted = yield JobShortListedRepository.findOne({ job, profile });
+                const isAlreadyHaveAnInterview = yield JobInterviewRepository.findOne({ job, profile });
+                if (isAlreadyApplied) {
+                    throw new Error('You are already applied to this job');
+                }
+                if (isAlreadyShortlisted) {
+                    throw new Error('You are already shortlisted to this job');
+                }
+                if (isAlreadyHaveAnInterview) {
+                    throw new Error('You are already have interview to this job');
+                }
+                const newApplicant = new jobs_applicants_1.JobApplicants();
+                newApplicant.job = job;
+                newApplicant.profile = profile;
+                yield JobApplicantRepository.save(newApplicant);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getApplicants(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const JobApplicantRepository = typeorm_1.getRepository(jobs_applicants_1.JobApplicants);
+            try {
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                const q = JobApplicantRepository.createQueryBuilder('a')
+                    .innerJoin('a.profile', 'profile')
+                    .select(['a.id', 'profile.id'])
+                    .where(`a.job.id = ${job.id}`)
+                    .orderBy('a.id', 'DESC');
+                const people = yield pagination_1.ApplyPagination(request, response, q, false);
+                people.results = people.results.map(e => e.profile.id);
+                const users = yield profileRepository.findByIds(people.results, {
+                    relations: ['user']
+                });
+                people.results = users.map(e => {
+                    const { first_name, last_name, email } = e.user;
+                    const auth_user = { first_name, last_name, email };
+                    delete e['user'];
+                    return Object.assign({}, e, { auth_user });
+                });
+                return response.status(200).send(people);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getShortListed(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const JobShortListedRepository = typeorm_1.getRepository(jobs_shortlisted_1.JobShortlist);
+            try {
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                const q = JobShortListedRepository.createQueryBuilder('a')
+                    .innerJoin('a.profile', 'profile')
+                    .select(['a.id', 'profile.id'])
+                    .where(`a.job.id = ${job.id}`)
+                    .orderBy('a.id', 'DESC');
+                const people = yield pagination_1.ApplyPagination(request, response, q, false);
+                people.results = people.results.map(e => e.profile.id);
+                const users = yield profileRepository.findByIds(people.results, {
+                    relations: ['user']
+                });
+                people.results = users.map(e => {
+                    const { first_name, last_name, email } = e.user;
+                    const auth_user = { first_name, last_name, email };
+                    delete e['user'];
+                    return Object.assign({}, e, { auth_user });
+                });
+                return response.status(200).send(people);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    getInterviews(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const JobInterviewRepository = typeorm_1.getRepository(jobs_interview_1.JobInterview);
+            try {
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                const q = JobInterviewRepository.createQueryBuilder('a')
+                    .innerJoin('a.profile', 'profile')
+                    .innerJoinAndMapOne('a.user', auth_user_1.User, 'user', 'user.id = profile.userId')
+                    .orderBy('a.id', 'DESC');
+                const people = yield pagination_1.ApplyPagination(request, response, q, false);
+                people.results = people.results.map(e => {
+                    const { first_name, last_name, email } = e.user;
+                    const auth_user = { first_name, last_name, email };
+                    delete e.user;
+                    return Object.assign({}, e, { auth_user });
+                });
+                return response.status(200).send(people);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    addApplicantsToShortList(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const JobshortlistRepository = typeorm_1.getRepository(jobs_shortlisted_1.JobShortlist);
+            const JobApplicantRepository = typeorm_1.getRepository(jobs_applicants_1.JobApplicants);
+            try {
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                const people = yield profileRepository.findByIds(request.body.users);
+                const shortlistedUsers = yield JobshortlistRepository.createQueryBuilder('s')
+                    .innerJoin('s.profile', 'profile')
+                    .select(['s.id', 'profile.id'])
+                    .where(`s.jobId = ${job.id}`)
+                    .getMany();
+                const shortlistedUsersFormated = shortlistedUsers.map(e => e.profile.id);
+                people.forEach((p) => __awaiter(this, void 0, void 0, function* () {
+                    if (!shortlistedUsersFormated.includes(p.id)) {
+                        const newShorlisted = new jobs_shortlisted_1.JobShortlist();
+                        newShorlisted.job = job;
+                        newShorlisted.profile = p;
+                        yield JobshortlistRepository.save(newShorlisted);
+                        const isAlreadyApplied = yield JobApplicantRepository.findOne({ job, profile: p });
+                        if (isAlreadyApplied) {
+                            yield JobApplicantRepository.remove(isAlreadyApplied);
+                        }
+                    }
+                }));
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    removeApplicantFromShortList(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const JobshortlistRepository = typeorm_1.getRepository(jobs_shortlisted_1.JobShortlist);
+            try {
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                const profile = yield profileRepository.findOne({ slug: request.params.userSlug });
+                const findOne = yield JobshortlistRepository.findOne({ job, profile });
+                if (!findOne) {
+                    throw new Error('user is already Not shortlisted ');
+                }
+                yield JobshortlistRepository.remove(findOne);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ success: false, error: err });
+            }
+        });
+    }
+    createInterviewForapplicants(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const JobRepository = typeorm_1.getRepository(jobs_1.Jobs);
+            const JobInterviewRepository = typeorm_1.getRepository(jobs_interview_1.JobInterview);
+            const JobshortlistRepository = typeorm_1.getRepository(jobs_shortlisted_1.JobShortlist);
+            try {
+                const job = yield JobRepository.findOne({ slug: request.params.jobSlug }, {
+                    relations: ['interviews', 'company'],
+                });
+                if (!job) {
+                    throw new Error('job Not Found');
+                }
+                const profile = yield profileRepository.findOne({ slug: request.params.userSlug });
+                const isAlreadyHaveInterview = yield JobInterviewRepository.findOne({
+                    where: { job, profile }
+                });
+                if (isAlreadyHaveInterview) {
+                    throw new Error('user already have an interview for this job');
+                }
+                const interview = new jobs_interview_1.JobInterview();
+                const validateBody = yield class_transformer_validator_1.transformAndValidate(jobs_interview_1.JobInterview, request.body);
+                Object.assign(interview, validateBody);
+                interview.job = job;
+                interview.profile = profile;
+                const saveInterview = yield JobInterviewRepository.save(interview);
+                const findOne = yield JobshortlistRepository.findOne({ job, profile });
+                if (!findOne) {
+                    throw new Error('user is already Not shortlisted ');
+                }
+                yield JobshortlistRepository.remove(findOne);
+                const notiToQueu = {
+                    actor_first_name: job.company.name,
+                    actor_avatar: job.company.avatar,
+                    type: SendNotification_1.NotificationTypeEnum.interview,
+                    target_slug: job.slug,
+                    interviewName: saveInterview.interviewer,
+                    interviewDate: saveInterview.interview_date,
+                    recipient: profile.id,
+                };
+                yield Queue_1.default.add(notiToQueu);
+                return response.status(200).send({ success: true });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];

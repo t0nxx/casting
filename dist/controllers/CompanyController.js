@@ -166,7 +166,10 @@ class CompanyController {
                     yield companyRepository.save(company);
                     delete request.body.tags;
                 }
-                yield companyRepository.update({ slug: request.params.slug }, request.body);
+                let newDataWitoutTags = Object.keys(request.body).length;
+                if (newDataWitoutTags > 1) {
+                    yield companyRepository.update({ slug: request.params.slug }, request.body);
+                }
                 const afterUpdate = yield companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'followers', 'tags'] });
                 let is_follow = false;
                 let is_admin = false;

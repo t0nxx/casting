@@ -4,6 +4,10 @@ export declare class ProfileController {
     getProfile(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     getProfileSettings(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     getProfileAlbums(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    getOneAlbum(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    updateAlbum(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    deleteAlbum(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    addNewlbum(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     getLookups(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     updateProfile(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     updateCover(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;

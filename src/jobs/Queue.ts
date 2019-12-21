@@ -1,5 +1,5 @@
 import * as  Queue from 'bull'
-import SendNotifiation from './jobs/SendNotification';
+import SendNotifiation from './SendNotification';
 const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
 
 

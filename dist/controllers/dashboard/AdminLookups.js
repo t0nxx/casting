@@ -17,6 +17,7 @@ const eye_lookup_1 = require("../../models/newModels/eye_lookup");
 const ethnicities_lookup_1 = require("../../models/newModels/ethnicities_lookup");
 const profile_hobbies_1 = require("../../models/newModels/profile_hobbies");
 const talent_categories_1 = require("../../models/newModels/talent_categories");
+const news_letter_1 = require("../../models/newModels/news_letter");
 function identifyLookupRepo(lookupString) {
     if (lookupString == 'height') {
         return height_range_lookup_1.HeightRangeLookup;
@@ -41,6 +42,9 @@ function identifyLookupRepo(lookupString) {
     }
     else if (lookupString == 'talent') {
         return talent_categories_1.TalentCategories;
+    }
+    else if (lookupString == 'newsletter') {
+        return news_letter_1.NewsLetter;
     }
     else {
         return '';
@@ -84,9 +88,6 @@ class AdminLookupsController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { lookupRepo } = request.params;
-                if (!request.body.name) {
-                    throw new Error('name is required');
-                }
                 const repo = identifyLookupRepo(lookupRepo);
                 const LookupRepository = typeorm_1.getRepository(repo);
                 let item;
@@ -120,11 +121,16 @@ class AdminLookupsController {
                         break;
                 }
                 if (lookupRepo !== 'talent') {
+                    if (!request.body.name) {
+                        throw new Error('name is required');
+                    }
                     item.name = request.body.name;
                 }
                 else {
+                    if (!request.body.name_en) {
+                        throw new Error('name is required');
+                    }
                     item.name_en = request.body.name_en;
-                    item.name_ar = request.body.name_ar;
                 }
                 const data = yield LookupRepository.save(item);
                 return response.status(200).send({ data });

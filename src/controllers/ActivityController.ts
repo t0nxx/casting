@@ -14,6 +14,8 @@ import { ActivityAttachment } from '../models/newModels/activity_attachment';
 import { UploadToS3 } from '../helpers/awsUploader';
 import { Company } from '../models/newModels/company';
 import { ActivityReports } from '../models/newModels/activity_reports';
+import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
+import notificationQueue from '../jobs/Queue';
 
 export class ActivityController {
 
@@ -484,6 +486,22 @@ export class ActivityController {
             activity.like_count = activity.like_count + 1;
             let saveLikedActivity = await ActivityRepository.save(activity);
             await profileRepository.save(profile);
+
+             /**
+             *  send notification to user 
+             * 
+             * 
+             * 
+             */
+            const notiToQueu: NotificationShape = {
+                actor_first_name: profile.user.first_name,
+                actor_last_name: profile.user.last_name,
+                actor_avatar : profile.avatar, 
+                type: NotificationTypeEnum.like,
+                target_id: activity.id,
+                recipient: profile.id,
+            }
+            await notificationQueue.add(notiToQueu);
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
