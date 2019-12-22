@@ -6,14 +6,17 @@ import * as fileupload from 'express-fileupload';
 import { Request, Response } from 'express';
 import * as cors from 'cors';
 import * as path from 'path';
+
+import * as  Queue from 'bull';
+import SendNotifiation from './jobs/SendNotification';
+
+
 import * as socketio from 'socket.io';
 // import * as expsession from 'express-session';
 const expsession = require('cookie-session');
 
-const { setQueues, UI } = require('bull-board');
-import notificationQueue from './jobs/Queue'
 
-setQueues(notificationQueue);
+const { setQueues, UI } = require('bull-board');
 
 import * as cookieParser from 'cookie-parser';
 
@@ -44,6 +47,10 @@ io.use((socket, next) => {
     sessionMiddleware(socket.request, socket.request.res, next);
 });
 
+
+// queue
+
+export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
 createConnection().then(async connection => {
 
     app.use(bodyParser.json());
@@ -90,5 +97,23 @@ createConnection().then(async connection => {
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
     });
+
+
+    /**
+     * use queue
+     * 
+     * 
+     */
+
+
+    setQueues(notificationQueue);
+
+    notificationQueue.process(SendNotifiation);
+
+    notificationQueue.on('failed', job => {
+
+        console.log('****************** job fail ******** for job ' + job);
+        console.log(job);
+    })
 
 }).catch(error => console.log(error));

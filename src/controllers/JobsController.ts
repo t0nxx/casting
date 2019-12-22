@@ -11,7 +11,7 @@ import { JobInterview } from '../models/newModels/jobs_interview';
 import { JobApplicants } from '../models/newModels/jobs_applicants';
 import { JobShortlist } from '../models/newModels/jobs_shortlisted';
 import { transformAndValidate } from 'class-transformer-validator';
-import notificationQueue from '../jobs/Queue';
+import { notificationQueue } from '../main';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 export class JobsController {
 

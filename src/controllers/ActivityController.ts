@@ -15,7 +15,7 @@ import { UploadToS3 } from '../helpers/awsUploader';
 import { Company } from '../models/newModels/company';
 import { ActivityReports } from '../models/newModels/activity_reports';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
-import notificationQueue from '../jobs/Queue';
+import { notificationQueue } from '../main';
 
 export class ActivityController {
 
