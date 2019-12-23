@@ -306,8 +306,8 @@ export class FriendsController {
                 delete e.user;
                 return resObject;
             });
-            results = _.sample(results,10);
-            return response.status(200).send({ results, count : 10 });
+            results = _.sample(results, 10);
+            return response.status(200).send({ results, count: 10 });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -336,10 +336,11 @@ export async function getAllFriendSharedBtwnApp(request, response: Response, slu
             .innerJoin('f.toUser', 'reciverUser')
             .innerJoinAndMapOne('f.senderUserObject', User, 'autherSender', 'autherSender.id = senderUser.userId')
             .innerJoinAndMapOne('f.reciverUserObject', User, 'autherReciver', 'autherReciver.id = reciverUser.userId')
-            .addSelect(
-                ['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'senderUser.user', 'f.room',
-                    'reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'reciverUser.user', 'f.room'
-                ])
+            // .addSelect(
+            //     ['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'senderUser.user', 'f.room',
+            //         'reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'reciverUser.user', 'f.room'
+            //     ])
+            .addSelect(['senderUser.id', 'senderUser.slug', 'reciverUser.slug', 'reciverUser.id'])
             .where(`f.toUser = ${profile.id}`)
             .orWhere(`f.fromUser = ${profile.id}`);
 
@@ -368,26 +369,27 @@ export async function getAllFriendSharedBtwnApp(request, response: Response, slu
             const senderUserObject: any = e['senderUserObject'];
             const reciverUserObject: any = e['reciverUserObject'];
             if (senderUserObject.username === profile.slug) {
+                //// not used so  let's simplify the response
                 // auther1 is the same profile searched ... no not wanted here
-                formatedREsponse.username = reciverUserObject.username;
-                formatedREsponse.first_name = reciverUserObject.first_name;
-                formatedREsponse.last_name = reciverUserObject.last_name;
-                formatedREsponse.email = reciverUserObject.email;
-                formatedREsponse.username = reciverUserObject.username;
+                // formatedREsponse.username = reciverUserObject.username;
+                // formatedREsponse.first_name = reciverUserObject.first_name;
+                // formatedREsponse.last_name = reciverUserObject.last_name;
+                // formatedREsponse.email = reciverUserObject.email;
+                // formatedREsponse.username = reciverUserObject.username;
                 formatedREsponse.pk = notSameUser.id;
-                formatedREsponse.avatar = notSameUser.avatar;
-                formatedREsponse.slug = notSameUser.slug;
-                formatedREsponse.room = e.room;
+                // formatedREsponse.avatar = notSameUser.avatar;
+                // formatedREsponse.slug = notSameUser.slug;
+                // formatedREsponse.room = e.room;
             } else {
-                formatedREsponse.username = senderUserObject.username;
-                formatedREsponse.first_name = senderUserObject.first_name;
-                formatedREsponse.last_name = senderUserObject.last_name;
-                formatedREsponse.email = senderUserObject.email;
-                formatedREsponse.username = senderUserObject.username;
+                // formatedREsponse.username = senderUserObject.username;
+                // formatedREsponse.first_name = senderUserObject.first_name;
+                // formatedREsponse.last_name = senderUserObject.last_name;
+                // formatedREsponse.email = senderUserObject.email;
+                // formatedREsponse.username = senderUserObject.username;
                 formatedREsponse.pk = notSameUser.id;
-                formatedREsponse.avatar = notSameUser.avatar;
-                formatedREsponse.slug = notSameUser.slug;
-                formatedREsponse.room = e.room;
+                // formatedREsponse.avatar = notSameUser.avatar;
+                // formatedREsponse.slug = notSameUser.slug;
+                // formatedREsponse.room = e.room;
             }
             return formatedREsponse;
         });

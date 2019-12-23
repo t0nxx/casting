@@ -8,6 +8,8 @@ import { TalentCategories } from '../models/newModels/talent_categories';
 import { Jobs } from '../models/newModels/jobs';
 import { ApplyPagination } from '../helpers/pagination';
 import { JobApplicants } from '../models/newModels/jobs_applicants';
+import { getAllFriendSharedBtwnApp } from './FriendsController';
+import { WhoSeeMe } from '../models/newModels/who_see_me';
 export class SearchController {
 
 
@@ -69,10 +71,12 @@ export class SearchController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-            const user = await profileRepository.findOne({ slug: request['user'].username });
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
             const q = companyRepository.createQueryBuilder('c')
                 .leftJoin('c.followers', 'followers')
+                .leftJoin('c.profile', 'profile')
                 // .where(`followers.id NOT IN (${user.id})`)
+                .addSelect(['followers.id', 'profile.id'])
                 .orderBy('c.id', 'DESC');
 
             if (request.query.search && request.query.search !== null) {
@@ -101,6 +105,19 @@ export class SearchController {
                 q.leftJoinAndSelect('c.tags', 'tags')
             }
             const compaines = await ApplyPagination(request, response, q, false);
+
+            compaines.results = compaines.results.map(element => {
+                let is_follow = false;
+                let is_admin = false;
+                if (element.profile.id === profile.id) { is_admin = true; }
+                const isfollowCompany = element.followers.find(f => f.id === profile.id);
+                if (isfollowCompany) { is_follow = true; }
+                delete element.followers;
+                delete element.profile;
+                return { ...element, is_admin, is_follow }
+            });
+
+
             return response.status(200).send(compaines);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -196,6 +213,11 @@ export class SearchController {
 
 
             const people = await ApplyPagination(request, response, q, false);
+
+            // add is friends or not 
+            const friends: any = await getAllFriendSharedBtwnApp(request, response, user.slug);
+            const friendsArray = friends.map(e => e.pk);
+
             people.results = people.results.map(e => {
                 const { first_name, last_name, email, username } = e['user'];
                 const auth_user = {
@@ -205,10 +227,56 @@ export class SearchController {
                 const has_photo = e.activity_attachment.some(a => a.type === 'IMG');
                 const has_audio = e.activity_attachment.some(a => a.type === 'AUDIO');
                 const has_video = e.activity_attachment.some(a => a.type === 'VIDEO');
-                return { ...e, auth_user, has_photo, has_video, has_audio }
+
+                let is_friends = false;
+                let isFriendWithMe = friendsArray.includes(e.id);
+                if (isFriendWithMe) { is_friends = true; }
+
+                return { ...e, auth_user, is_friends, has_photo, has_video, has_audio }
             });
             // not return the same user in search
             people.results = people.results.filter(e => e.id !== user.id);
+            return response.status(200).send(people);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    async getWhoSeeMePeople(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const userRepository = getRepository(User);
+        const whoSeeMeRepository = getRepository(WhoSeeMe);
+        try {
+            const user = await profileRepository.findOne({ slug: request['user'].username });
+            const q = whoSeeMeRepository.createQueryBuilder('w')
+                .innerJoinAndMapOne('w.viewer', Profile, 'profile', 'profile.id = w.viewer')
+                .innerJoinAndMapOne('w.user', User, 'user', 'profile.userId = user.id')
+                .where(`w.viewed = ${user.id}`);
+            // .where(`p.who_see_me = ${user.id}`);
+
+
+            const people = await ApplyPagination(request, response, q, false);
+
+            // add is friends or not 
+            const friends: any = await getAllFriendSharedBtwnApp(request, response, user.slug);
+            const friendsArray = friends.map(e => e.pk);
+
+            people.results = people.results.map(e => {
+                const { first_name, last_name, email, username } = e['user'];
+                const auth_user = {
+                    first_name, last_name, email, username, pk: e.viewer.id,
+                };
+                delete e['user'];
+
+                let is_friends = false;
+                let isFriendWithMe = friendsArray.includes(e.viewer.id);
+                if (isFriendWithMe) { is_friends = true; }
+                return { ...e.viewer, auth_user, is_friends }
+            });
+            // // not return the same user in search
+            // people.results = people.results.filter(e => e.id !== user.id);
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

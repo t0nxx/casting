@@ -16,6 +16,7 @@ import { UploadToS3 } from '../helpers/awsUploader';
 import { User } from '../models/newModels/auth_user';
 import { ProfileAlbum } from '../models/newModels/profile_album';
 import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
+import { WhoSeeMe } from '../models/newModels/who_see_me';
 
 export class ProfileController {
 
@@ -42,11 +43,13 @@ export class ProfileController {
     async getProfile(request: Request, response: Response, next: NextFunction) {
         const friendsRepository = getRepository(FriendshipFriend);
         const profileRepository = getRepository(Profile);
+        const whoSeeMeRepository = getRepository(WhoSeeMe);
         const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
         try {
             const data = await profileRepository.findOne({ slug: request.params.slug }, {
                 relations: ['user']
             });
+            if (!data) { throw new Error('profile Not Found'); }
             const Myprofile = await profileRepository.findOne({ slug: request['user'].username });
             let is_friends = false;
             let is_IreceivedReqFromHim = false;
@@ -80,7 +83,16 @@ export class ProfileController {
             delete data.user;
             // tslint:disable-next-line: max-line-length
             const responseObject = { ...data, is_friends, is_IreceivedReqFromHim, is_IsendReqToHim, auth_user: { pk: id, first_name, last_name, email, username } }
-            if (!data) { throw new Error('profile Not Found'); }
+
+            if (data.id !== Myprofile.id) {
+                const isViewdAlready = await whoSeeMeRepository.findOne({ viewed: data.id, viewer: Myprofile.id });
+                if (!isViewdAlready) {
+                    const newViewer = new WhoSeeMe();
+                    newViewer.viewer = data.id;
+                    newViewer.viewer = Myprofile.id;
+                    await whoSeeMeRepository.save(newViewer);
+                }
+            }
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             /**
@@ -162,7 +174,7 @@ export class ProfileController {
         const albumRepository = getRepository(ProfileAlbum);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
-            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10)}, { relations: ['profile'] });
+            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
             if (!album) { throw new Error('album Not Found'); }
             if (album.profile.id !== profile.id) {
                 throw new Error('You are Not Allowed to edit this album');
@@ -187,7 +199,7 @@ export class ProfileController {
         const albumRepository = getRepository(ProfileAlbum);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
-            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10)});
+            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10) });
             if (!album) { throw new Error('album Not Found'); }
             if (album.profile.id !== profile.id) {
                 throw new Error('You are Not Allowed to edit this album');

@@ -21,6 +21,7 @@ import { JobApplicants } from './jobs_applicants';
 import { JobShortlist } from './jobs_shortlisted';
 import { ActivityReports } from './activity_reports';
 import { Notification } from './notify_notification';
+import { WhoSeeMe } from './who_see_me';
 // import {auth_user} from "./auth_user";
 // import {build_lookup} from "./build_lookup";
 // import {ethnicities_lookup} from "./ethnicities_lookup";

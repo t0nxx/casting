@@ -5,14 +5,19 @@ import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 import { UploadToS3 } from '../helpers/awsUploader';
 import { FriendsController } from '../controllers/FriendsController';
 import { ActivityController } from '../controllers/ActivityController';
+import { SearchController } from '../controllers/SearchController';
 
 const router = Router();
 const profileController = new ProfileController();
 const companyController = new CompanyController();
 const friendsController = new FriendsController();
 const activityController = new ActivityController();
+const searchController = new SearchController();
 
 router.get('/lookups', profileController.getLookups);
+
+router.get('/whoseeme', AuthMiddleWare,searchController.getWhoSeeMePeople);
+
 router.get('/:slug', AuthMiddleWare, profileController.getProfile);
 router.get('/:slug/settings', AuthMiddleWare, profileController.getProfileSettings);
 
