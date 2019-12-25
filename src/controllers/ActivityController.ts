@@ -366,6 +366,25 @@ export class ActivityController {
                 avatar: profile.avatar,
             }
 
+            mentions.map(async e => {
+                /**
+                *  send notification to user 
+                * 
+                * 
+                * 
+                */
+                console.log(e);
+                const notiToQueu: NotificationShape = {
+                    actor_first_name: profile.user.first_name,
+                    actor_last_name: profile.user.last_name,
+                    actor_avatar: profile.avatar,
+                    type: NotificationTypeEnum.mentionOnPost,
+                    target_id: save.id,
+                    recipient: e,
+                }
+                await notificationQueue.add(notiToQueu);
+            })
+
             return response.status(200).send({
                 ...getAfterSave, auth_user, author_settings,
                 activity_mention,
@@ -440,10 +459,10 @@ export class ActivityController {
                 * 
                 * 
                 */
+                console.log(e);
                 const notiToQueu: NotificationShape = {
-                    actor_first_name: profile.user.first_name,
-                    actor_last_name: profile.user.last_name,
-                    actor_avatar: profile.avatar,
+                    actor_first_name: company.name,
+                    actor_avatar: company.avatar,
                     type: NotificationTypeEnum.mentionOnPost,
                     target_id: save.id,
                     recipient: e,
