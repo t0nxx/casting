@@ -35,7 +35,7 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string)
         case 8:
             verb = 'Mention You In Comment';
             break;
-        case 8:
+        case 9:
             verb = 'Your Followed Company Has New Job ';
             break;
         default:
