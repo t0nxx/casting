@@ -446,7 +446,7 @@ export class ActivityController {
                     actor_avatar: profile.avatar,
                     type: NotificationTypeEnum.mentionOnPost,
                     target_id: save.id,
-                    recipient: e.auth_user,
+                    recipient: e,
                 }
                 await notificationQueue.add(notiToQueu);
             })
