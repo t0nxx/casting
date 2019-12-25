@@ -35,6 +35,9 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string)
         case 8:
             verb = 'Mention You In Comment';
             break;
+        case 8:
+            verb = 'Your Followed Company Has New Job ';
+            break;
         default:
             verb = `We remind you that site has new updates`;
             break;
@@ -52,7 +55,8 @@ export enum NotificationTypeEnum {
     remienderIntervewAdmin = 6,
     mentionOnPost = 7,
     mentionOnComment = 8,
-    others = 9,
+    newJobFromFollowedCompany = 9,
+    others = 10,
 
 
 }

@@ -98,8 +98,15 @@ export class JobsController {
         const JobRepository = getRepository(Jobs);
         const talentCategoryRepository = getRepository(TalentCategories);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug });
+            const company = await companyRepository.createQueryBuilder('q')
+                .leftJoin('q.followers', 'followers')
+                .where(`q.slug like '${request.params.slug}'`)
+                .addSelect(['followers.id'])
+                .getOne();
+
             if (!company) { throw new Error('company Not Found'); }
+            // followers
+            console.log(company);
 
             const newJob = new Jobs();
             Object.assign(newJob, request.body);
@@ -114,6 +121,19 @@ export class JobsController {
             newJob.company = company;
             newJob.slug = newJob.title + '-' + randomString.generate({ length: 5 });
             const save = await JobRepository.save(newJob);
+
+            company.followers.map(async e => {
+                const notiToQueu: NotificationShape = {
+                    actor_first_name: company.name,
+                    actor_avatar: company.avatar,
+                    type: NotificationTypeEnum.newJobFromFollowedCompany,
+                    target_slug: save.slug,
+                    target_company: company.slug,
+                    recipient: e.id,
+                }
+                await notificationQueue.add(notiToQueu);
+            })
+
             return response.status(200).send({ success: true, slug: save.slug });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
