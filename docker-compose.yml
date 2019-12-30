@@ -1,13 +1,5 @@
 version: "3.5"
 services:
-  backend:
-    container_name: casting
-    restart: always
-    build: .
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
   db:
     image: "mysql:5.7.24"
     container_name: "dbcontainer"
@@ -16,5 +8,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "tonitonitoni"
       MYSQL_USER: "root"
-      MYSQL_PASSWORD: "tonitonitoni"
       MYSQL_DATABASE: "casting_dev"
+  backend:
+    container_name: casting
+    restart: always
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
