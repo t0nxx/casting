@@ -101,9 +101,14 @@ router.patch('/:slug/cover', AuthMiddleWare, profileController.updateCover);
 router.post('/:slug/cover/reset', AuthMiddleWare, profileController.resetCover);
 router.post('/:slug/album', AuthMiddleWare, profileController.addNewlbum);
 
+router.patch('/:slug/album/:id', AuthMiddleWare, profileController.updateAlbum);
+
+router.delete('/:slug/album/:id', AuthMiddleWare, profileController.deleteAlbum);
+
 router.post('/:slug/album/image', AuthMiddleWare, activityController.AddNewVideoOrAudio);
 
 router.put('/:slug/album/:id/image', AuthMiddleWare, activityController.addImageToAlbum);
+
 // router.delete('/:id', profileController.remove);
 // delete
 router.delete('/:slug/training/:id', AuthMiddleWare, profileController.deleteTaninig);

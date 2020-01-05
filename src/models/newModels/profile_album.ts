@@ -20,10 +20,10 @@ export class ProfileAlbum {
 
     @ManyToOne(type => Profile, p => p.albums, { onDelete: 'CASCADE' })
     profile: Profile;
-    
 
 
-    @OneToMany(type => ActivityAttachment, ac => ac.album)
+
+    @OneToMany(type => ActivityAttachment, ac => ac.album, { onDelete: 'CASCADE' })
     activity_attachment: ActivityAttachment[];
 
     // @OneToMany(() => activity_attachment, (activity_attachment: activity_attachment) => activity_attachment.album)
