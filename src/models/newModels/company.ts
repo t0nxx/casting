@@ -13,10 +13,10 @@ export class Company {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/company-avatar.png' })
+    @Column({ default: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/company-avatar.png' })
     avatar: string;
 
-    @Column({ default: 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg' })
+    @Column({ default: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/banner.jpg' })
     cover: string;
 
     @Column()

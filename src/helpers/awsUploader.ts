@@ -8,7 +8,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-const bucketName = 'casting-secret';
+const bucketName = 'casting-secret-new';
 
 export const UploadToS3 = (file, type) => {
     const folder = type === 'image' ? 'images' : type === 'video' ? 'videos' : type === 'audio' ? 'voices' : 'videos';

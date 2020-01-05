@@ -349,7 +349,7 @@ export class ProfileController {
             // username is the slug here 
             const profile = await profileRepository.findOne({ slug: request['user'].username });
             if (!profile) { throw new Error('profile Not Found'); }
-            const resetCover = 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg';
+            const resetCover = 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/banner.jpg';
             await profileRepository.update({ id: profile.id }, { cover: resetCover });
             const afterUpdate = await profileRepository.findOne({ id: profile.id });
             return response.status(200).send({ cover: resetCover });
