@@ -75,6 +75,12 @@ export class User {
     @Column({ default: false })
     is_active: boolean;
 
+    @Column({ default: null })
+    social_site: string;
+
+    @Column({ default: null })
+    social_site_id: string;
+
 
     @CreateDateColumn()
     date_joined: Date;

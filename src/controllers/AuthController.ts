@@ -134,6 +134,199 @@ export class AuthController {
     }
 
     /**
+     * @Post
+     */
+
+    async LoginWithFacebook(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        const talentCategoryRepository = getRepository(TalentCategories);
+        try {
+
+            //  user = {
+            //     email: 'mahmoudko1500@hotmail.com',
+            //     first_name: 'Toni',
+            //     granted_scopes: ['email', 'public_profile'],
+            //     id: '2436631583122279',
+            //     last_name: 'Toni',
+            //     name: 'Toni',
+            //     picture: {
+            //         data: {
+            //             url: 'https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=2436631583122279&height=100&width=100&ext=1580835533&hash=AeS3cD4ERiiXhlgc'
+
+            //         }
+            //     }
+            // }
+
+            const usernameExist = await userRepository.findOne({ social_site_id: request.body.user.id, social_site: 'facebook' });
+
+            if (usernameExist) {
+                const data = await profileRepository.findOne({ slug: usernameExist.username }, {
+                    relations: ['user']
+                });
+                delete data.user;
+                const token = await generateJwtToken({
+                    id: usernameExist.id,
+                    isAdmin: usernameExist.isAdmin,
+                });
+                const { first_name, last_name, id, email, username } = usernameExist;
+                const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+                return response.status(200).send({ success: true, token, user: { ...responseObject } });
+                /**
+                 *  return data
+                 */
+            }
+            const newUser = new User();
+            newUser.social_site_id = request.body.user.id;
+            newUser.email = request.body.user.email;
+            newUser.first_name = request.body.user.first_name;
+            newUser.last_name = request.body.user.last_name;
+            newUser.username = request.body.user.first_name + '-' + randomString.generate({ length: 5 });
+            newUser.social_site = 'facebook';
+
+            const DefaultPass = 'casting_dev_pass';
+            // just optional 
+            newUser.password1 = DefaultPass;
+            newUser.password2 = DefaultPass;
+            newUser.password = await hash(DefaultPass, 10);
+            const create = await userRepository.save(newUser);
+
+            const categories = await talentCategoryRepository.findByIds(request.body.category);
+            // start create profile for the new user
+            const newProfile = new Profile();
+            newProfile.slug = create.username;
+            newProfile.user = create;
+            newProfile.categories = categories;
+            newProfile.about = request.body.about;
+
+            // profile pic 
+            if (request.body.user.picture) {
+                newProfile.avatar = request.body.user.picture.data.url;
+            }
+            const createProfile = await profileRepository.save(newProfile);
+            // end create profile for the new user
+            // start create settings for the new user
+            const newProfileSettings = new ProfileSettings();
+            newProfileSettings.profile = createProfile;
+            const crateProfileSettings = await profileSettingsRepository.save(newProfileSettings);
+            // start create settings for the new user
+            const token = await generateJwtToken({
+                id: create.id,
+                isAdmin: create.isAdmin,
+            });
+            const data = await profileRepository.findOne({ slug: createProfile.slug }, {
+                relations: ['user']
+            });
+            delete data.user;
+            const { first_name, last_name, id, email, username } = create;
+            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            return response.status(200).send({ success: true, token, user: { ...responseObject } });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+     * @Post
+     */
+
+    async LoginWithGoogle(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        const talentCategoryRepository = getRepository(TalentCategories);
+        try {
+
+            //  user = {
+            // email: "m.toni801@gmail.com"
+            // family_name: "Toni"
+            // given_name: "M."
+            // granted_scopes: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid"
+            // id: "102334376156349730628"
+            // locale: "en"
+            // name: "M. Toni"
+            // picture: "https://lh3.googleusercontent.com/a-/AAuE7mCcjNNbsiEVZklADVF2pZBf826DEYC8IB5-_ARR"
+            // verified_email: true
+            // }
+
+            const usernameExist = await userRepository.findOne({ social_site_id: request.body.user.id, social_site: 'google' });
+
+            if (usernameExist) {
+                const data = await profileRepository.findOne({ slug: usernameExist.username }, {
+                    relations: ['user']
+                });
+                delete data.user;
+                const token = await generateJwtToken({
+                    id: usernameExist.id,
+                    isAdmin: usernameExist.isAdmin,
+                });
+                const { first_name, last_name, id, email, username } = usernameExist;
+                const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+                return response.status(200).send({ success: true, token, user: { ...responseObject } });
+                /**
+                 *  return data
+                 */
+            }
+            const newUser = new User();
+            newUser.social_site_id = request.body.user.id;
+            newUser.email = request.body.user.email;
+            newUser.first_name = request.body.user.given_name;
+            newUser.last_name = request.body.user.family_name;
+            newUser.username = request.body.user.given_name + '-' + randomString.generate({ length: 5 });
+            newUser.social_site = 'google';
+
+            const DefaultPass = 'casting_dev_pass';
+            // just optional 
+            newUser.password1 = DefaultPass;
+            newUser.password2 = DefaultPass;
+            newUser.password = await hash(DefaultPass, 10);
+            const create = await userRepository.save(newUser);
+
+            const categories = await talentCategoryRepository.findByIds(request.body.category);
+            // start create profile for the new user
+            const newProfile = new Profile();
+            newProfile.slug = create.username;
+            newProfile.user = create;
+            newProfile.categories = categories;
+            newProfile.about = request.body.about;
+
+            // profile pic 
+            if (request.body.user.picture) {
+                newProfile.avatar = request.body.user.picture;
+            }
+            const createProfile = await profileRepository.save(newProfile);
+            // end create profile for the new user
+            // start create settings for the new user
+            const newProfileSettings = new ProfileSettings();
+            newProfileSettings.profile = createProfile;
+            const crateProfileSettings = await profileSettingsRepository.save(newProfileSettings);
+            // start create settings for the new user
+            const token = await generateJwtToken({
+                id: create.id,
+                isAdmin: create.isAdmin,
+            });
+            const data = await profileRepository.findOne({ slug: createProfile.slug }, {
+                relations: ['user']
+            });
+            delete data.user;
+            const { first_name, last_name, id, email, username } = create;
+            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            return response.status(200).send({ success: true, token, user: { ...responseObject } });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
      * @Post 
      */
 
