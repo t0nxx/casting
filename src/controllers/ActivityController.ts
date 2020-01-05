@@ -1092,8 +1092,8 @@ export class ActivityController {
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
 
 
-            // const responseObject = await ApplyPagination(request, response, q, false);
-            let responseObject: any = {};
+            const responseObject = await ApplyPagination(request, response, q, false);
+            //let responseObject: any = {};
             responseObject.results = await q.getMany();
 
             const myLikes = profile.likes.map(ac => ac.id);
