@@ -199,7 +199,7 @@ export class ProfileController {
         const albumRepository = getRepository(ProfileAlbum);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
-            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10) });
+            const album = await albumRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
             if (!album) { throw new Error('album Not Found'); }
             if (album.profile.id !== profile.id) {
                 throw new Error('You are Not Allowed to edit this album');
