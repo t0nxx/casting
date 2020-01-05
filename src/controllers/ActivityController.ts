@@ -1140,7 +1140,7 @@ export class ActivityController {
             ).then(rez => rez);
 
             if (request.query.some) {
-                responseObject.results = responseObject.results.slice(0, 10);
+                responseObject.results = responseObject.results.slice(0, 6);
             }
             return response.status(200).send({ ...responseObject });
         } catch (error) {
