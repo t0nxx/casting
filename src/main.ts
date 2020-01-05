@@ -64,6 +64,7 @@ createConnection().then(async connection => {
             'https://casting-admin-panel.s3.eu-central-1.amazonaws.com',
             'http://casting-admin-panel.s3.eu-central-1.amazonaws.com',
             'http://casting-admin-panel.s3-website.eu-central-1.amazonaws.com',
+            'http://3.125.225.214','http://3.125.225.214:3000'
         ],
     }));
     //app.use(cors());
