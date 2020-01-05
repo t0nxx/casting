@@ -7,7 +7,7 @@ module.exports = {
    // "database": "casting_dev",
 //
 
-   "host": "db",
+   "host": "localhost",
    "port": 3306,
    "username": "root",
    "password": "tonitonitoni",
