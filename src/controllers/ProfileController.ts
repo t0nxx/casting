@@ -88,7 +88,7 @@ export class ProfileController {
                 const isViewdAlready = await whoSeeMeRepository.findOne({ viewed: data.id, viewer: Myprofile.id });
                 if (!isViewdAlready) {
                     const newViewer = new WhoSeeMe();
-                    newViewer.viewer = data.id;
+                    newViewer.viewed = data.id;
                     newViewer.viewer = Myprofile.id;
                     await whoSeeMeRepository.save(newViewer);
                 }
