@@ -86,9 +86,11 @@ export class NotificationsController {
 
     async addNotificationsFromAdmin(request: Request, response: Response, next: NextFunction) {
         const profileRepository = getRepository(Profile);
+        const NotificationRepository = getRepository(Notification);
         try {
             const users = await profileRepository.find({ select: ['id'] });
-
+            // for dashboard just send the next noti id for response
+            const count = await NotificationRepository.count();
 
             users.map(async e => {
                 const notiToQueu: NotificationShape = {
@@ -102,7 +104,7 @@ export class NotificationsController {
                 await notificationQueue.add(notiToQueu);
             })
 
-            return response.status(200).send({ success: true });
+            return response.status(200).send({ data: { id: count + 1 } });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -115,9 +117,26 @@ export class NotificationsController {
         const NotificationRepository = getRepository(Notification);
         try {
 
-           // const data = NotificationRepository.find({ type: 10 });
+            // const data = NotificationRepository.find({ type: 10 });
 
-            return response.status(200).send([]);
+            return response.status(200).send({ data: [], count: 0 });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+
+    }
+
+    async getOneNotificationsForAdmin(request: Request, response: Response, next: NextFunction) {
+
+        const NotificationRepository = getRepository(Notification);
+        try {
+
+            const data = NotificationRepository.findOne({ id: parseInt(request.params.id, 10) });
+
+            if (!data) { throw new Error('given id not found'); }
+
+            return response.status(200).send({ data });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
