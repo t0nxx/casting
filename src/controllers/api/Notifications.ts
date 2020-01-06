@@ -4,6 +4,8 @@ import { Notification } from '../../models/newModels/notify_notification';
 import { Profile } from '../../models/newModels/users_profile';
 import { transformAndValidate } from 'class-transformer-validator';
 import { ApplyPagination } from '../../helpers/pagination';
+import { NotificationShape, NotificationTypeEnum } from '../../jobs/SendNotification';
+import { notificationQueue } from '../../main';
 
 
 export class NotificationsController {
@@ -77,6 +79,56 @@ export class NotificationsController {
         }
 
     }
+
+    /**
+    * @Post
+    */
+
+    async addNotificationsFromAdmin(request: Request, response: Response, next: NextFunction) {
+        const profileRepository = getRepository(Profile);
+        try {
+            const users = await profileRepository.find({ select: ['id'] });
+
+
+            users.map(async e => {
+                const notiToQueu: NotificationShape = {
+                    actor_first_name: 'Casting',
+                    actor_last_name: 'Admin ',
+                    actor_avatar: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/admin.jpg',
+                    type: NotificationTypeEnum.others,
+                    msgFromAdmin: request.body.msg,
+                    recipient: e.id,
+                }
+                await notificationQueue.add(notiToQueu);
+            })
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+
+    }
+
+    async getAllNotificationsForAdmin(request: Request, response: Response, next: NextFunction) {
+
+        const NotificationRepository = getRepository(Notification);
+        try {
+
+           // const data = NotificationRepository.find({ type: 10 });
+
+            return response.status(200).send([]);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+
+    }
+
+
+
+
+
 
     // /**
     //  * 

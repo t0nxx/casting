@@ -3,7 +3,7 @@ import { Notification } from '../models/newModels/notify_notification';
 import { Profile } from '../models/newModels/users_profile';
 
 
-function getVerbType(type: number, interviewDate?: Date, interviewName?: string) {
+function getVerbType(type: number, interviewDate?: Date, interviewName?: string, msg?: string) {
     let verb = '';
     switch (type) {
         case 0:
@@ -39,7 +39,7 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string)
             verb = 'Your Followed Company Has New Job ';
             break;
         default:
-            verb = `We remind you that site has new updates`;
+            verb = msg;
             break;
     }
     return verb;
@@ -85,6 +85,7 @@ export interface NotificationShape {
     actor_last_name?: string;
     interviewDate?: Date;
     interviewName?: string;
+    msgFromAdmin?: string;
 
 }
 
@@ -92,7 +93,7 @@ export default async function ({ data }) {
     const NotificationsRepository = getRepository(Notification);
     const ProfileRepository = getRepository(Profile);
     try {
-        const recipient = await ProfileRepository.findOne({ id: data.recipient });
+        const recipient = await ProfileRepository.findOne({ id: data.recipient }, { select: ['id'] });
         if (!recipient) { throw new Error('recipient profile not found '); }
 
         const newNoti = new Notification();
@@ -111,7 +112,21 @@ export default async function ({ data }) {
             newNoti.target_company = data.target_company;
         }
         newNoti.type = data.type;
-        newNoti.verb = data.type === 4 ? getVerbType(data.type, data.interviewDate, data.interviewName) : getVerbType(data.type);
+        newNoti.verb =
+            data.type === 4 ? getVerbType(data.type, data.interviewDate, data.interviewName) :
+                data.type === 10 ? getVerbType(data.type, null, null, data.msgFromAdmin) :
+                    getVerbType(data.type);// users.map(async e => {
+        //     const notiToQueu: NotificationShape = {
+        //         actor_first_name: 'Casting',
+        //         actor_last_name: 'Admin ',
+        //         actor_avatar: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/admin.jpg',
+        //         type: NotificationTypeEnum.others,
+        //         msgFromAdmin: request.body.msg,
+        //         recipient: e.id,
+        //     }
+        //     await notificationQueue.add(notiToQueu);
+        // })
+
         newNoti.recipient = recipient;
         await NotificationsRepository.save(newNoti);
 
