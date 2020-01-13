@@ -192,13 +192,18 @@ export class AuthController {
             newUser.password = await hash(DefaultPass, 10);
             const create = await userRepository.save(newUser);
 
-            const categories = await talentCategoryRepository.findByIds(request.body.category);
+
             // start create profile for the new user
             const newProfile = new Profile();
             newProfile.slug = create.username;
             newProfile.user = create;
-            newProfile.categories = categories;
-            newProfile.about = request.body.about;
+            //newProfile.about = request.body.about;
+
+
+            if (request.body.category) {
+                const categories = await talentCategoryRepository.findByIds(request.body.category);
+                newProfile.categories = categories;
+            }
 
             // profile pic 
             if (request.body.user.picture) {
@@ -287,13 +292,16 @@ export class AuthController {
             newUser.password = await hash(DefaultPass, 10);
             const create = await userRepository.save(newUser);
 
-            const categories = await talentCategoryRepository.findByIds(request.body.category);
             // start create profile for the new user
             const newProfile = new Profile();
             newProfile.slug = create.username;
             newProfile.user = create;
-            newProfile.categories = categories;
-            newProfile.about = request.body.about;
+            // newProfile.about = request.body.about;
+
+            if (request.body.category) {
+                const categories = await talentCategoryRepository.findByIds(request.body.category);
+                newProfile.categories = categories;
+            }
 
             // profile pic 
             if (request.body.user.picture) {
