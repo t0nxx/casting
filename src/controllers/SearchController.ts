@@ -311,11 +311,10 @@ export class SearchController {
 
             const q = JobRepository.createQueryBuilder('j')
                 .innerJoinAndSelect('j.company', 'company')
-                .innerJoinAndSelect('j.category', 'category', `category.id In (${myCate})`)
                 .orderBy('j.id', 'DESC');
 
-            if (myCate.length < 1) {
-                return response.status(200).send({ count: 0, results: [] });
+            if (myCate.length > 1) {
+                q.innerJoinAndSelect('j.category', 'category', `category.id In (${myCate})`);
             }
             const jobs = await ApplyPagination(request, response, q, false);
             jobs.results = jobs.results.map(element => {
