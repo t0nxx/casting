@@ -314,6 +314,9 @@ export class SearchController {
                 .innerJoinAndSelect('j.category', 'category', `category.id In (${myCate})`)
                 .orderBy('j.id', 'DESC');
 
+            if (myCate.length < 1) {
+                return response.status(400).send({ success: false, error: 'please select your talent ccategories' });
+            }
             const jobs = await ApplyPagination(request, response, q, false);
             jobs.results = jobs.results.map(element => {
                 let job_category = [];
