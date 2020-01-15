@@ -315,7 +315,7 @@ export class SearchController {
                 .orderBy('j.id', 'DESC');
 
             if (myCate.length < 1) {
-                return response.status(400).send({ success: false, error: 'please select your talent ccategories' });
+                return response.status(200).send({ count: 0, results: [] });
             }
             const jobs = await ApplyPagination(request, response, q, false);
             jobs.results = jobs.results.map(element => {
