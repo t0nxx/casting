@@ -10,6 +10,7 @@ import { ApplyPagination } from '../helpers/pagination';
 import { JobApplicants } from '../models/newModels/jobs_applicants';
 import { getAllFriendSharedBtwnApp } from './FriendsController';
 import { WhoSeeMe } from '../models/newModels/who_see_me';
+import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
 export class SearchController {
 
 
@@ -128,6 +129,7 @@ export class SearchController {
     async searchPeople(request: any, response: Response, next: NextFunction) {
 
         const profileRepository = getRepository(Profile);
+        const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
         const userRepository = getRepository(User);
         try {
             const user = await profileRepository.findOne({ slug: request['user'].username });
@@ -218,7 +220,7 @@ export class SearchController {
             const friends: any = await getAllFriendSharedBtwnApp(request, response, user.slug);
             const friendsArray = friends.map(e => e.pk);
 
-            people.results = people.results.map(e => {
+            people.results = people.results.map(async e => {
                 const { first_name, last_name, email, username } = e['user'];
                 const auth_user = {
                     first_name, last_name, email, username, pk: e.id,
@@ -229,10 +231,21 @@ export class SearchController {
                 const has_video = e.activity_attachment.some(a => a.type === 'VIDEO');
 
                 let is_friends = false;
+                let is_IreceivedReqFromHim = false;
+                let is_IsendReqToHim = false;
                 let isFriendWithMe = friendsArray.includes(e.id);
                 if (isFriendWithMe) { is_friends = true; }
 
-                return { ...e, auth_user, is_friends, has_photo, has_video, has_audio }
+                const is_IreceivefromHim = await friendRequestRepository.findOne({
+                    where: { toUser: user, fromUser: e, }
+                });
+                const is_IsendtoHim = await friendRequestRepository.findOne({
+                    where: { toUser: e, fromUser: user, }
+                });
+                if (is_IreceivefromHim) { is_IreceivedReqFromHim = true; }
+                if (is_IsendtoHim) { is_IsendReqToHim = true; }
+
+                return { ...e, auth_user, is_friends, is_IreceivedReqFromHim, is_IsendReqToHim, has_photo, has_video, has_audio }
             });
             // not return the same user in search
             people.results = people.results.filter(e => e.id !== user.id);
