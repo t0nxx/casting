@@ -1,7 +1,25 @@
-version: "3.5"
+version: '2.2'
 services:
+  casting-db:
+    container_name: casting-db
+    image: "mysql:5.7.24"
+    environment:
+      MYSQL_ROOT_PASSWORD: tonitonitoni
+      MYSQL_USER: root
+      MYSQL_DATABASE: "casting_dev"
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: "mysql --password=tonitonitoni --user=root -e 'SELECT VERSION();SELECT NOW()'"
+      interval: 5s
+      retries: 10
+      timeout: 5s
+
   backend:
-    image: casting_backend
+    container_name: casting_backend
+    depends_on:
+      casting-db:
+        condition: service_healthy
     restart: always
     build: .
     ports:

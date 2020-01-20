@@ -71,7 +71,7 @@ createConnection().then(async connection => {
     //app.use(cors());
     app.use(fileupload());
 
-    app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
+    // app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
     app.use('/queue', UI);
@@ -79,27 +79,30 @@ createConnection().then(async connection => {
 
 
 
-    // io.on('connection', socket => {
+    io.on('connection', socket => {
 
-    //     console.log(`socket.io connected: ${socket.id}`);
+        console.log(`socket.io connected: ${socket.id}`);
 
-    //     // save socket.io socket in the session
-    //     socket.request.session.socketio = socket.id;
-    //     //socket.request.session.save();
-    //     console.log('new socket session', socket.request.session);
-    //     socket.on('disconnect', () => {
-    //         console.log('user disconnected');
-    //     });
-    // });
+        // save socket.io socket in the session
+        socket.request.session.socketio = socket.id;
+        //socket.request.session.save();
+        console.log('new socket session', socket.request.session);
+        socket.on('disconnect', () => {
+            console.log('user disconnected');
+        });
+    });
 
     // app.get('/dashboard', (req, res) => {
     //     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
     // });
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
-    });
+    // app.get('*', (req, res) => {
+    //     res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
+    // });
 
+    app.get('*', (req, res) => {
+        res.status(404).send({error : 'Not Found'});
+    });
 
     /**
      * use queue
