@@ -35,6 +35,10 @@ export class ChatController {
             const sender = await profileRepository.findOne({ slug: request['user'].username });
             const receiver = await profileRepository.findOne({ slug: request.params.slug });
 
+            if (!receiver) {
+                throw new Error('receiver user not found');
+            }
+
             let room = sender.slug + '-' + receiver.slug + '-' + randomString.generate({ length: 5 });
 
             const isFriends = await friendsRepository.findOne({
