@@ -6,6 +6,6 @@ const router = Router();
 const chatController = new ChatController();
 
 router.get('/:room', AuthMiddleWare, chatController.getAllMessage);
-router.post('/:room', AuthMiddleWare, chatController.sendMessage);
+router.post('/:slug', AuthMiddleWare, chatController.sendMessage);
 
 export default router;
