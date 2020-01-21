@@ -16,22 +16,61 @@ export class ChatController {
     async sendMessage(request, response: Response, next) {
         const profileRepository = getRepository(Profile);
         const ChatRepository = getRepository(Chat);
-        const firendsRepository = getRepository(FriendshipFriend);
+        const friendsRepository = getRepository(FriendshipFriend);
         try {
+            // const sender = await profileRepository.findOne({ slug: request['user'].username });
+            // const isRoomExist = await firendsRepository.findOne({ room: request.params.room });
+            // if (!isRoomExist) { throw new Error('Room Not Found'); }
+
+            // const newMessage = new Chat();
+            // newMessage.sender = sender;
+            // newMessage.room = request.params.room;
+            // newMessage.message = request.body.message || '';
+            // const create = await ChatRepository.save(newMessage);
+            // /**
+            //  * Socket work here
+            //  */
+            // const io = request.app.get('io');
+            // io.to(request.params.room).emit('message', { room: request.params.room });
             const sender = await profileRepository.findOne({ slug: request['user'].username });
-            const isRoomExist = await firendsRepository.findOne({ room: request.params.room });
-            if (!isRoomExist) { throw new Error('Room Not Found'); }
+            const receiver = await profileRepository.findOne({ slug: request.params.slug });
+
+            let room = sender.slug + '-' + receiver.slug + '-' + randomString.generate({ length: 5 });
+
+            const isFriends = await friendsRepository.findOne({
+                where: [
+                    { fromUser: sender, toUser: receiver },
+                    { fromUser: receiver, toUser: sender }
+                ],
+            });
+            if (isFriends) {
+                room = isFriends.room;
+            } else {
+                // find if thier is existing chat btwn sender and recevier to not create another room .
+                const isExistingChat = await ChatRepository.findOne({
+                    where: [
+                        // tslint:disable-next-line: object-literal-shorthand
+                        { sender: sender, recipient: receiver },
+                        { sender: receiver, recipient: sender }
+                    ]
+                });
+                if (isExistingChat) {
+                    room = isExistingChat.room;
+                }
+            }
 
             const newMessage = new Chat();
             newMessage.sender = sender;
-            newMessage.room = request.params.room;
+            newMessage.recipient = receiver;
+            newMessage.room = room;
             newMessage.message = request.body.message || '';
             const create = await ChatRepository.save(newMessage);
             /**
              * Socket work here
              */
             const io = request.app.get('io');
-            io.to(request.params.room).emit('message', { room: request.params.room });
+            // tslint:disable-next-line: object-literal-shorthand
+            io.to(room).emit('message', { room: room, sender: sender.slug });
 
             return response.status(200).send({ success: true });
         } catch (error) {

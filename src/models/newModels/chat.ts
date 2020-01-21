@@ -13,6 +13,9 @@ export class Chat {
     @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
     sender: Profile;
 
+    @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
+    recipient: Profile;
+
     @Index()
     @Column()
     room: string;
