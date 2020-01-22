@@ -114,4 +114,70 @@ export class ChatController {
 
     }
 
+    async getChats(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const ChatRepository = getRepository(Chat);
+        try {
+            // for sql issue in grouping 
+            // set global sql_mode='';
+
+            const user = await profileRepository.findOne({ slug: request['user'].username });
+            const subQ = ChatRepository.createQueryBuilder('chat')
+                .select('max(id) as id')
+                .where(`chat.senderId = '${user.id}' or chat.recipientId = '${user.id}'`)
+                .groupBy('chat.room');
+
+            const q = ChatRepository.createQueryBuilder('chat')
+                .leftJoin('chat.sender', 'sender')
+                .leftJoin('chat.recipient', 'recipient')
+                .innerJoinAndMapOne('chat.autherSender', User, 'autherSender', 'autherSender.id = sender.userId')
+                .innerJoinAndMapOne('chat.autherRecipient', User, 'autherRecipient', 'autherRecipient.id = recipient.userId')
+                .addSelect(['sender.id', 'sender.slug', 'sender.avatar', 'recipient.id', 'recipient.slug', 'recipient.avatar'])
+                .where(`chat.id In (${subQ.getQuery()})`)
+                .orderBy('chat.id', 'DESC');
+
+            const responseObject = await ApplyPagination(request, response, q, false);
+
+            // remove same user . to display only the other avatar
+            if (responseObject.results) {
+                responseObject.results = responseObject.results.map(e => {
+                    const formatedREsponse = {
+                        first_name: '',
+                        last_name: '',
+                        avatar: '',
+                        slug: '',
+                    };
+                    if (e.sender.slug !== user.slug) {
+                        formatedREsponse.slug = e.sender.slug;
+                        formatedREsponse.avatar = e.sender.avatar;
+                    } else {
+                        formatedREsponse.slug = e.recipient.slug;
+                        formatedREsponse.avatar = e.recipient.avatar;
+                    }
+
+                    if (e.autherSender.username !== user.slug) {
+                        formatedREsponse.first_name = e.autherSender.first_name;
+                        formatedREsponse.last_name = e.autherSender.last_name;
+                    } else {
+                        formatedREsponse.first_name = e.autherRecipient.first_name;
+                        formatedREsponse.last_name = e.autherRecipient.last_name;
+                    }
+
+                    return {
+                        id: e.id,
+                        created: e.created,
+                        room: e.room, message: e.message,
+                        readRecipient: e.readRecipient,
+                        auth_user: formatedREsponse,
+                    }
+                });
+
+            }
+            return response.status(200).send({ ...responseObject });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
 }
