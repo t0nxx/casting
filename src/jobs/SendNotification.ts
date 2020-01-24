@@ -112,13 +112,16 @@ export default async function ({ data }) {
             newNoti.actor_last_name = data.actor_last_name;
         }
         if (data.target_id) {
-            newNoti.target_id = data.target_id;
+            newNoti.target_activity_id = data.target_id;
         }
         if (data.target_slug) {
-            newNoti.target_slug = data.target_slug;
+            newNoti.target_job_slug = data.target_slug;
         }
         if (data.target_company) {
             newNoti.target_company = data.target_company;
+        }
+        if (data.target_profile_slug) {
+            newNoti.target_profile_slug = data.target_profile_slug;
         }
         newNoti.type = data.type;
         newNoti.verb =

@@ -14,13 +14,16 @@ export class Notification {
     type: number;
 
     @Column({ default: null })
-    target_slug: string;
+    target_job_slug: string;
+
+    @Column({ default: null })
+    target_profile_slug: string;
 
     @Column({ default: null })
     target_company: string;
 
     @Column({ default: null })
-    target_id: number;
+    target_activity_id: number;
 
     @CreateDateColumn()
     created: Date;
