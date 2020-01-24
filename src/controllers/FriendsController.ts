@@ -88,7 +88,7 @@ export class FriendsController {
                 actor_last_name: toUser.user.last_name,
                 actor_avatar: toUser.avatar,
                 type: NotificationTypeEnum.acceptFriendReq,
-                target_profile_slug: fromUser.slug,
+                target_profile_slug: toUser.slug,
                 recipient: fromUser.id,
             }
             await notificationQueue.add(notiToQueu);
