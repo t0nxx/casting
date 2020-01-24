@@ -7,6 +7,8 @@ import { FriendshipFriend } from '../models/newModels/friendship_friend';
 import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
 import { ApplyPagination } from '../helpers/pagination';
 import * as _ from 'underscore';
+import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
+import { notificationQueue } from '../main';
 
 export class FriendsController {
 
@@ -17,8 +19,8 @@ export class FriendsController {
         const profileRepository = getRepository(Profile);
         const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
         try {
-            const fromUser = await profileRepository.findOne({ slug: request['user'].username });
-            const toUser = await profileRepository.findOne({ slug: request.params.slug });
+            const fromUser = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const toUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
             if (!toUser) { throw new Error('user not found'); }
 
             const friendRequest = await friendRequestRepository.findOne({
@@ -35,6 +37,16 @@ export class FriendsController {
             newFriendRequest.toUser = toUser;
 
             await friendRequestRepository.save(newFriendRequest);
+
+            const notiToQueu: NotificationShape = {
+                actor_first_name: fromUser.user.first_name,
+                actor_last_name: fromUser.user.last_name,
+                actor_avatar: fromUser.avatar,
+                type: NotificationTypeEnum.sendFriendReq,
+                target_profile_slug: toUser.slug,
+                recipient: toUser.id,
+            }
+            await notificationQueue.add(notiToQueu);
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -53,8 +65,8 @@ export class FriendsController {
         const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
         const friendsRepository = getRepository(FriendshipFriend);
         try {
-            const toUser = await profileRepository.findOne({ slug: request['user'].username });
-            const fromUser = await profileRepository.findOne({ slug: request.params.slug });
+            const toUser = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const fromUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
             const friendRequest = await friendRequestRepository.findOne({
                 where: {
                     toUser,
@@ -70,6 +82,16 @@ export class FriendsController {
             addNewFriends.toUser = toUser;
             addNewFriends.room = fromUser.slug + '-' + toUser.slug + '-' + randomString.generate({ length: 5 });
             await friendsRepository.save(addNewFriends);
+
+            const notiToQueu: NotificationShape = {
+                actor_first_name: toUser.user.first_name,
+                actor_last_name: toUser.user.last_name,
+                actor_avatar: toUser.avatar,
+                type: NotificationTypeEnum.acceptFriendReq,
+                target_profile_slug: fromUser.slug,
+                recipient: fromUser.id,
+            }
+            await notificationQueue.add(notiToQueu);
 
             return response.status(200).send({ success: true });
         } catch (error) {

@@ -38,6 +38,12 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
         case 9:
             verb = 'Your Followed Company Has New Job ';
             break;
+        case 10:
+            verb = 'Send You Friend Request  ';
+            break;
+        case 11:
+            verb = 'Accept Your Friend Request ';
+            break;
         default:
             verb = msg;
             break;
@@ -56,7 +62,9 @@ export enum NotificationTypeEnum {
     mentionOnPost = 7,
     mentionOnComment = 8,
     newJobFromFollowedCompany = 9,
-    others = 10,
+    sendFriendReq = 10,
+    acceptFriendReq = 11,
+    others = 12,
 
 
 }
@@ -82,6 +90,7 @@ export interface NotificationShape {
     // slug of the job
     target_slug?: string;
     target_company?: string;
+    target_profile_slug?: string;
     actor_last_name?: string;
     interviewDate?: Date;
     interviewName?: string;
