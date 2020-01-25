@@ -1247,6 +1247,25 @@ export class ActivityController {
         }
     }
 
+    async reomveImageFromAlbum(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const ActivityRepository = getRepository(Activity);
+        const ActivityAttachmentRepository = getRepository(ActivityAttachment);
+        try {
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.imgId, 10) });
+
+            await ActivityAttachmentRepository.update({ activity }, { album_id: null });
+            activity.content = request.body.content;
+            await ActivityRepository.save(activity);
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
     async deleteActivity(request: Request, response: Response, next: NextFunction) {
 
         const profileRepository = getRepository(Profile);

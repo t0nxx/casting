@@ -109,6 +109,8 @@ router.post('/:slug/album/image', AuthMiddleWare, activityController.AddNewVideo
 
 router.put('/:slug/album/:id/image', AuthMiddleWare, activityController.addImageToAlbum);
 
+router.delete('/:slug/album/:id/image/:imgId', AuthMiddleWare, activityController.reomveImageFromAlbum);
+
 // router.delete('/:id', profileController.remove);
 // delete
 router.delete('/:slug/training/:id', AuthMiddleWare, profileController.deleteTaninig);
