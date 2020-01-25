@@ -95,7 +95,7 @@ export class ChatController {
             const q = ChatRepository.createQueryBuilder('chat')
                 .leftJoin('chat.sender', 'sender')
                 .leftJoin('chat.recipient', 'recipient')
-                .addSelect(['sender.id', 'sender.slug', 'sender.avatar', 'recipient.slug'])
+                .addSelect(['sender.id', 'sender.slug', 'sender.avatar', 'recipient.id', 'recipient.slug'])
                 .where(`chat.room like '${request.params.room}'`)
                 .orderBy('chat.id', 'DESC');
 
