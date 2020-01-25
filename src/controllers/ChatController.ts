@@ -90,14 +90,29 @@ export class ChatController {
     async getAllMessage(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
         const ChatRepository = getRepository(Chat);
-        const user = await profileRepository.findOne({ slug: request['user'].username });
-        const q = ChatRepository.createQueryBuilder('chat')
-            .leftJoin('chat.sender', 'sender')
-            .addSelect(['sender.id', 'sender.slug', 'sender.avatar'])
-            .where(`chat.room like '${request.params.room}'`)
-            .orderBy('chat.id', 'DESC');
+        try {
+            const user = await profileRepository.findOne({ slug: request['user'].username });
+            const q = ChatRepository.createQueryBuilder('chat')
+                .leftJoin('chat.sender', 'sender')
+                .leftJoin('chat.recipient', 'recipient')
+                .addSelect(['sender.id', 'sender.slug', 'sender.avatar', 'recipient.slug'])
+                .where(`chat.room like '${request.params.room}'`)
+                .orderBy('chat.id', 'DESC');
 
-        return ApplyPagination(request, response, q, true);
+            const responseObject = await ApplyPagination(request, response, q, false);
+
+            responseObject.results = responseObject.results.map(e => {
+                const partners = [e.sender.slug, e.recipient.slug];
+                delete e.recipient;
+                return { ...e, partners }
+            })
+
+            return response.status(200).send({ ...responseObject });
+
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
 
         // // make isRead is true 
         // let [isNotSender, countIsNotSender] = await ChatRepository.createQueryBuilder('chat')
@@ -169,10 +184,12 @@ export class ChatController {
                         room: e.room, message: e.message,
                         readRecipient: e.readRecipient,
                         auth_user: formatedREsponse,
+                        partners: [e.autherSender.username, e.autherRecipient.username]
                     }
                 });
 
             }
+
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
