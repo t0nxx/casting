@@ -17,7 +17,7 @@ router.post('/:id/bookmark', AuthMiddleWare, activityController.BookmarkActivity
 router.post('/:id/report', AuthMiddleWare, activityController.reportActivity);
 router.post('/:id/hide', AuthMiddleWare, activityController.HideActivity);
 router.delete('/:id/delete', AuthMiddleWare, activityController.deleteActivity);
-router.delete('/:id/deleteImg/:imgId', AuthMiddleWare, activityController.reomveImageFromAlbum);
+router.delete('/:id/removefromalbum', AuthMiddleWare, activityController.reomveImageFromAlbum);
 router.get('/:id/comments', AuthMiddleWare, commentController.getAllCommentsOfACtivity);
 
 router.get('/:id/comments/:comId/replies', AuthMiddleWare, commentController.getAllRepliesOfComment);

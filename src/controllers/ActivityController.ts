@@ -1253,7 +1253,7 @@ export class ActivityController {
         const ActivityRepository = getRepository(Activity);
         const ActivityAttachmentRepository = getRepository(ActivityAttachment);
         try {
-            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.imgId, 10) });
+            const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
 
             await ActivityAttachmentRepository.update({ activity }, { album_id: null });
             activity.content = request.body.content;
