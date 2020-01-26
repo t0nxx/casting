@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { NewsLetter } from '../../models/newModels/news_letter';
 import { transformAndValidate } from 'class-transformer-validator';
+import { sendInviteMail } from '../../helpers/sendMail';
 
 
 export class NewsLetterController {
@@ -64,7 +65,7 @@ export class NewsLetterController {
              * 
              * send mail logic 
              */
-
+            sendInviteMail(request.body.email);
 
             return response.status(200).send({ success: true });
         } catch (error) {
