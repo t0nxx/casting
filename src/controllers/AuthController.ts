@@ -10,7 +10,7 @@ import { generateJwtToken } from '../helpers/GnerateJwt';
 import { Profile } from '../models/newModels/users_profile';
 import { ProfileSettings } from '../models/newModels/profile_settings';
 import { TalentCategories } from '../models/newModels/talent_categories';
-import { sendMail } from '../helpers/sendMail';
+import { sendMail, sendWelcomeMail } from '../helpers/sendMail';
 
 export class AuthController {
 
@@ -123,6 +123,7 @@ export class AuthController {
             delete data.user;
             const { first_name, last_name, id, email, username } = create;
             const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            sendWelcomeMail(create.email, create.first_name);
             return response.status(200).send({ success: true, token, user: { ...responseObject } });
         } catch (error) {
             /**
