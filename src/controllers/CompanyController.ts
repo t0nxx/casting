@@ -153,7 +153,7 @@ export class CompanyController {
             }
             //////////////
             let newDataWitoutTags = Object.keys(request.body).length;
-            if (newDataWitoutTags > 1) {
+            if (newDataWitoutTags >= 1) {
                 await companyRepository.update({ slug: request.params.slug }, request.body);
             }
 
