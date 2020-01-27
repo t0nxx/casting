@@ -5,6 +5,7 @@ import { NotificationsController } from '../controllers/api/Notifications';
 import { AuthController } from '../controllers/AuthController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 import { RandomJobsAndUsersController } from '../controllers/api/RandomJobAndUser';
+import { SearchController } from '../controllers/SearchController';
 
 const router = Router();
 const talentController = new TalentCategoriesController();
@@ -12,6 +13,7 @@ const authController = new AuthController();
 const newsLetterController = new NewsLetterController();
 const notificationsController = new NotificationsController();
 const randomJobsAndUsersController = new RandomJobsAndUsersController();
+const searchController = new SearchController();
 
 // start talent categories
 router.get('/talent-categories', talentController.getAllTalentCategories);
@@ -26,6 +28,8 @@ router.post('/notification/:id/read', AuthMiddleWare, notificationsController.ma
 
 router.get('/random/jobs', randomJobsAndUsersController.getRandomJobs);
 router.get('/random/users',randomJobsAndUsersController.getRandomUsers);
+
+router.get('/landing/search',searchController.searchPeopleLandingPage);
 
 // start verify username , email is available
 router.post('/verifyusernameemail', authController.verifyEmailAndUsernamIsAvailable);

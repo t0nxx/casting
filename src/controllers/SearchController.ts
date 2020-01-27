@@ -243,6 +243,50 @@ export class SearchController {
         }
     }
 
+
+    async searchPeopleLandingPage(request: any, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const userRepository = getRepository(User);
+        try {
+            const q = profileRepository.createQueryBuilder('p')
+                .innerJoinAndMapOne('p.user', User, 'user', 'user.id = p.userId')
+                .leftJoinAndSelect('p.weight', 'weight')
+                .leftJoinAndSelect('p.height', 'height')
+                .leftJoinAndSelect('p.eye', 'eye')
+                .leftJoinAndSelect('p.hair', 'hair')
+                .leftJoinAndSelect('p.build', 'build')
+                .leftJoinAndSelect('p.ethnicity', 'ethnicity');
+
+
+            if (request.query.search && request.query.search !== null) {
+                /// come from navbar
+                q.andWhere(`user.username like '%${request.query.search}%' `);
+            }
+
+
+            const people = await ApplyPagination(request, response, q, false);
+
+            people.results = people.results.map(e => {
+                const { first_name, last_name, email, username } = e['user'];
+                const auth_user = {
+                    first_name, last_name, email, username, pk: e.id,
+                };
+                const has_photo = true;
+                const has_audio = true;
+                const has_video = true;
+
+                const is_friends = false;
+
+                return { ...e, auth_user, is_friends, has_photo, has_video, has_audio }
+            });
+            return response.status(200).send(people);
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
     async getWhoSeeMePeople(request: any, response: Response, next: NextFunction) {
 
         const profileRepository = getRepository(Profile);
