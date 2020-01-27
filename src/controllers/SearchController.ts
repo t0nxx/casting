@@ -261,7 +261,7 @@ export class SearchController {
 
             if (request.query.search && request.query.search !== null) {
                 /// come from navbar
-                q.andWhere(`user.username like '%${request.query.search}%' `);
+                q.andWhere(`user.username like '%${request.query.search}%' or user.first_name like '%${request.query.search}%' or user.last_name like '%${request.query.search}%'`);
             }
 
 
