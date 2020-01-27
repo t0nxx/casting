@@ -19,6 +19,8 @@ router.patch('/:slug/avatar', AuthMiddleWare, companyController.updateCompanyAva
 
 router.patch('/:slug/cover', AuthMiddleWare, companyController.updateCompanyCover);
 
+router.post('/:slug/cover/reset', AuthMiddleWare, companyController.resetCompanyCover);
+
 router.post('/:slug/follow', AuthMiddleWare, companyController.followCompany);
 
 router.post('/:slug/un-follow', AuthMiddleWare, companyController.unFollowCompany);

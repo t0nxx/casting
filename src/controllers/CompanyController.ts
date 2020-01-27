@@ -279,6 +279,25 @@ export class CompanyController {
             return response.status(400).send({ success: false, error: err });
         }
     }
+
+    async resetCompanyCover(request: Request, response: Response, next: NextFunction) {
+
+        const profileRepository = getRepository(Profile);
+        const companyRepository = getRepository(Company);
+        try {
+            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile'] });
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            if (!company) { throw new Error('company Not Found'); }
+            if (company.profile.id !== profile.id) { throw new Error('Not authorize to edit this company'); }
+            const resetCover = 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/banner.jpg';
+            await companyRepository.update({ slug: request.params.slug }, { cover: resetCover });
+            const afterUpdate = await companyRepository.findOne({ slug: request.params.slug });
+            return response.status(200).send({ cover: resetCover });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
     /**
     * @Delete Company
     */
