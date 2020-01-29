@@ -65,7 +65,8 @@ createConnection().then(async connection => {
             'https://casting-admin-panel.s3.eu-central-1.amazonaws.com',
             'http://casting-admin-panel.s3.eu-central-1.amazonaws.com',
             'http://casting-admin-panel.s3-website.eu-central-1.amazonaws.com',
-            'http://3.125.225.214','http://3.125.225.214:3000'
+            'http://3.125.225.214','http://3.125.225.214:3000',
+            'https://admin.castingsecret.com','https://d32dm90ra3bag1.cloudfront.net'
         ],
     }));
     //app.use(cors());
