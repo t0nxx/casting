@@ -9,6 +9,7 @@ import { ApplyPagination } from '../helpers/pagination';
 import * as _ from 'underscore';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 import { notificationQueue } from '../main';
+import { Chat } from '../models/newModels/chat';
 
 export class FriendsController {
 
@@ -64,6 +65,7 @@ export class FriendsController {
         const profileRepository = getRepository(Profile);
         const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
         const friendsRepository = getRepository(FriendshipFriend);
+        const ChatRepository = getRepository(Chat)
         try {
             const toUser = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
             const fromUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
@@ -80,7 +82,21 @@ export class FriendsController {
             const addNewFriends = new FriendshipFriend();
             addNewFriends.fromUser = fromUser;
             addNewFriends.toUser = toUser;
-            addNewFriends.room = fromUser.slug + '-' + toUser.slug + '-' + randomString.generate({ length: 5 });
+            /// this block mean if friends , then unfriend , after that we should not create a new room
+            // to retrive any chat if unfriend
+            const isExistingChat = await ChatRepository.findOne({
+                where: [
+                    // tslint:disable-next-line: object-literal-shorthand
+                    { sender: toUser, recipient: fromUser },
+                    { sender: fromUser, recipient: toUser }
+                ]
+            });
+            if (isExistingChat) {
+                addNewFriends.room = isExistingChat.room;
+            } else {
+                addNewFriends.room = fromUser.slug + '-' + toUser.slug + '-' + randomString.generate({ length: 5 });
+            }
+            /// end block
             await friendsRepository.save(addNewFriends);
 
             const notiToQueu: NotificationShape = {
