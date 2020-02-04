@@ -59,6 +59,12 @@ export class ProfileSettings {
     @Column({ default: false })
     jobs_notification: boolean;
 
+    @Column({ default: false })
+    mute_all_chats: boolean;
+
+    @Column({ default: true })
+    sound_alert: boolean;
+
     @Column({ default: myStatus.ONLINE })
     my_status: myStatus;
 

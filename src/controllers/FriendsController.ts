@@ -10,6 +10,7 @@ import * as _ from 'underscore';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 import { notificationQueue } from '../main';
 import { Chat } from '../models/newModels/chat';
+import { ChatRoom } from '../models/newModels/chat_room';
 
 export class FriendsController {
 
@@ -66,6 +67,7 @@ export class FriendsController {
         const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
         const friendsRepository = getRepository(FriendshipFriend);
         const ChatRepository = getRepository(Chat)
+        const ChatRoomRepository = getRepository(ChatRoom)
         try {
             const toUser = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
             const fromUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
@@ -84,20 +86,46 @@ export class FriendsController {
             addNewFriends.toUser = toUser;
             /// this block mean if friends , then unfriend , after that we should not create a new room
             // to retrive any chat if unfriend
-            const isExistingChat = await ChatRepository.findOne({
+            const isExistingRoom = await ChatRoomRepository.findOne({
                 where: [
                     // tslint:disable-next-line: object-literal-shorthand
-                    { sender: toUser, recipient: fromUser },
-                    { sender: fromUser, recipient: toUser }
+                    { participant1: toUser, participant2: fromUser },
+                    { participant2: fromUser, participant1: toUser }
                 ]
             });
-            if (isExistingChat) {
-                addNewFriends.room = isExistingChat.room;
+            if (isExistingRoom) {
+                addNewFriends.room = isExistingRoom.name;
             } else {
-                addNewFriends.room = fromUser.slug + '-' + toUser.slug + '-' + randomString.generate({ length: 5 });
+                const newRoom = new ChatRoom();
+                newRoom.name = fromUser.slug + '-' + toUser.slug + '-' + randomString.generate({ length: 5 });
+                newRoom.participant1 = fromUser;
+                newRoom.participant2 = toUser;
+                newRoom.last_deleted_from_participant1 = new Date();
+                newRoom.last_deleted_from_participant2 = new Date();
+                const createNewRoom = await ChatRoomRepository.save(newRoom);
+                addNewFriends.room = createNewRoom.name;
             }
             /// end block
-            await friendsRepository.save(addNewFriends);
+            const saveNewFriend = await friendsRepository.save(addNewFriends);
+            const room = await ChatRoomRepository.findOne({ name: saveNewFriend.room });
+
+
+            const newMessage = new Chat();
+            newMessage.room = room;
+            newMessage.sender = fromUser;
+            newMessage.recipient = toUser;
+            newMessage.message = 'Say hi to your new friend';
+            const createMsg1 = await ChatRepository.save(newMessage);
+
+            const newMessage2 = new Chat();
+            newMessage.room = room;
+            newMessage.sender = toUser;
+            newMessage.recipient = fromUser;
+            newMessage.message = 'Say hi to your new friend';
+            const createMsg2 = await ChatRepository.save(newMessage);
+
+
+
 
             const notiToQueu: NotificationShape = {
                 actor_first_name: toUser.user.first_name,

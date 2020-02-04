@@ -1,5 +1,6 @@
-import { Entity, ManyToOne, CreateDateColumn, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
+import { Entity, ManyToOne, CreateDateColumn, Column, PrimaryGeneratedColumn, Index, OneToOne, JoinColumn } from 'typeorm';
 import { Profile } from './users_profile';
+import { ChatRoom } from './chat_room';
 
 @Entity('chat')
 export class Chat {
@@ -16,9 +17,12 @@ export class Chat {
     @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
     recipient: Profile;
 
-    @Index()
-    @Column()
-    room: string;
+    // @Index()
+    // @Column()
+    // room: string;
+
+    @ManyToOne(type => ChatRoom, room => room.messages)
+    room: ChatRoom;
 
     @Column('text')
     message: string;
