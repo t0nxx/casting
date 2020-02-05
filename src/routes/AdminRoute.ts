@@ -21,6 +21,7 @@ router.put('/user/:id', adminAdditionController.updateUser);
 router.delete('/user/:id', adminAdditionController.deleteUser);
 
 router.get('/reports', adminAdditionController.getActivityReports);
+router.delete('/reports/:id', adminAdditionController.deleteReportedActivityFromAdmin);
 
 router.get('/:lookupRepo', adminLookupsController.getAllTemplate);
 router.get('/:lookupRepo/:id', adminLookupsController.getOneTemplate);

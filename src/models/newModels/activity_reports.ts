@@ -12,10 +12,10 @@ export class ActivityReports {
     @Column()
     reason: string;
 
-    @ManyToOne(type => Profile, p => p.activity_reports)
+    @ManyToOne(type => Profile, p => p.activity_reports, { onDelete: 'CASCADE' })
     profile: Profile;
 
-    @ManyToOne(type => Activity, a => a.reports)
+    @ManyToOne(type => Activity, a => a.reports, { onDelete: 'CASCADE' })
     activity: Activity;
 
 

@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../../models/newModels/auth_user';
 import { ActivityReports } from '../../models/newModels/activity_reports';
+import { Activity } from '../../models/newModels/activity';
 
 export class AdminAdditionController {
     /**
@@ -114,6 +115,31 @@ export class AdminAdditionController {
                 }
             })
             return response.status(200).send({ data: newData, count });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+   * @Delete
+   */
+    async deleteReportedActivityFromAdmin(request: Request, response: Response) {
+        const activityReportsRepository = getRepository(ActivityReports);
+        const activityRepository = getRepository(Activity);
+        try {
+            const report = await activityReportsRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['activity'] });
+            if (!report) { throw new Error('report not found '); }
+            const deleteAllreportsOfActivity = await activityReportsRepository.createQueryBuilder('r')
+                .delete()
+                .where(`r.activityId = ${report.activity.id}`)
+                .execute();
+
+            await activityRepository.remove(report.activity);
+            return response.status(200).send({ data: report });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
