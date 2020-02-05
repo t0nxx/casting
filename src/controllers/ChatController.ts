@@ -120,7 +120,7 @@ export class ChatController {
             } else {
                 after_date_condation = room.last_deleted_from_participant2;
             }
-            after_date_condation = new Date(after_date_condation).toISOString().split('T')[0];
+            after_date_condation = new Date(after_date_condation).toISOString();
             const q = ChatRepository.createQueryBuilder('chat')
                 .leftJoin('chat.sender', 'sender')
                 .leftJoin('chat.recipient', 'recipient')
