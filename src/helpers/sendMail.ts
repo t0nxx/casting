@@ -2,25 +2,25 @@ const mailgun = require('mailgun-js');
 const DOMAIN = 'castingsecret.com';
 const mg = mailgun({ apiKey: '13c992e774b054f494bbd805381e4816-f696beb4-b9c906c7', domain: DOMAIN, host: "api.eu.mailgun.net" });
 export function sendMail(mail, resetCode) {
-    const data = {
-        from: 'Casting mail@castingsecret.com',
-        to: `${mail}`,
-        subject: 'Reset Password Code',
-        text: ` Hi , 
+  const data = {
+    from: 'Casting mail@castingsecret.com',
+    to: `${mail}`,
+    subject: 'Reset Password Code',
+    text: ` Hi , 
         Your code is ${resetCode} .`
-    };
-    mg.messages().send(data, (error, body) => {
-        console.log(body);
-    });
+  };
+  mg.messages().send(data, (error, body) => {
+    console.log(body);
+  });
 }
 
 export function sendWelcomeMail(mail, userName) {
-    const data = {
-        from: 'Casting mail@castingsecret.com',
-        to: `${mail}`,
-        subject: 'Welcome To Casting',
-        text: `Welcome ,`,
-        html: `
+  const data = {
+    from: 'Casting mail@castingsecret.com',
+    to: `${mail}`,
+    subject: 'Welcome To Casting',
+    text: `Welcome ,`,
+    html: `
         <body bgcolor="#F5F8FA" style="-webkit-text-size-adjust:none;margin:0;padding:0;">
   <!-- Background -->
   <table align="center" border="0" cellpadding="0" cellspacing="0"
@@ -94,16 +94,25 @@ export function sendWelcomeMail(mail, userName) {
                                   style="font-size:15px;font-family:Arial,sans-serif;line-height:18px;color:#66757f;vertical-align:top;"
                                   valign="top">
                                   Hello&nbsp ${userName};,<br>
-                                  <br>Thank you for joining our website !.<br>
-                                  <br>Sincerely,
-
-
-
-
+                                  <br>
+                                     <p>You successfully created an account. Thank you for being a member of Casting Secret friends. Start engaging , reacting and sharing your awesome production work on your wall and profile. Invite your actors, Voice Overs and Models friends to join you for easier and professional casting calls finding.</p>
+                                  <br>
+                                  Glad to have you and Welcome to the talents and filmmaker space.
+                                  <br>
+                                  Sincerely,
                                   <br>
                                   <br>
                                   Casting Secret Team .
                                   <br>
+                                     <p>
+                                     أهلا وسهلا (اسم المستخدم)
+لقد أنشأت حسابك بنجاح. شكرا لانضمامك إلى قائمة أصدقاء كاستنج سيكريت. ابدأ بالتفاعل ومشاركة أعمالك الانتاجية الرائعة على الحائط وعلى الملف الشخصي. ادع اصدقائك الممثلين والمعلقين الصوتيين والعارضين للانضمام لسهولة مشاركة الأعمال وإيجاد طلبات النداءات بشكل احترافي.
+
+سعيدون بانضمامك و أهلا بك مرة أخرى في فضاء المواهب وصناع الأفلام 
+تحياتنا 
+فريق كاستنج سيكريت.
+
+                                     </p>
                                   <center>
                                     <strong>Want To Start Your Adventure ?</strong><br>
                                     <br>
@@ -142,19 +151,19 @@ export function sendWelcomeMail(mail, userName) {
 
 </body>
         `
-    };
-    mg.messages().send(data, (error, body) => {
-        console.log(body);
-    });
+  };
+  mg.messages().send(data, (error, body) => {
+    console.log(body);
+  });
 }
 
 export function sendInviteMail(mail) {
-    const data = {
-        from: 'Casting mail@castingsecret.com',
-        to: `${mail}`,
-        subject: 'Invite To Casting',
-        text: `Hello ,`,
-        html: `
+  const data = {
+    from: 'Casting mail@castingsecret.com',
+    to: `${mail}`,
+    subject: 'Invite To Casting',
+    text: `Hello ,`,
+    html: `
         <body bgcolor="#F5F8FA" style="-webkit-text-size-adjust:none;margin:0;padding:0;">
   <!-- Background -->
   <table align="center" border="0" cellpadding="0" cellspacing="0"
@@ -276,8 +285,8 @@ export function sendInviteMail(mail) {
 
 </body>
         `
-    };
-    mg.messages().send(data, (error, body) => {
-        console.log(body);
-    });
+  };
+  mg.messages().send(data, (error, body) => {
+    console.log(body);
+  });
 }
