@@ -21,6 +21,7 @@ const { setQueues, UI } = require('bull-board');
 import * as cookieParser from 'cookie-parser';
 
 import routes from './routes/index';
+import { JoinChatRooms } from './middlewares/JoinChatRooms';
 // tslint:disable-next-line: no-var-requires
 // create express app
 const app = express();
@@ -65,17 +66,22 @@ createConnection().then(async connection => {
             'https://casting-admin-panel.s3.eu-central-1.amazonaws.com',
             'http://casting-admin-panel.s3.eu-central-1.amazonaws.com',
             'http://casting-admin-panel.s3-website.eu-central-1.amazonaws.com',
-            'http://3.125.225.214','http://3.125.225.214:3000',
-            'https://admin.castingsecret.com','https://d32dm90ra3bag1.cloudfront.net'
+            'http://3.125.225.214', 'http://3.125.225.214:3000',
+            'https://admin.castingsecret.com', 'https://d32dm90ra3bag1.cloudfront.net'
         ],
     }));
     //app.use(cors());
     app.use(fileupload());
 
+    // join chat rooms middleware 
+    // note order matter
+    app.use(JoinChatRooms);
+
     // app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
     app.use('/queue', UI);
+
 
 
 
@@ -102,7 +108,7 @@ createConnection().then(async connection => {
     // });
 
     app.get('*', (req, res) => {
-        res.status(404).send({error : 'Not Found'});
+        res.status(404).send({ error: 'Not Found' });
     });
 
     /**

@@ -20,19 +20,6 @@ export class ChatController {
         const ChatRoomRepository = getRepository(ChatRoom);
         const friendsRepository = getRepository(FriendshipFriend);
         try {
-            // const sender = await profileRepository.findOne({ slug: request['user'].username });
-            // const isRoomExist = await firendsRepository.findOne({ room: request.params.room });
-            // if (!isRoomExist) { throw new Error('Room Not Found'); }
-
-            // const newMessage = new Chat();
-            // newMessage.sender = sender;
-            // newMessage.room = request.params.room;
-            // newMessage.message = request.body.message || '';
-            // const create = await ChatRepository.save(newMessage);
-            // /**
-            //  * Socket work here
-            //  */
-            // const io = request.app.get('io');
             // io.to(request.params.room).emit('message', { room: request.params.room });
             const sender = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
             const receiver = await profileRepository.findOne({ slug: request.params.slug });
@@ -80,7 +67,6 @@ export class ChatController {
             newMessage.recipient = receiver;
             newMessage.message = request.body.message || '';
             const create = await ChatRepository.save(newMessage);
-            console.log(create);
 
             // loop over muted array and send them to the socket
             let muted_from = [];
@@ -105,6 +91,7 @@ export class ChatController {
                     last_name: sender.user.last_name,
                     slug: sender.slug,
                     avatar: sender.avatar,
+                    id: sender.id,
                 },
             });
 
@@ -313,7 +300,7 @@ export class ChatController {
                 room.last_deleted_from_participant2 = new Date();
             }
             const save = await ChatRoomRepository.save(room);
-            return response.status(200).send({ success: true , save });
+            return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
