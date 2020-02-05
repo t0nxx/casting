@@ -133,10 +133,9 @@ export class AdminAdditionController {
         try {
             const report = await activityReportsRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['activity'] });
             if (!report) { throw new Error('report not found '); }
-            const deleteAllreportsOfActivity = await activityReportsRepository.createQueryBuilder('r')
-                .delete()
-                .where(`r.activityId = ${report.activity.id}`)
-                .execute();
+            const allReportsOfPost = await activityReportsRepository.find({ activity: report.activity });
+            const deleteAllreportsOfActivity = await activityReportsRepository
+                .remove(allReportsOfPost);
 
             await activityRepository.remove(report.activity);
             return response.status(200).send({ data: report });
