@@ -3,7 +3,7 @@ import { Notification } from '../models/newModels/notify_notification';
 import { Profile } from '../models/newModels/users_profile';
 
 
-function getVerbType(type: number, interviewDate?: Date, interviewName?: string, msg?: string) {
+function getVerbType(type: number, interviewDate?: Date, interviewName?: string, interviewLocation?: string, msg?: string) {
     let verb = '';
     switch (type) {
         case 0:
@@ -21,7 +21,9 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
         case 4:
             const date = new Date(interviewDate).toUTCString();
             verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
-             on ${date}   With Mr/ ${interviewName}`;
+             on ${date} 
+             in ${interviewLocation}
+             With Mr/ ${interviewName}`;
             break;
         case 5:
             verb = `New Applicant On Your Job! Have A Good Chance :) `;
@@ -94,6 +96,7 @@ export interface NotificationShape {
     actor_last_name?: string;
     interviewDate?: Date;
     interviewName?: string;
+    interviewLocation?: string;
     msgFromAdmin?: string;
 
 }
@@ -125,8 +128,8 @@ export default async function ({ data }) {
         }
         newNoti.type = data.type;
         newNoti.verb =
-            data.type === 4 ? getVerbType(data.type, data.interviewDate, data.interviewName) :
-                data.type === 10 ? getVerbType(data.type, null, null, data.msgFromAdmin) :
+            data.type === 4 ? getVerbType(data.type, data.interviewDate, data.interviewName, data.interviewLocation) :
+                data.type === 10 ? getVerbType(data.type, null, null, null, data.msgFromAdmin) :
                     getVerbType(data.type);// users.map(async e => {
         //     const notiToQueu: NotificationShape = {
         //         actor_first_name: 'Casting',

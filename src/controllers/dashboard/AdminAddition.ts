@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../../models/newModels/auth_user';
+import { ActivityReports } from '../../models/newModels/activity_reports';
 
 export class AdminAdditionController {
     /**
@@ -83,6 +84,36 @@ export class AdminAdditionController {
             if (!data) { throw new Error('User not found'); }
             await userRepository.delete({ id: parseInt(request.params.id, 10) });
             return response.status(200).send({ data });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+    }
+
+    /**
+    * @Get
+    */
+    async getActivityReports(request: Request, response: Response) {
+        const activityReportsRepository = getRepository(ActivityReports);
+        try {
+            const [data, count] = await activityReportsRepository.findAndCount({
+                relations: ['activity'],
+                order: { id: 'DESC' },
+                select: ['id', 'reason', 'activity']
+                // order: { id: 'DESC' },
+                // select: ['id', 'reason', 'activity.id']
+            });
+            const newData = data.map(e => {
+                return {
+                    id: e.id,
+                    reason: e.reason,
+                    link: `https://castingsecret.com/activity/${e.activity.id}`
+                }
+            })
+            return response.status(200).send({ data: newData, count });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error

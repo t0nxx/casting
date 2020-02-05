@@ -6,6 +6,7 @@ import { transformAndValidate } from 'class-transformer-validator';
 import { ApplyPagination } from '../../helpers/pagination';
 import { NotificationShape, NotificationTypeEnum } from '../../jobs/SendNotification';
 import { notificationQueue } from '../../main';
+import { NotificationAdminPanel } from '../../models/newModels/notification_admin_panel';
 
 
 export class NotificationsController {
@@ -87,6 +88,7 @@ export class NotificationsController {
     async addNotificationsFromAdmin(request: Request, response: Response, next: NextFunction) {
         const profileRepository = getRepository(Profile);
         const NotificationRepository = getRepository(Notification);
+        const AdminNotificationRepository = getRepository(NotificationAdminPanel);
         try {
             const users = await profileRepository.find({ select: ['id'] });
             // for dashboard just send the next noti id for response
@@ -102,9 +104,12 @@ export class NotificationsController {
                     recipient: e.id,
                 }
                 await notificationQueue.add(notiToQueu);
-            })
+            });
+            const newAdminNotification = new NotificationAdminPanel();
+            newAdminNotification.body = request.body.msg;
+            const data = await AdminNotificationRepository.save(newAdminNotification);
 
-            return response.status(200).send({ data: { id: count + 1 } });
+            return response.status(200).send({ data });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -114,12 +119,12 @@ export class NotificationsController {
 
     async getAllNotificationsForAdmin(request: Request, response: Response, next: NextFunction) {
 
-        const NotificationRepository = getRepository(Notification);
+        const AdminNotificationRepository = getRepository(NotificationAdminPanel);
         try {
 
-            // const data = NotificationRepository.find({ type: 10 });
+            const [data, count] = await AdminNotificationRepository.findAndCount({ order: { id: 'DESC' } });
 
-            return response.status(200).send({ data: [], count: 0 });
+            return response.status(200).send({ data, count });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -129,10 +134,10 @@ export class NotificationsController {
 
     async getOneNotificationsForAdmin(request: Request, response: Response, next: NextFunction) {
 
-        const NotificationRepository = getRepository(Notification);
+        const AdminNotificationRepository = getRepository(NotificationAdminPanel);
         try {
 
-            const data = NotificationRepository.findOne({ id: parseInt(request.params.id, 10) });
+            const data = await AdminNotificationRepository.findOne({ id: parseInt(request.params.id, 10) });
 
             if (!data) { throw new Error('given id not found'); }
 

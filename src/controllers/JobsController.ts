@@ -491,6 +491,7 @@ export class JobsController {
                 target_company: job.company.slug,
                 interviewName: saveInterview.interviewer,
                 interviewDate: saveInterview.interview_date,
+                interviewLocation : saveInterview.location,
                 recipient: profile.id,
             }
             await notificationQueue.add(notiToQueu);
