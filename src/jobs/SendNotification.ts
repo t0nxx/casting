@@ -22,7 +22,7 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
             const date = new Date(interviewDate).toUTCString();
             verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
              on ${date} 
-             in ${interviewLocation}
+             location ${interviewLocation}
              With Mr/ ${interviewName}`;
             break;
         case 5:
@@ -129,7 +129,7 @@ export default async function ({ data }) {
         newNoti.type = data.type;
         newNoti.verb =
             data.type === 4 ? getVerbType(data.type, data.interviewDate, data.interviewName, data.interviewLocation) :
-                data.type === 10 ? getVerbType(data.type, null, null, null, data.msgFromAdmin) :
+                data.type === 12 ? getVerbType(data.type, null, null, null, data.msgFromAdmin) :
                     getVerbType(data.type);// users.map(async e => {
         //     const notiToQueu: NotificationShape = {
         //         actor_first_name: 'Casting',
