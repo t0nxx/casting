@@ -8,6 +8,7 @@ import { FriendshipFriendshipRequest } from '../models/newModels/friendship_frie
 import { Chat } from '../models/newModels/chat';
 import { ApplyPagination } from '../helpers/pagination';
 import { ChatRoom } from '../models/newModels/chat_room';
+import {ProfileSettings} from '../models/newModels/profile_settings';
 
 export class ChatController {
 
@@ -161,9 +162,12 @@ export class ChatController {
     async getChats(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
         const ChatRepository = getRepository(Chat);
+        const profileSettingsRepository = getRepository(ProfileSettings)
         try {
             // for sql issue in grouping 
             // set global sql_mode='';
+
+            // const settings = await profileSettingsRepository.findOne({ profile })
 
             const user = await profileRepository.findOne({ slug: request['user'].username });
             const subQ = ChatRepository.createQueryBuilder('chat')
@@ -177,6 +181,8 @@ export class ChatController {
                 .innerJoin('chat.room', 'room')
                 .innerJoinAndMapOne('chat.autherSender', User, 'autherSender', 'autherSender.id = sender.userId')
                 .innerJoinAndMapOne('chat.autherRecipient', User, 'autherRecipient', 'autherRecipient.id = recipient.userId')
+                .innerJoinAndMapOne('chat.senderSettings',ProfileSettings , 'senderSettings' , 'sender.id = senderSettings.profileId')
+                .innerJoinAndMapOne('chat.recipientSettings',ProfileSettings , 'recipientSettings' , 'recipient.id = recipientSettings.profileId')
                 .addSelect(['room.id', 'room.name', 'room.muted_from', 'sender.id', 'sender.slug', 'sender.avatar', 'recipient.id', 'recipient.slug', 'recipient.avatar'])
                 .where(`chat.id In (${subQ.getQuery()})`)
                 .orderBy('chat.id', 'DESC');
@@ -191,13 +197,16 @@ export class ChatController {
                         last_name: '',
                         avatar: '',
                         slug: '',
+                        status : 'online',
                     };
                     if (e.sender.slug !== user.slug) {
                         formatedREsponse.slug = e.sender.slug;
                         formatedREsponse.avatar = e.sender.avatar;
+                        formatedREsponse.status = e.senderSettings.my_status;
                     } else {
                         formatedREsponse.slug = e.recipient.slug;
                         formatedREsponse.avatar = e.recipient.avatar;
+                        formatedREsponse.status = e.recipientSettings.my_status;
                     }
 
                     if (e.autherSender.username !== user.slug) {
