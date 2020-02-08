@@ -45,7 +45,7 @@ export class ChatController {
                     where: [
                         // tslint:disable-next-line: object-literal-shorthand
                         { participant1: sender, participant2: receiver },
-                        { participant2: receiver, participant1: sender }
+                        { participant1: receiver, participant2: sender }
                     ]
                 });
                 if (isExistingRoom) {
