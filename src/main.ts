@@ -81,7 +81,7 @@ createConnection().then(async connection => {
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
     app.use('/queue', UI);
-    app.use(require('express-status-monitor')());
+    // app.use(require('express-status-monitor')());
 
 
 
