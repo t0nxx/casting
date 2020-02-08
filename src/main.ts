@@ -76,7 +76,7 @@ createConnection().then(async connection => {
     // join chat rooms middleware 
     // note order matter
     app.use(JoinChatRooms);
-
+    app.use(require('express-status-monitor')());
     // app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
