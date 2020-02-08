@@ -90,7 +90,7 @@ export class FriendsController {
                 where: [
                     // tslint:disable-next-line: object-literal-shorthand
                     { participant1: toUser, participant2: fromUser },
-                    { participant2: fromUser, participant1: toUser }
+                    { participant1: fromUser, participant2: toUser }
                 ]
             });
             if (isExistingRoom) {
