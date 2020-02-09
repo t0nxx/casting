@@ -313,7 +313,10 @@ export class FriendsController {
                 return formatedREsponse1;
             });
 
-            const results = [...res1, ...res2];
+            let results = [...res1, ...res2];
+
+            // remove the same user from response 
+            results =results.filter(e => e.slug !== profile.slug);
             /**
              * socket work here
              */
