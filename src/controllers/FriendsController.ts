@@ -11,6 +11,7 @@ import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotificatio
 import { notificationQueue } from '../main';
 import { Chat } from '../models/newModels/chat';
 import { ChatRoom } from '../models/newModels/chat_room';
+import { ProfileSettings } from '../models/newModels/profile_settings';
 
 export class FriendsController {
 
@@ -252,6 +253,7 @@ export class FriendsController {
             const q1 = friendsRepository2
                 .innerJoin('f2.fromUser', 'senderUser')
                 .innerJoinAndMapOne('f2.Auther', User, 'auther', 'auther.id = senderUser.userId')
+                .innerJoinAndMapOne('f2.senderSettings', ProfileSettings, 'senderSettings', 'senderUser.id = senderSettings.profileId')
                 .addSelect(['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'f2.room'])
                 .where(`f2.toUser = ${profile.id}`);
             // search friends 
@@ -262,7 +264,7 @@ export class FriendsController {
 
             const [friendsRequestsTouser, count1] = await q1.getManyAndCount();
 
-            const res1 = friendsRequestsTouser.map(e => {
+            const res1: any = friendsRequestsTouser.map(e => {
                 // pk: number,
                 // first_name: string,
                 // last_name: string,
@@ -280,6 +282,7 @@ export class FriendsController {
                     avatar: e.fromUser.avatar,
                     slug: e.fromUser.slug,
                     room: e.room,
+                    status: e['senderSettings'].my_status,
                 };
                 return formatedREsponse1;
             });
@@ -287,6 +290,7 @@ export class FriendsController {
             const q2 = friendsRepository
                 .innerJoin('f.toUser', 'reciverUser')
                 .innerJoinAndMapOne('f.Auther', User, 'auther', 'auther.id = reciverUser.userId')
+                .innerJoinAndMapOne('f.recipientSettings', ProfileSettings, 'recipientSettings', 'reciverUser.id = recipientSettings.profileId')
                 .addSelect(['reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'f.room'])
                 .where(`f.fromUser = ${profile.id}`);
 
@@ -309,6 +313,7 @@ export class FriendsController {
                     avatar: e.toUser.avatar,
                     slug: e.toUser.slug,
                     room: e.room,
+                    status: e['recipientSettings'].my_status,
                 };
                 return formatedREsponse1;
             });
@@ -316,7 +321,7 @@ export class FriendsController {
             let results = [...res1, ...res2];
 
             // remove the same user from response 
-            results =results.filter(e => e.slug !== profile.slug);
+            results = results.filter(e => e.slug !== profile.slug);
             /**
              * socket work here
              */
