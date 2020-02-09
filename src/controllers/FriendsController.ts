@@ -391,6 +391,109 @@ export class FriendsController {
     }
 
 
+    async makeAllusersFriendWithAdminForDevOnly(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
+        const friendsRepository = getRepository(FriendshipFriend);
+        const ChatRepository = getRepository(Chat)
+        const ChatRoomRepository = getRepository(ChatRoom)
+        try {
+            const toUser = await profileRepository.findOne({ slug: 'test9' }, { relations: ['user'] });
+            // const fromUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
+            const allUsers = await profileRepository.find({ relations: ['user'] });
+            allUsers.map(async fromUser => {
+                const addNewFriends = new FriendshipFriend();
+                addNewFriends.fromUser = fromUser;
+                addNewFriends.toUser = toUser;
+                /// this block mean if friends , then unfriend , after that we should not create a new room
+                // to retrive any chat if unfriend
+                const isExistingRoom = await ChatRoomRepository.findOne({
+                    where: [
+                        // tslint:disable-next-line: object-literal-shorthand
+                        { participant1: toUser, participant2: fromUser },
+                        { participant1: fromUser, participant2: toUser }
+                    ]
+                });
+                if (isExistingRoom) {
+                    addNewFriends.room = isExistingRoom.name;
+                } else {
+                    const newRoom = new ChatRoom();
+                    newRoom.name = fromUser.slug + '-' + toUser.slug + '-' + randomString.generate({ length: 5 });
+                    newRoom.participant1 = fromUser;
+                    newRoom.participant2 = toUser;
+                    newRoom.last_deleted_from_participant1 = new Date();
+                    newRoom.last_deleted_from_participant2 = new Date();
+                    const createNewRoom = await ChatRoomRepository.save(newRoom);
+                    addNewFriends.room = createNewRoom.name;
+                }
+                /// end block
+                const saveNewFriend = await friendsRepository.save(addNewFriends);
+                const room = await ChatRoomRepository.findOne({ name: saveNewFriend.room });
+
+
+                const newMessage = new Chat();
+                newMessage.room = room;
+                newMessage.sender = fromUser;
+                newMessage.recipient = toUser;
+                newMessage.message = 'Say hi to your new friend';
+                const createMsg1 = await ChatRepository.save(newMessage);
+
+                const newMessage2 = new Chat();
+                newMessage.room = room;
+                newMessage.sender = toUser;
+                newMessage.recipient = fromUser;
+                newMessage.message = 'Say hi to your new friend';
+                const createMsg2 = await ChatRepository.save(newMessage);
+
+
+
+
+                const notiToQueu: NotificationShape = {
+                    actor_first_name: toUser.user.first_name,
+                    actor_last_name: toUser.user.last_name,
+                    actor_avatar: toUser.avatar,
+                    type: NotificationTypeEnum.acceptFriendReq,
+                    target_profile_slug: toUser.slug,
+                    recipient: fromUser.id,
+                }
+                await notificationQueue.add(notiToQueu);
+            })
+
+
+
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+    async removeAllusersFromFriendWithAdminForDevOnly(request: Request, response: Response) {
+        const profileRepository = getRepository(Profile);
+        const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
+        const friendsRepository = getRepository(FriendshipFriend);
+        const ChatRepository = getRepository(Chat)
+        const ChatRoomRepository = getRepository(ChatRoom)
+        try {
+            const toUser = await profileRepository.findOne({ slug: 'test9' }, { relations: ['user'] });
+            // const fromUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
+            const friendsWithAdmin = await friendsRepository.find({toUser : toUser});
+            await friendsRepository.remove(friendsWithAdmin);
+     
+    
+    
+    
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+    
+        }
+    }
+
+
 
 }
 
@@ -477,3 +580,4 @@ export async function getAllFriendSharedBtwnApp(request, response: Response, slu
 
 
 }
+

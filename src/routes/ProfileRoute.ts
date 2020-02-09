@@ -16,7 +16,7 @@ const searchController = new SearchController();
 
 router.get('/lookups', profileController.getLookups);
 
-router.get('/whoseeme', AuthMiddleWare,searchController.getWhoSeeMePeople);
+router.get('/whoseeme', AuthMiddleWare, searchController.getWhoSeeMePeople);
 
 router.get('/:slug', AuthMiddleWare, profileController.getProfile);
 router.get('/:slug/settings', AuthMiddleWare, profileController.getProfileSettings);
@@ -65,6 +65,27 @@ router.post('/:slug/companies', AuthMiddleWare, companyController.createCompany)
 
 // send friend request
 router.post('/:slug/friends', AuthMiddleWare, friendsController.sendFriendRequest);
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+// for dev onlyyyyyyyyyyyyyyyyy
+// make all users friends with admin profile
+router.post('/:slug/friends/friendalladmin', AuthMiddleWare, friendsController.makeAllusersFriendWithAdminForDevOnly);
+router.post('/:slug/friends/unfriendalladmin', AuthMiddleWare, friendsController.removeAllusersFromFriendWithAdminForDevOnly);
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 
 // accept friend request 
 router.post('/:slug/friends/accept', AuthMiddleWare, friendsController.acceptFriendRequest);
