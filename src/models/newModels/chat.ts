@@ -21,7 +21,7 @@ export class Chat {
     // @Column()
     // room: string;
 
-    @ManyToOne(type => ChatRoom, room => room.messages)
+    @ManyToOne(type => ChatRoom, room => room.messages, { onDelete: 'CASCADE' })
     room: ChatRoom;
 
     @Column('text')
