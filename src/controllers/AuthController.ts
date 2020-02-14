@@ -29,12 +29,12 @@ export class AuthController {
             const data = await profileRepository.findOne({ slug: request.body.username }, {
                 relations: ['user']
             });
-            const { first_name, last_name, email, username, id } = data.user;
+            const { first_name, last_name, email, username } = data.user;
             delete data.user;
-            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            const responseObject = { ...data, isSuperAdmin: user.isAdmin, auth_user: { pk: data.id, first_name, last_name, email, username } }
             const token = await generateJwtToken({
                 id: user.id,
-                isAdmin: user.isAdmin,
+                isSuperAdmin: user.isAdmin,
             });
             return response.status(200).send({ success: true, token, user: { ...responseObject } });
         } catch (error) {

@@ -57,8 +57,8 @@ export class ActivityController {
 
             responseObject.results = await Promise.all(responseObject.results.map(async ac => {
                 // temp setting for front end
-                const author_settings: any = await profileSettingsRepository.findOne({ profile: ac.profile },
-                    { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+                const author_settings = await profileSettingsRepository.findOne({ profile: ac.profile });
+                delete author_settings.profile;
                 const liked = myLikes.includes(ac.id);
                 const disliked = myDisLikes.includes(ac.id);
                 const bookmarked = myBookMarks.includes(ac.id);
