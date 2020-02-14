@@ -300,10 +300,10 @@ export class ProfileController {
                 relations: ['user']
             });
             /// extract auth_user object for response
-            const { first_name, last_name, email, username, id } = data.user;
+            const { first_name, last_name, email, username } = data.user;
             // important to not retrive all user data
             delete data.user;
-            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            const responseObject = { ...data, isSuperAdmin: data.user.isAdmin, auth_user: { pk: data.id, first_name, last_name, email, username } }
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             /**
