@@ -20,8 +20,9 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
             break;
         case 4:
             // add 3 hourse cause server in europe and client in ksa +3 gmt
+            // i add 2 not three for hours cause server in frankfurt 1+gmt
             const date = new Date(interviewDate)
-            date.setHours(date.getHours() + 3);
+            date.setHours(date.getHours() + 2);
             verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
              on ${date} 
              location ${interviewLocation}

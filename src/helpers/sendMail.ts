@@ -292,7 +292,7 @@ export function sendInviteMail(mail) {
 }
 
 
-export function sendInterviewDate(mail, userName, date, interviewLocation, interviewName) {
+export function sendInterviewDate(mail, userName, date, interviewLocation, interviewName,jobLink) {
   const data = {
     from: 'Casting mail@castingsecret.com',
     to: `${mail}`,
@@ -377,6 +377,10 @@ export function sendInterviewDate(mail, userName, date, interviewLocation, inter
                                      on ${date} 
                                      location  :  ${interviewLocation}
                                      With Mr/ ${interviewName} </p>
+                                  <br>
+                                  <a href="${jobLink}"
+                                  style="background-color: #3c2b3f;border-radius:5px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:15px;font-weight:bold;line-height:45px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;">Go
+                                  To Job </a>
                                   <br>
                                   Sincerely,
                                   <br>
