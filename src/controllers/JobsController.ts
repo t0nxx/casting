@@ -354,7 +354,7 @@ export class JobsController {
             const q = JobInterviewRepository.createQueryBuilder('a')
                 .innerJoin('a.profile', 'profile')
                 .innerJoinAndMapOne('a.user', User, 'user', 'user.id = profile.userId')
-                .where(`a.id = ${job.id}`)
+                .where(`a.jobId = ${job.id}`)
                 .orderBy('a.id', 'DESC');
 
             const people = await ApplyPagination(request, response, q, false);
