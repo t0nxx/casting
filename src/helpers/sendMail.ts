@@ -290,3 +290,129 @@ export function sendInviteMail(mail) {
     console.log(body);
   });
 }
+
+
+export function sendInterviewDate(mail, userName, date, interviewLocation, interviewName) {
+  const data = {
+    from: 'Casting mail@castingsecret.com',
+    to: `${mail}`,
+    subject: 'Job Interview To Casting',
+    text: `Welcome ,`,
+    html: `
+        <body bgcolor="#F5F8FA" style="-webkit-text-size-adjust:none;margin:0;padding:0;">
+  <!-- Background -->
+  <table align="center" border="0" cellpadding="0" cellspacing="0"
+    style="border-collapse:collapse;background-color:#f5f8fa;text-align:center;" width="100%">
+    <tbody>
+      <tr>
+        <td align="center" class="framepadding" style="padding-left:30px;padding-right:30px;">
+          <!--FRAME-->
+          <table align="center" border="0" cellpadding="0" cellspacing="0" class="frame"
+            style="border-collapse:collapse;background-color:#f5f8fa;width:600px;min-width:320px;text-align:center;">
+            <tbody>
+              <tr>
+                <td style="font-size:15px;font-family:Arial,sans-serif;line-height:18px;">
+                  <!--preheader -->
+                  <table align="center" border="0" cellpadding="0" cellspacing="0"
+                    style="border-collapse:collapse;width:100%;text-align:center;">
+                    <tbody>
+                      <tr>
+
+                      </tr>
+                    </tbody>
+                  </table>
+                  <!--/preheader -->
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <!-- header -->
+                  <table align="left" border="0" cellpadding="0" cellspacing="0"
+                    style="border-collapse:collapse;/* background-color:#55acee; */background-color: #3c2b3f;text-align:left;"
+                    width="100%">
+                    <tbody>
+                      <tr>
+                        <td class="preblue"
+                          style="font-size:0px;line-height:0px;color: white;padding-left:30px;margin-top: 10px;padding-top: 20px;padding-bottom:8px;height: 30px;">
+
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <!--/header-->
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <!-- banner -->
+                  <table align="center" border="0" cellpadding="0" cellspacing="0"
+                    style="border-collapse:collapse;background-color:#ffffff;text-align:center;" width="100%">
+                    <tbody>
+                    </tbody>
+                  </table>
+                  <!--/banner-->
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <!-- body -->
+                  <table align="left" bgcolor="#FFFFFF" border="0" cellpadding="0" cellspacing="0"
+                    style="border-collapse:collapse;text-align:left;" width="100%">
+                    <tbody>
+                      <tr>
+                        <td class="bodypadding"
+                          style="padding:30px;font-size:15px;font-family:Arial,sans-serif;line-height:18px;color:#66757f;">
+                          <!-- columns -->
+                          <table align="left" bgcolor="#FFFFFF" border="0" cellpadding="0" cellspacing="0"
+                            style="border-collapse:collapse;text-align:left;" width="100%">
+                            <tbody>
+                              <tr>
+                                <!-- left column -->
+                                <td class="stack"
+                                  style="font-size:15px;font-family:Arial,sans-serif;line-height:18px;color:#66757f;vertical-align:top;"
+                                  valign="top">
+                                  Hello&nbsp ${userName};,<br>
+                                  <br>
+                                     <p> Congratulation! You Accept In Job And Have Inivitation For Interview
+                                     on ${date} 
+                                     location  :  ${interviewLocation}
+                                     With Mr/ ${interviewName} </p>
+                                  <br>
+                                  Sincerely,
+                                  <br>
+                                  <br>
+                                  Casting Secret Team .
+                                  <br>
+                                </td><!-- /left column -->
+                              </tr>
+                            </tbody>
+                          </table><!-- /columns -->
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table><!-- /body -->
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <!-- footer -->
+                  <!-- /footer -->
+                </td>
+              </tr>
+              <tr>
+                <td bgcolor="#F5F8FA">&nbsp;</td>
+              </tr>
+            </tbody>
+          </table><!-- /FRAME -->
+        </td>
+      </tr>
+    </tbody>
+  </table><!-- /Background -->
+
+</body>
+        `
+  };
+  mg.messages().send(data, (error, body) => {
+    console.log(body);
+  });
+}

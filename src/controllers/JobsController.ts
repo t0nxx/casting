@@ -13,6 +13,7 @@ import { JobShortlist } from '../models/newModels/jobs_shortlisted';
 import { transformAndValidate } from 'class-transformer-validator';
 import { notificationQueue } from '../main';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
+import { sendInterviewDate } from '../helpers/sendMail';
 export class JobsController {
 
     /**
@@ -452,7 +453,7 @@ export class JobsController {
                 });
             if (!job) { throw new Error('job Not Found'); }
 
-            const profile = await profileRepository.findOne({ slug: request.params.userSlug });
+            const profile = await profileRepository.findOne({ slug: request.params.userSlug }, { relations: ['user'] });
 
             const isAlreadyHaveInterview = await JobInterviewRepository.findOne({
                 where: { job, profile }
@@ -492,10 +493,14 @@ export class JobsController {
                 target_company: job.company.slug,
                 interviewName: saveInterview.interviewer,
                 interviewDate: saveInterview.interview_date,
-                interviewLocation : saveInterview.location,
+                interviewLocation: saveInterview.location,
                 recipient: profile.id,
             }
             await notificationQueue.add(notiToQueu);
+            const saudiDate = new Date(saveInterview.interview_date)
+            saudiDate.setHours(saudiDate.getHours() + 3);
+
+            sendInterviewDate(profile.user.email, profile.user.first_name, saudiDate, saveInterview.location, saveInterview.interviewer);
 
             return response.status(200).send({ success: true });
         } catch (error) {
