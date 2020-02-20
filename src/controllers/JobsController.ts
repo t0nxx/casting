@@ -500,9 +500,10 @@ export class JobsController {
             // i add 2 not three for hours cause server in frankfurt 1+gmt
             const saudiDate = new Date(saveInterview.interview_date)
             saudiDate.setHours(saudiDate.getHours() + 2);
+            const formatedDate = `'${saudiDate}'`.split('GMT')[0];
             const jobLink = `https://castingsecret.com/job/job-page/${job.slug}/${job.company.slug}`;
 
-            sendInterviewDate(profile.user.email, profile.user.first_name, saudiDate, saveInterview.location, saveInterview.interviewer , jobLink);
+            sendInterviewDate(profile.user.email, profile.user.first_name, formatedDate, saveInterview.location, saveInterview.interviewer , jobLink);
 
             return response.status(200).send({ success: true });
         } catch (error) {

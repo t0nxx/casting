@@ -23,8 +23,9 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
             // i add 2 not three for hours cause server in frankfurt 1+gmt
             const date = new Date(interviewDate)
             date.setHours(date.getHours() + 2);
+            const formatedDate = `'${date}'`;
             verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
-             on ${date} 
+             on ${formatedDate.split('GMT')[0]},
              location ${interviewLocation}
              With Mr/ ${interviewName}`;
             break;
