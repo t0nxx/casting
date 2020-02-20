@@ -443,15 +443,15 @@ export class FriendsController {
 
 
 
-                const notiToQueu: NotificationShape = {
-                    actor_first_name: toUser.user.first_name,
-                    actor_last_name: toUser.user.last_name,
-                    actor_avatar: toUser.avatar,
-                    type: NotificationTypeEnum.acceptFriendReq,
-                    target_profile_slug: toUser.slug,
-                    recipient: fromUser.id,
-                }
-                await notificationQueue.add(notiToQueu);
+                // const notiToQueu: NotificationShape = {
+                //     actor_first_name: toUser.user.first_name,
+                //     actor_last_name: toUser.user.last_name,
+                //     actor_avatar: toUser.avatar,
+                //     type: NotificationTypeEnum.acceptFriendReq,
+                //     target_profile_slug: toUser.slug,
+                //     recipient: fromUser.id,
+                // }
+                // await notificationQueue.add(notiToQueu);
             })
 
 
@@ -472,9 +472,15 @@ export class FriendsController {
         const ChatRepository = getRepository(Chat)
         const ChatRoomRepository = getRepository(ChatRoom)
         try {
-            const toUser = await profileRepository.findOne({ slug: 'test9' }, { relations: ['user'] });
+            const adminProfile = await profileRepository.findOne({ slug: 'test9' }, { relations: ['user'] });
             // const fromUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
-            const friendsWithAdmin = await friendsRepository.find({ toUser: toUser });
+            const friendsWithAdmin = await friendsRepository.find({
+                where: [
+                    { fromUser: adminProfile },
+                    { toUser: adminProfile }
+
+                ]
+            });
             await friendsRepository.remove(friendsWithAdmin);
 
 
