@@ -23,15 +23,14 @@ router.get('/:slug/settings', AuthMiddleWare, profileController.getProfileSettin
 
 router.get('/:slug/companies', companyController.getAllCompanies);
 
+// get all friends
+router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
+
 // get all friends request
 router.get('/:slug/friends-request', AuthMiddleWare, friendsController.getAllFriendsRequest);
 
 // get Suggested  friends
 router.get('/:slug/friends-suggested', AuthMiddleWare, friendsController.getSuggestedFriends);
-
-// get all friends
-router.get('/:slug/friends', AuthMiddleWare, friendsController.getAllFriends);
-
 
 // test album
 router.get('/:slug/album', AuthMiddleWare, profileController.getProfileAlbums);

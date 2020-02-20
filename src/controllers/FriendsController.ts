@@ -256,22 +256,27 @@ export class FriendsController {
                 .innerJoinAndMapOne('f2.senderSettings', ProfileSettings, 'senderSettings', 'senderUser.id = senderSettings.profileId')
                 .addSelect(['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'f2.room'])
                 .where(`f2.toUser = ${profile.id}`);
+
+            const q2 = friendsRepository
+                .innerJoin('f.toUser', 'reciverUser')
+                .innerJoinAndMapOne('f.Auther', User, 'auther', 'auther.id = reciverUser.userId')
+                .innerJoinAndMapOne('f.recipientSettings', ProfileSettings, 'recipientSettings', 'reciverUser.id = recipientSettings.profileId')
+                .addSelect(['reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'f.room'])
+                .where(`f.fromUser = ${profile.id}`);
+
             // search friends 
             if (request.query.query) {
                 const query1 = request.query.query;
                 q1.andWhere(`auther.username like '%${query1}%' or auther.first_name like '%${query1}%' or auther.last_name like '%${query1}%' or senderUser.location like '%${query1}%'`)
+                q2.andWhere(`auther.username like '%${query1}%' or auther.first_name like '%${query1}%' or auther.last_name like '%${query1}%' or reciverUser.location like '%${query1}%'`)
             }
 
-            const [friendsRequestsTouser, count1] = await q1.getManyAndCount();
+            const [
+                [friendsRequestsTouser, count1],
+                [friendsRequestsFromUser, count2]
+            ] = await Promise.all([q1.getManyAndCount(), q2.getManyAndCount()]);
 
             const res1: any = friendsRequestsTouser.map(e => {
-                // pk: number,
-                // first_name: string,
-                // last_name: string,
-                // email: string,
-                // username: string,
-                // slug: string,
-                // avatar: any
                 const tempAuther: any = e['Auther'];
                 const formatedREsponse1 = {
                     pk: e.fromUser.id,
@@ -286,21 +291,6 @@ export class FriendsController {
                 };
                 return formatedREsponse1;
             });
-
-            const q2 = friendsRepository
-                .innerJoin('f.toUser', 'reciverUser')
-                .innerJoinAndMapOne('f.Auther', User, 'auther', 'auther.id = reciverUser.userId')
-                .innerJoinAndMapOne('f.recipientSettings', ProfileSettings, 'recipientSettings', 'reciverUser.id = recipientSettings.profileId')
-                .addSelect(['reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'f.room'])
-                .where(`f.fromUser = ${profile.id}`);
-
-            // search friends 
-            if (request.query.query) {
-                const query2 = request.query.query;
-                q2.andWhere(`auther.username like '%${query2}%' or auther.first_name like '%${query2}%' or auther.last_name like '%${query2}%' or reciverUser.location like '%${query2}%'`)
-            }
-
-            const [friendsRequestsFromUser, count2] = await q2.getManyAndCount();
 
             const res2 = friendsRequestsFromUser.map(e => {
                 const tempAuther: any = e['Auther'];
@@ -322,6 +312,27 @@ export class FriendsController {
 
             // remove the same user from response 
             results = results.filter(e => e.slug !== profile.slug);
+            /**
+             * socket work here
+             */
+            // mean he is get his friends from wall page
+            //// i 'll replace this with middleware over the whole app
+            // if (profile.slug === request['user'].username) {
+            //     const io = request.app.get('io');
+            //     const socketID = request.cookies.io;
+            //     console.log('from friends');
+            //     console.log(socketID);
+            //     // console.log(io);
+            //     if (socketID) {
+            //         results.forEach(f => {
+            //             io.sockets.connected[socketID].join(f.room, () => {
+            //                 console.log('joined ' + f.room);
+            //             })
+            //         });
+            //     }
+            //     // io.to('test9-toni2-PXVTY').emit('message','hi from join');
+
+            // }
             const count = count1 + count2;
 
             return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
@@ -458,17 +469,17 @@ export class FriendsController {
         try {
             const toUser = await profileRepository.findOne({ slug: 'test9' }, { relations: ['user'] });
             // const fromUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
-            const friendsWithAdmin = await friendsRepository.find({toUser : toUser});
+            const friendsWithAdmin = await friendsRepository.find({ toUser: toUser });
             await friendsRepository.remove(friendsWithAdmin);
-     
-    
-    
-    
+
+
+
+
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
-    
+
         }
     }
 
