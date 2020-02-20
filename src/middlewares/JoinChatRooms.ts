@@ -50,11 +50,12 @@ export const JoinChatRooms = async (req, res: Response, next: NextFunction) => {
         }
 
     } catch (error) {
+        next();
         /**
               * if ther error from class validator , return first object . else message of error
               */
-        const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-        return res.status(401).send({ where: "from rooms middleware", success: false, error: err });
+        // const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+        // return res.status(401).send({ where: "from rooms middleware", success: false, error: err });
     }
 }
 
