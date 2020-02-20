@@ -19,7 +19,9 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
             verb = 'Replied On  Your  Comment';
             break;
         case 4:
-            const date = new Date(interviewDate).toString();
+            // add 3 hourse cause server in europe and client in ksa +3 gmt
+            const date = new Date(interviewDate)
+            date.setHours(date.getHours() + 3);
             verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
              on ${date} 
              location ${interviewLocation}
