@@ -19,7 +19,7 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
             verb = 'Replied On  Your  Comment';
             break;
         case 4:
-            const date = new Date(interviewDate).toUTCString();
+            const date = new Date(interviewDate).toLocaleString();
             verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
              on ${date} 
              location ${interviewLocation}
