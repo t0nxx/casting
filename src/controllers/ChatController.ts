@@ -8,7 +8,7 @@ import { FriendshipFriendshipRequest } from '../models/newModels/friendship_frie
 import { Chat } from '../models/newModels/chat';
 import { ApplyPagination } from '../helpers/pagination';
 import { ChatRoom } from '../models/newModels/chat_room';
-import {ProfileSettings} from '../models/newModels/profile_settings';
+import { ProfileSettings } from '../models/newModels/profile_settings';
 
 export class ChatController {
 
@@ -76,14 +76,13 @@ export class ChatController {
                     muted_from.push(slug);
                 })
             }
-            /**
-             * Socket work here
-             */
-            const io = request.app.get('io');
-            // tslint:disable-next-line: object-literal-shorthand
-            io.to(create.room.name).emit(isFriends ? 'message' : 'updateChatList', {
+            const resObject = {
+                id: create.id,
+                created: create.created,
+                readRecipient: create.readRecipient,
                 room: create.room.name,
                 message: create.message,
+                partners: [sender.slug, receiver.slug],
                 settings: {
                     muted_from,
                 },
@@ -94,9 +93,17 @@ export class ChatController {
                     avatar: sender.avatar,
                     id: sender.id,
                 },
+            }
+            /**
+             * Socket work here
+             */
+            const io = request.app.get('io');
+            // tslint:disable-next-line: object-literal-shorthand
+            io.to(create.room.name).emit(isFriends ? 'message' : 'updateChatList', {
+                ...resObject,
             });
 
-            return response.status(200).send({ success: true, room: room.name });
+            return response.status(200).send({ ...resObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
@@ -181,8 +188,8 @@ export class ChatController {
                 .innerJoin('chat.room', 'room')
                 .innerJoinAndMapOne('chat.autherSender', User, 'autherSender', 'autherSender.id = sender.userId')
                 .innerJoinAndMapOne('chat.autherRecipient', User, 'autherRecipient', 'autherRecipient.id = recipient.userId')
-                .innerJoinAndMapOne('chat.senderSettings',ProfileSettings , 'senderSettings' , 'sender.id = senderSettings.profileId')
-                .innerJoinAndMapOne('chat.recipientSettings',ProfileSettings , 'recipientSettings' , 'recipient.id = recipientSettings.profileId')
+                .innerJoinAndMapOne('chat.senderSettings', ProfileSettings, 'senderSettings', 'sender.id = senderSettings.profileId')
+                .innerJoinAndMapOne('chat.recipientSettings', ProfileSettings, 'recipientSettings', 'recipient.id = recipientSettings.profileId')
                 .addSelect(['room.id', 'room.name', 'room.muted_from', 'sender.id', 'sender.slug', 'sender.avatar', 'recipient.id', 'recipient.slug', 'recipient.avatar'])
                 .where(`chat.id In (${subQ.getQuery()})`)
                 .orderBy('chat.id', 'DESC');
@@ -197,7 +204,7 @@ export class ChatController {
                         last_name: '',
                         avatar: '',
                         slug: '',
-                        status : 'online',
+                        status: 'online',
                     };
                     if (e.sender.slug !== user.slug) {
                         formatedREsponse.slug = e.sender.slug;

@@ -322,27 +322,6 @@ export class FriendsController {
 
             // remove the same user from response 
             results = results.filter(e => e.slug !== profile.slug);
-            /**
-             * socket work here
-             */
-            // mean he is get his friends from wall page
-            //// i 'll replace this with middleware over the whole app
-            // if (profile.slug === request['user'].username) {
-            //     const io = request.app.get('io');
-            //     const socketID = request.cookies.io;
-            //     console.log('from friends');
-            //     console.log(socketID);
-            //     // console.log(io);
-            //     if (socketID) {
-            //         results.forEach(f => {
-            //             io.sockets.connected[socketID].join(f.room, () => {
-            //                 console.log('joined ' + f.room);
-            //             })
-            //         });
-            //     }
-            //     // io.to('test9-toni2-PXVTY').emit('message','hi from join');
-
-            // }
             const count = count1 + count2;
 
             return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
