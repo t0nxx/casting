@@ -255,14 +255,14 @@ export class FriendsController {
                 .innerJoinAndMapOne('f2.Auther', User, 'auther', 'auther.id = senderUser.userId')
                 .innerJoinAndMapOne('f2.senderSettings', ProfileSettings, 'senderSettings', 'senderUser.id = senderSettings.profileId')
                 .addSelect(['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'f2.room'])
-                .where(`f2.toUser = ${profile.id}`);
+                .where(`f2.toUserId = ${profile.id}`);
 
             const q2 = friendsRepository
                 .innerJoin('f.toUser', 'reciverUser')
                 .innerJoinAndMapOne('f.Auther', User, 'auther', 'auther.id = reciverUser.userId')
                 .innerJoinAndMapOne('f.recipientSettings', ProfileSettings, 'recipientSettings', 'reciverUser.id = recipientSettings.profileId')
                 .addSelect(['reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'f.room'])
-                .where(`f.fromUser = ${profile.id}`);
+                .where(`f.fromUserId = ${profile.id}`);
 
             // search friends 
             if (request.query.query) {
@@ -314,7 +314,8 @@ export class FriendsController {
             results = results.filter(e => e.slug !== profile.slug);
 
             // remove redundant in search 
-            results = results.filter((e, i) => results.findIndex(a => a['pk'] === e['pk']) === i);
+            // this is worng , since it retrive not friends also , but now i've made this temporary solution 
+            results = results.filter(e => e.room.indexOf(profile.slug) != -1);
 
             /**
              * socket work here
