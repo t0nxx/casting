@@ -248,7 +248,7 @@ export class FriendsController {
         const friendsRepository = getRepository(FriendshipFriend).createQueryBuilder('f');
         const friendsRepository2 = getRepository(FriendshipFriend).createQueryBuilder('f2');
         try {
-            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const profile = await profileRepository.findOne({ slug: request.params.slug });
 
             const q1 = friendsRepository2
                 .innerJoin('f2.fromUser', 'senderUser')
