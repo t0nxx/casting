@@ -312,6 +312,10 @@ export class FriendsController {
 
             // remove the same user from response 
             results = results.filter(e => e.slug !== profile.slug);
+
+            // remove redundant in search 
+            results = results.filter((e, i) => results.findIndex(a => a['pk'] === e['pk']) === i);
+
             /**
              * socket work here
              */
