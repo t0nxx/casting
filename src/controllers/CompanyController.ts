@@ -39,6 +39,7 @@ export class CompanyController {
             .leftJoin('c.profile' , 'profile')
             .leftJoin('c.tags' , 'tags')
             .addSelect(['followers.slug','profile.slug','tags.id','tags.name_en','tags.name_ar'])
+            .where(`c.slug like '${request.params.slug}'`)
             .getOne();
             if (!company) { throw new Error('company Not Found'); }
             let is_follow = false;
