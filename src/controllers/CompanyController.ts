@@ -33,13 +33,18 @@ export class CompanyController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-            const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
-            const profile = await profileRepository.findOne({ slug: request['user'].username });
+           // const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
+            const company = await companyRepository.createQueryBuilder('c')
+            .leftJoin('c.followers' , 'followers')
+            .leftJoin('c.profile' , 'profile')
+            .leftJoin('c.tags' , 'tags')
+            .addSelect(['followers.slug','profile.slug','tags.id','tags.name_en','tags.name_ar'])
+            .getOne();
             if (!company) { throw new Error('company Not Found'); }
             let is_follow = false;
             let is_admin = false;
-            if (company.profile.id === profile.id) { is_admin = true; }
-            const isfollowCompany = company.followers.find(f => f.id === profile.id);
+            if (company.profile.slug === request['user'].username) { is_admin = true; }
+            const isfollowCompany = company.followers.find(f => f.slug === request['user'].username);
             if (isfollowCompany) { is_follow = true; }
             delete company.followers;
             delete company.profile;
