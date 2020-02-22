@@ -27,7 +27,7 @@ export class Activity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('text')
+    @Column('longtext')
     content: string;
 
     @CreateDateColumn()
