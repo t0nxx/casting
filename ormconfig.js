@@ -15,7 +15,7 @@ module.exports = {
    "database": "casting_dev",
 
    "synchronize": true,
-   "logging": false,
+   "logging": true,
    "cache" : true,
    "charset": "UTF8MB4_GENERAL_CI",
    "entities": [

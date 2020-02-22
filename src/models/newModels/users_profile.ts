@@ -59,7 +59,7 @@ export class Profile {
     @Column({ default: 'Not Provided' })
     location: string;
 
-    @Column({ type : 'longtext' , default: 'Not Provided' })
+    @Column('longtext')
     about: string;
 
     @Column({ default: 'Not Provided' })
