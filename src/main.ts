@@ -54,7 +54,7 @@ io.use((socket, next) => {
 export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
 createConnection().then(async connection => {
 
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({limit: '100mb'}));
     app.use(cors({
         credentials: true, origin: [
             'http://localhost:4200', 'http://localhost', 'http://localhost:3000',
