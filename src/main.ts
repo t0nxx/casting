@@ -54,7 +54,7 @@ io.use((socket, next) => {
 export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
 createConnection().then(async connection => {
 
-    app.use(bodyParser.json({limit: '100mb'}));
+    app.use(bodyParser.json({ limit: '100mb' }));
     app.use(cors({
         credentials: true, origin: [
             'http://localhost:4200', 'http://localhost', 'http://localhost:3000',
@@ -70,13 +70,15 @@ createConnection().then(async connection => {
             'https://admin.castingsecret.com', 'https://d32dm90ra3bag1.cloudfront.net'
         ],
     }));
-    //app.use(cors());
-    app.use(fileupload());
+    //app.use(cor
+    app.use(fileupload({
+        limits: { fileSize: 100 * 1024 * 1024 },
+    }));
 
     // join chat rooms middleware 
     // note order matter
     app.use(JoinChatRooms);
-    
+
     // app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
     // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
