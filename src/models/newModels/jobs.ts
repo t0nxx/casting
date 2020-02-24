@@ -18,7 +18,7 @@ export class Jobs {
     @Column()
     title: string;
 
-    @Column()
+    @Column('longtext')
     description: string;
 
     @Column({ default: false })
@@ -73,7 +73,7 @@ export class Jobs {
     @JoinTable()
     category: TalentCategories[];
 
-    @Column({ default: 'Not Provided' })
+    @Column('longtext')
     location: string;
 
 

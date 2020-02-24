@@ -22,7 +22,7 @@ export class Company {
     @Column()
     name: string;
 
-    @Column({ default: 'no data provided' })
+    @Column('longtext')
     about: string;
 
     @Column({ default: 'no data provided' })
