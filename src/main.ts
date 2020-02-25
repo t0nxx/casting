@@ -9,6 +9,7 @@ import * as path from 'path';
 
 import * as  Queue from 'bull';
 import SendNotifiation from './jobs/SendNotification';
+import AutoReplyMessagesJob from './jobs/AutoReplyMessages';
 import { ChaneUsersOnlineSatusJob } from './jobs/cron/OnlineStatusJob';
 
 
@@ -53,6 +54,7 @@ io.use((socket, next) => {
 // queue
 
 export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
+export const autoReplyMessageQueue = new Queue('autoReplyMsg', { redis: { host: '127.0.0.1', port: 6379 } });
 createConnection().then(async connection => {
 
     app.use(bodyParser.json({ limit: '100mb' }));
@@ -122,14 +124,20 @@ createConnection().then(async connection => {
      */
 
     ChaneUsersOnlineSatusJob();
-    setQueues(notificationQueue);
+    setQueues([
+        notificationQueue,
+        autoReplyMessageQueue,
+    ]);
 
     notificationQueue.process(SendNotifiation);
+    autoReplyMessageQueue.process(AutoReplyMessagesJob);
 
     notificationQueue.on('failed', job => {
-
         console.log('****************** job fail ******** for job ' + job);
-        console.log(job);
+    })
+
+    autoReplyMessageQueue.on('failed', job => {
+        console.log('****************** job fail ******** for job ' + job);
     })
 
 }).catch(error => console.log(error));

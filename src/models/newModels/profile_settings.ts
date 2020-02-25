@@ -50,7 +50,7 @@ export class ProfileSettings {
     @Column({ default: null })
     response_to: Date;
 
-    @Column({ default: 'No provided setting' })
+    @Column('longtext')
     response_message: string;
 
     @Column({ default: false })

@@ -40,7 +40,7 @@ export const JoinChatRooms = async (req, res: Response, next: NextFunction) => {
             if (socketID) {
                 subscribedRooms.forEach(room => {
                     io.sockets.connected[socketID].join(room.name, () => {
-                        console.log('joined ' + room.name);
+                        // console.log('joined ' + room.name);
                     })
                 });
             }

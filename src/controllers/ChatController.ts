@@ -1,5 +1,6 @@
 import { getRepository, In, MoreThan } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
+import * as moment from 'moment';
 import * as randomString from 'randomstring';
 import { User } from '../models/newModels/auth_user';
 import { Profile } from '../models/newModels/users_profile';
@@ -17,17 +18,19 @@ export class ChatController {
       */
     async sendMessage(request, response: Response, next) {
         const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings)
         const ChatRepository = getRepository(Chat);
         const ChatRoomRepository = getRepository(ChatRoom);
         const friendsRepository = getRepository(FriendshipFriend);
         try {
             // io.to(request.params.room).emit('message', { room: request.params.room });
             const sender = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
-            const receiver = await profileRepository.findOne({ slug: request.params.slug });
+            const receiver = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
 
             if (!receiver) {
                 throw new Error('receiver user not found');
             }
+            const receiverSettings = await profileSettingsRepository.findOne({ profile: receiver });
 
             let room;
 
@@ -69,6 +72,19 @@ export class ChatController {
             newMessage.message = request.body.message || '';
             const create = await ChatRepository.save(newMessage);
 
+
+            let isThierAutoResponseMsg = false;
+            const autoresMsg = new Chat();
+
+            if (receiverSettings.response_all_time === true) {
+                isThierAutoResponseMsg = true;
+            } else if (receiverSettings.response_from != null && receiverSettings.response_to != null) {
+                const isResponseTimeBtwnSettings = moment(new Date()).isBetween(receiverSettings.response_from, receiverSettings.response_to);
+                if (isResponseTimeBtwnSettings) {
+                    isThierAutoResponseMsg = true;
+                }
+            }
+
             // loop over muted array and send them to the socket
             let muted_from = [];
             if (create.room.muted_from) {
@@ -102,6 +118,43 @@ export class ChatController {
             io.to(create.room.name).emit(isFriends ? 'message' : 'updateChatList', {
                 ...resObject,
             });
+
+            // new .. check if thier is auto response message
+            if (isThierAutoResponseMsg) {
+                autoresMsg.room = room;
+                autoresMsg.sender = receiver;
+                autoresMsg.recipient = sender;
+                autoresMsg.message = receiverSettings.response_message || '';
+                const autoResponseMsg = await ChatRepository.save(autoresMsg);
+                let muted_from = [];
+                if (autoResponseMsg.room.muted_from) {
+                    autoResponseMsg.room.muted_from.forEach(slug => {
+                        muted_from.push(slug);
+                    })
+                }
+                const resObjectAutoMsg = {
+                    id: autoResponseMsg.id,
+                    created: autoResponseMsg.created,
+                    readRecipient: autoResponseMsg.readRecipient,
+                    room: autoResponseMsg.room.name,
+                    message: autoResponseMsg.message,
+                    partners: [sender.slug, receiver.slug],
+                    settings: {
+                        muted_from,
+                    },
+                    sender: {
+                        first_name: receiver.user.first_name,
+                        last_name: receiver.user.last_name,
+                        slug: receiver.slug,
+                        avatar: receiver.avatar,
+                        id: receiver.id,
+                    },
+                }
+
+                io.to(create.room.name).emit(isFriends ? 'message' : 'updateChatList', {
+                    ...resObjectAutoMsg,
+                });
+            }
 
             return response.status(200).send({ ...resObject });
         } catch (error) {
