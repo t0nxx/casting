@@ -255,14 +255,16 @@ export class FriendsController {
                 .innerJoinAndMapOne('f2.Auther', User, 'auther', 'auther.id = senderUser.userId')
                 .innerJoinAndMapOne('f2.senderSettings', ProfileSettings, 'senderSettings', 'senderUser.id = senderSettings.profileId')
                 .addSelect(['senderUser.id', 'senderUser.slug', 'senderUser.avatar', 'f2.room'])
-                .where(`f2.toUserId = ${profile.id}`);
+                .where(`f2.toUserId = ${profile.id}`)
+                .orderBy('senderSettings.my_status', 'DESC');
 
             const q2 = friendsRepository
                 .innerJoin('f.toUser', 'reciverUser')
                 .innerJoinAndMapOne('f.Auther', User, 'auther', 'auther.id = reciverUser.userId')
                 .innerJoinAndMapOne('f.recipientSettings', ProfileSettings, 'recipientSettings', 'reciverUser.id = recipientSettings.profileId')
                 .addSelect(['reciverUser.id', 'reciverUser.slug', 'reciverUser.avatar', 'f.room'])
-                .where(`f.fromUserId = ${profile.id}`);
+                .where(`f.fromUserId = ${profile.id}`)
+                .orderBy('recipientSettings.my_status', 'DESC');
 
             // search friends 
             if (request.query.query) {
