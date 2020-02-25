@@ -62,7 +62,7 @@ export class User {
     @IsNotEmpty({ message: 'password2 is required' })
     password2: string;
 
-    @Column({ default: 'No Data Provided' })
+    @Column('longtext')
     about: string;
 
     @Column({ default: 'noResetPass' })
