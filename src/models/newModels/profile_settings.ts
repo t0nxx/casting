@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { Profile } from './users_profile';
 import { IsEnum } from 'class-validator';
 
@@ -67,6 +67,10 @@ export class ProfileSettings {
 
     @Column({ default: myStatus.ONLINE })
     my_status: myStatus;
+
+    // to track online/offline status every 10 minute
+    @CreateDateColumn()
+    latest_action: Date;
 
     @OneToOne(type => Profile, { onDelete: 'CASCADE' })
     @JoinColumn()

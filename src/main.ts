@@ -9,6 +9,7 @@ import * as path from 'path';
 
 import * as  Queue from 'bull';
 import SendNotifiation from './jobs/SendNotification';
+import { ChaneUsersOnlineSatusJob } from './jobs/cron/OnlineStatusJob';
 
 
 import * as socketio from 'socket.io';
@@ -120,7 +121,7 @@ createConnection().then(async connection => {
      * 
      */
 
-
+    ChaneUsersOnlineSatusJob();
     setQueues(notificationQueue);
 
     notificationQueue.process(SendNotifiation);
