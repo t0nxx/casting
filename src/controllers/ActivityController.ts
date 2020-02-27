@@ -96,7 +96,7 @@ export class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -177,7 +177,7 @@ export class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -192,7 +192,7 @@ export class ActivityController {
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, {
                 relations: ['activityMention', 'activity_attachment', 'profile', 'company']
             });
-            if (!activity) { throw new Error('activivty not found'); }
+            if (!activity) { throw new Error('activivty not found or deleted'); }
 
             const profile = await profileRepository.findOne({ id: activity.profile.id }, { relations: ['user'] });
             const author_settings = await profileSettingsRepository.findOne({ profile },
@@ -230,7 +230,7 @@ export class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -311,7 +311,7 @@ export class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -392,7 +392,7 @@ export class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -477,7 +477,7 @@ export class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -494,7 +494,7 @@ export class ActivityController {
             const myDisLikes = profile.dislikes.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
-            if (!activity) { throw new Error('activivty not found'); }
+            if (!activity) { throw new Error('activivty not found or deleted'); }
 
             const liked = myLikes.includes(activity.id);
             const disliked = myDisLikes.includes(activity.id);
@@ -542,7 +542,7 @@ export class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -559,7 +559,7 @@ export class ActivityController {
             const myDisLikes = profile.dislikes.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
-            if (!activity) { throw new Error('activivty not found'); }
+            if (!activity) { throw new Error('activivty not found or deleted'); }
 
             const liked = myLikes.includes(activity.id);
             const disliked = myDisLikes.includes(activity.id);
@@ -609,7 +609,7 @@ export class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -625,7 +625,7 @@ export class ActivityController {
             const myBookMarks = profile.bookmarks.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found'); }
+            if (!activity) { throw new Error('activivty not found or deleted'); }
 
             const bookmarked = myBookMarks.includes(activity.id);
             if (bookmarked) {
@@ -640,7 +640,7 @@ export class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -652,7 +652,7 @@ export class ActivityController {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found'); }
+            if (!activity) { throw new Error('activivty not found or deleted'); }
 
             if (!request.body.reason) { throw new Error('you must enter reason'); }
 
@@ -670,7 +670,7 @@ export class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -687,7 +687,7 @@ export class ActivityController {
             const myHiddenActivity = profile.hidden.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found'); }
+            if (!activity) { throw new Error('activivty not found or deleted'); }
 
             const hidden = myHiddenActivity.includes(activity.id);
             if (hidden) {
@@ -702,7 +702,7 @@ export class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -718,7 +718,7 @@ export class ActivityController {
                 { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found'); }
+            if (!activity) { throw new Error('activivty not found or deleted'); }
 
             const file: any = request.files.file;
             const mime = file.mimetype;
@@ -771,7 +771,7 @@ export class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -858,7 +858,7 @@ export class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -905,7 +905,7 @@ export class ActivityController {
             return response.status(200).send({ ...getActivityAfterInsert, auth_user });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -983,7 +983,7 @@ export class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -1061,7 +1061,7 @@ export class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -1145,7 +1145,7 @@ export class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -1224,7 +1224,7 @@ export class ActivityController {
             return response.status(200).send(responseObject.results);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -1243,7 +1243,7 @@ export class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -1262,7 +1262,7 @@ export class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -1283,7 +1283,7 @@ export class ActivityController {
 
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
