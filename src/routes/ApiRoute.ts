@@ -24,6 +24,7 @@ router.post('/new-category', talentController.createNewCategory);
 // notifiactions
 router.get('/notification', AuthMiddleWare, notificationsController.getAllNotifications);
 router.get('/notification/new', AuthMiddleWare, notificationsController.getCountOfNewAndNotRead);
+router.get('/notification/readall', AuthMiddleWare, notificationsController.makeAllNotificationsRead);
 router.post('/notification/:id/read', AuthMiddleWare, notificationsController.makeNotificationRead);
 
 router.get('/random/jobs', randomJobsAndUsersController.getRandomJobs);

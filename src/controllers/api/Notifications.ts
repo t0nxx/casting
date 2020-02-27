@@ -85,6 +85,25 @@ export class NotificationsController {
     * @Post
     */
 
+    async makeAllNotificationsRead(request: Request, response: Response, next: NextFunction) {
+        const profileRepository = getRepository(Profile);
+        const NotificationRepository = getRepository(Notification);
+        try {
+            const profile = await profileRepository.findOne({ slug: request['user'].username });
+            const noti = await NotificationRepository.update({ recipient: profile }, { read: true });
+
+            return response.status(200).send({ success: true });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+        }
+
+    }
+
+    /**
+    * @Post
+    */
+
     async addNotificationsFromAdmin(request: Request, response: Response, next: NextFunction) {
         const profileRepository = getRepository(Profile);
         const NotificationRepository = getRepository(Notification);
