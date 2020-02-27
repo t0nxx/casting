@@ -21,10 +21,22 @@ export class FriendsController {
     async sendFriendRequest(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
         const friendRequestRepository = getRepository(FriendshipFriendshipRequest);
+        const friendsRepository = getRepository(FriendshipFriend);
         try {
             const fromUser = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
             const toUser = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
             if (!toUser) { throw new Error('user not found'); }
+
+
+            // check if friends , cause search page can send request also 
+            const friendShip = await friendsRepository.findOne({
+                where: [
+                    { toUser, fromUser },
+                    { toUser: fromUser, fromUser: toUser }
+                ]
+            });
+
+            if (friendShip) { throw new Error('You Already are friend with this user'); }
 
             const friendRequest = await friendRequestRepository.findOne({
                 where: [
