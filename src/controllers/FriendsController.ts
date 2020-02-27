@@ -315,9 +315,12 @@ export class FriendsController {
             // remove the same user from response 
             results = results.filter(e => e.slug !== profile.slug);
 
-            // remove redundant in search 
+
             // this is worng , since it retrive not friends also , but now i've made this temporary solution 
             results = results.filter(e => e.room.indexOf(profile.slug) != -1);
+
+            // remove redundant in search 
+            results = results.filter((e, i) => results.findIndex(a => a['pk'] === e['pk']) === i);
 
             /**
              * socket work here
