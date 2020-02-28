@@ -376,4 +376,66 @@ export class ChatController {
         }
     }
 
+
+    async checkIfRoomExistOrCreateNewRoom(request, response: Response, next) {
+        const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        const ChatRoomRepository = getRepository(ChatRoom);
+        try {
+            // io.to(request.params.room).emit('message', { room: request.params.room });
+            const sender = await profileRepository.findOne({ slug: request['user'].username }, { relations: ['user'] });
+            const receiver = await profileRepository.findOne({ slug: request.params.slug }, { relations: ['user'] });
+
+            if (!sender) {
+                throw new Error('account not found or deleted');
+            }
+
+            if (!receiver) {
+                throw new Error('receiver user not found');
+            }
+            const receiverSettings = await profileSettingsRepository.findOne({ profile: receiver });
+
+            let room;
+            // find if thier is existing chat btwn sender and recevier to not create another room .
+            const isExistingRoom = await ChatRoomRepository.findOne({
+                where: [
+                    // tslint:disable-next-line: object-literal-shorthand
+                    { participant1: sender, participant2: receiver },
+                    { participant1: receiver, participant2: sender }
+                ]
+            });
+            if (isExistingRoom) {
+                room = isExistingRoom;
+                // mean not create room for the same user
+            } else if (sender.slug !== receiver.slug) {
+                const newRoom = new ChatRoom();
+                newRoom.name = sender.slug + '-' + receiver.slug + '-' + randomString.generate({ length: 5 });
+                newRoom.participant1 = sender;
+                newRoom.participant2 = receiver;
+                newRoom.last_deleted_from_participant1 = new Date();
+                newRoom.last_deleted_from_participant2 = new Date();
+                const createNewRoom = await ChatRoomRepository.save(newRoom);
+                room = createNewRoom;
+            }
+
+            const resObject = {
+                room: room.name,
+                auth_user: {
+                    first_name: receiver.user.first_name,
+                    last_name: receiver.user.last_name,
+                    slug: receiver.slug,
+                    avatar: receiver.avatar,
+                    pk: receiver.id,
+                    status: receiverSettings.my_status,
+                },
+            }
+            return response.status(200).send({ ...resObject });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ success: false, error: err });
+
+        }
+    }
+
+
 }
