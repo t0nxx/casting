@@ -33,14 +33,14 @@ export class CompanyController {
         const profileRepository = getRepository(Profile);
         const companyRepository = getRepository(Company);
         try {
-           // const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
+            // const company = await companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
             const company = await companyRepository.createQueryBuilder('c')
-            .leftJoin('c.followers' , 'followers')
-            .leftJoin('c.profile' , 'profile')
-            .leftJoin('c.tags' , 'tags')
-            .addSelect(['followers.slug','profile.slug','tags.id','tags.name_en','tags.name_ar'])
-            .where(`c.slug like '${request.params.slug}'`)
-            .getOne();
+                .leftJoin('c.followers', 'followers')
+                .leftJoin('c.profile', 'profile')
+                .leftJoin('c.tags', 'tags')
+                .addSelect(['followers.slug', 'profile.slug', 'tags.id', 'tags.name_en', 'tags.name_ar'])
+                .where(`c.slug like '${request.params.slug}'`)
+                .getOne();
             if (!company) { throw new Error('company Not Found'); }
             let is_follow = false;
             let is_admin = false;
@@ -124,6 +124,8 @@ export class CompanyController {
             }
             newCompany.profile = profile;
             newCompany.slug = newCompany.name + '-' + randomString.generate({ length: 5 });
+            // cause no default value in about 
+            newCompany.about = request.body.about ? request.body.about : '';
             const save = await companyRepository.save(newCompany);
             delete save.followers;
             return response.status(200).send({ ...save });
