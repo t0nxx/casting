@@ -15,8 +15,8 @@ const s3 = new AWS.S3();
 const bucketName = 'casting-secret-new';
 
 export const dbDailyBackup = () => {
-    cron.schedule('* 6 * * *', async () => {
-        console.log('running a task every day at 6 am');
+    cron.schedule('* 2 * * *', async () => {
+        console.log('running a task every day at 2 am');
 
         try {
             const dumpCommand = `mysqldump -uroot -ptonitonitoni casting_dev`;
