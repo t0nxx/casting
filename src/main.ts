@@ -21,6 +21,7 @@ const { setQueues, UI } = require('bull-board');
 
 import SendNotifiation from './jobs/SendNotification';
 import { ChaneUsersOnlineSatusJob } from './jobs/cron/OnlineStatusJob';
+import { dbDailyBackup } from './jobs/cron/dbBackup';
 
 // create queues in redis
 export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
@@ -110,6 +111,7 @@ createConnection().then(async connection => {
 
     // excute each queue / cron job worker
     ChaneUsersOnlineSatusJob();
+    dbDailyBackup();
     setQueues([
         notificationQueue,
     ]);
