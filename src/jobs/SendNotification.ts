@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
-import { Notification } from '../models/newModels/notify_notification';
-import { Profile } from '../models/newModels/users_profile';
+import { Notification } from '../models/notify_notification';
+import { Profile } from '../models/users_profile';
 
 
 function getVerbType(type: number, interviewDate?: Date, interviewName?: string, interviewLocation?: string, msg?: string) {

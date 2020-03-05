@@ -1,22 +1,22 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { Profile } from '../models/newModels/users_profile'
-import { ProfileSettings } from '../models/newModels/profile_settings';
-import { HeightRangeLookup } from '../models/newModels/height_range_lookup';
-import { WeightRangeLookup } from '../models/newModels/weight_range_lookup';
-import { BuildLookup } from '../models/newModels/build_lookup';
-import { HairLookup } from '../models/newModels/hair_lookup';
-import { EyeLookup } from '../models/newModels/eye_lookup';
-import { EthnicitiesLookup } from '../models/newModels/ethnicities_lookup';
-import { Hobbies } from '../models/newModels/profile_hobbies';
-import { Courses } from '../models/newModels/profile_courses';
-import { FriendshipFriend } from '../models/newModels/friendship_friend';
-import { ProfileSocialNetworks } from '../models/newModels/profile_social';
+import { Profile } from '../models/users_profile'
+import { ProfileSettings } from '../models/profile_settings';
+import { HeightRangeLookup } from '../models/height_range_lookup';
+import { WeightRangeLookup } from '../models/weight_range_lookup';
+import { BuildLookup } from '../models/build_lookup';
+import { HairLookup } from '../models/hair_lookup';
+import { EyeLookup } from '../models/eye_lookup';
+import { EthnicitiesLookup } from '../models/ethnicities_lookup';
+import { Hobbies } from '../models/profile_hobbies';
+import { Courses } from '../models/profile_courses';
+import { FriendshipFriend } from '../models/friendship_friend';
+import { ProfileSocialNetworks } from '../models/profile_social';
 import { UploadToS3 } from '../helpers/awsUploader';
-import { User } from '../models/newModels/auth_user';
-import { ProfileAlbum } from '../models/newModels/profile_album';
-import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
-import { WhoSeeMe } from '../models/newModels/who_see_me';
+import { User } from '../models/auth_user';
+import { ProfileAlbum } from '../models/profile_album';
+import { FriendshipFriendshipRequest } from '../models/friendship_friendshiprequest';
+import { WhoSeeMe } from '../models/who_see_me';
 
 export class ProfileController {
 

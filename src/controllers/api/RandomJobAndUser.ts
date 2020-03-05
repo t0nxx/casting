@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { Jobs } from '../../models/newModels/jobs';
-import { Profile } from '../../models/newModels/users_profile';
+import { Jobs } from '../../models/jobs';
+import { Profile } from '../../models/users_profile';
 
 
 export class RandomJobsAndUsersController {

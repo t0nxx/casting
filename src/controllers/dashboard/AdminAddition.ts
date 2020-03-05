@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { User } from '../../models/newModels/auth_user';
-import { ActivityReports } from '../../models/newModels/activity_reports';
-import { Activity } from '../../models/newModels/activity';
+import { User } from '../../models/auth_user';
+import { ActivityReports } from '../../models/activity_reports';
+import { Activity } from '../../models/activity';
 
 export class AdminAdditionController {
     /**

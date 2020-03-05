@@ -1,9 +1,9 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import * as randomString from 'randomstring';
-import { Profile } from '../models/newModels/users_profile';
-import { TalentCategories } from '../models/newModels/talent_categories';
-import { Company } from '../models/newModels/company';
+import { Profile } from '../models/users_profile';
+import { TalentCategories } from '../models/talent_categories';
+import { Company } from '../models/company';
 import { UploadToS3 } from '../helpers/awsUploader';
 
 export class CompanyController {

@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { TalentCategories } from '../../models/newModels/talent_categories';
+import { TalentCategories } from '../../models/talent_categories';
 import { transformAndValidate } from 'class-transformer-validator';
 
 

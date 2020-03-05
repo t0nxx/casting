@@ -1,17 +1,17 @@
 import { getRepository, Not } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import * as randomString from 'randomstring';
-import { User } from '../models/newModels/auth_user';
-import { Profile } from '../models/newModels/users_profile';
-import { FriendshipFriend } from '../models/newModels/friendship_friend';
-import { FriendshipFriendshipRequest } from '../models/newModels/friendship_friendshiprequest';
+import { User } from '../models/auth_user';
+import { Profile } from '../models/users_profile';
+import { FriendshipFriend } from '../models/friendship_friend';
+import { FriendshipFriendshipRequest } from '../models/friendship_friendshiprequest';
 import { ApplyPagination } from '../helpers/pagination';
 import * as _ from 'underscore';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 import { notificationQueue } from '../main';
-import { Chat } from '../models/newModels/chat';
-import { ChatRoom } from '../models/newModels/chat_room';
-import { ProfileSettings } from '../models/newModels/profile_settings';
+import { Chat } from '../models/chat';
+import { ChatRoom } from '../models/chat_room';
+import { ProfileSettings } from '../models/profile_settings';
 
 export class FriendsController {
 

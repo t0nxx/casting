@@ -1,6 +1,6 @@
 import * as cron from 'node-cron';
 import { getRepository } from 'typeorm';
-import { ProfileSettings, myStatus } from '../../models/newModels/profile_settings';
+import { ProfileSettings, myStatus } from '../../models/profile_settings';
 
 
 export const ChaneUsersOnlineSatusJob = () => {

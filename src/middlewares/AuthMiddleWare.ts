@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
 import { JWTSECRET } from '../config/Secrets';
-import { User } from '../models/newModels/auth_user';
-import { ProfileSettings } from '../models/newModels/profile_settings';
-import { Profile } from '../models/newModels/users_profile';
+import { User } from '../models/auth_user';
+import { ProfileSettings } from '../models/profile_settings';
+import { Profile } from '../models/users_profile';
 
 
 export const AuthMiddleWare = async (req, res: Response, next: NextFunction) => {

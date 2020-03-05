@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { NewsLetter } from '../../models/newModels/news_letter';
+import { NewsLetter } from '../../models/news_letter';
 import { transformAndValidate } from 'class-transformer-validator';
 import { sendInviteMail } from '../../helpers/sendMail';
 

@@ -1,11 +1,11 @@
 import { getRepository, In } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
 import * as randomString from 'randomstring';
-import { User } from '../models/newModels/auth_user';
-import { Profile } from '../models/newModels/users_profile';
-import { Comment } from '../models/newModels/comments';
+import { User } from '../models/auth_user';
+import { Profile } from '../models/users_profile';
+import { Comment } from '../models/comments';
 import { ApplyPagination } from '../helpers/pagination';
-import { Activity } from '../models/newModels/activity';
+import { Activity } from '../models/activity';
 
 export class CommentController {
 

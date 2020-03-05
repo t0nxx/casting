@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
 import { JWTSECRET } from '../config/Secrets';
-import { User } from '../models/newModels/auth_user';
-import { ChatRoom } from '../models/newModels/chat_room';
-import { Profile } from '../models/newModels/users_profile';
+import { User } from '../models/auth_user';
+import { ChatRoom } from '../models/chat_room';
+import { Profile } from '../models/users_profile';
 
 // this is optional middle ware
 export const JoinChatRooms = async (req, res: Response, next: NextFunction) => {

@@ -1,12 +1,12 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { Notification } from '../../models/newModels/notify_notification';
-import { Profile } from '../../models/newModels/users_profile';
+import { Notification } from '../../models/notify_notification';
+import { Profile } from '../../models/users_profile';
 import { transformAndValidate } from 'class-transformer-validator';
 import { ApplyPagination } from '../../helpers/pagination';
 import { NotificationShape, NotificationTypeEnum } from '../../jobs/SendNotification';
 import { notificationQueue } from '../../main';
-import { NotificationAdminPanel } from '../../models/newModels/notification_admin_panel';
+import { NotificationAdminPanel } from '../../models/notification_admin_panel';
 
 
 export class NotificationsController {

@@ -3,28 +3,29 @@ import { createConnection } from 'typeorm';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as fileupload from 'express-fileupload';
-import { Request, Response } from 'express';
 import * as cors from 'cors';
-import * as path from 'path';
-
 import * as  Queue from 'bull';
-import SendNotifiation from './jobs/SendNotification';
-import AutoReplyMessagesJob from './jobs/AutoReplyMessages';
-import { ChaneUsersOnlineSatusJob } from './jobs/cron/OnlineStatusJob';
-
-
 import * as socketio from 'socket.io';
-// import * as expsession from 'express-session';
-const expsession = require('cookie-session');
-
-
-const { setQueues, UI } = require('bull-board');
-
 import * as cookieParser from 'cookie-parser';
-
 import routes from './routes/index';
 import { JoinChatRooms } from './middlewares/JoinChatRooms';
-// tslint:disable-next-line: no-var-requires
+
+// packages has no ts definition
+const expsession = require('cookie-session');
+const { setQueues, UI } = require('bull-board');
+
+/**
+ * Queue services
+ * i put them here to run directly with the main process
+ */
+
+import SendNotifiation from './jobs/SendNotification';
+import { ChaneUsersOnlineSatusJob } from './jobs/cron/OnlineStatusJob';
+
+// create queues in redis
+export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
+export const autoReplyMessageQueue = new Queue('autoReplyMsg', { redis: { host: '127.0.0.1', port: 6379 } });
+
 // create express app
 const app = express();
 const server = app.listen(3000, () => 'running on port 3000');
@@ -33,7 +34,9 @@ app.set('io', io);
 // get it from any place 
 //  const ioS = request.app.get('io');
 
-// i changed my mind :D , i'll store socket id in the session
+/**
+ * Here i'm storing the socket id for each user in the session
+ */
 const sessionMiddleware = expsession({
     secret: 'CastingSec',
     secure: false,
@@ -44,17 +47,11 @@ const sessionMiddleware = expsession({
 app.use(sessionMiddleware);
 app.use(cookieParser())
 
-
 // run session middleware for socket.io connections
 io.use((socket, next) => {
     sessionMiddleware(socket.request, socket.request.res, next);
 });
 
-
-// queue
-
-export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
-export const autoReplyMessageQueue = new Queue('autoReplyMsg', { redis: { host: '127.0.0.1', port: 6379 } });
 createConnection().then(async connection => {
 
     app.use(bodyParser.json({ limit: '100mb' }));
@@ -73,33 +70,27 @@ createConnection().then(async connection => {
             'https://admin.castingsecret.com', 'https://d32dm90ra3bag1.cloudfront.net'
         ],
     }));
-    //app.use(cor
     app.use(fileupload({
         limits: { fileSize: 100 * 1024 * 1024 },
     }));
 
-    // join chat rooms middleware 
+    // join chat rooms middleware
     // note order matter
     app.use(JoinChatRooms);
 
-    // app.use(express.static(path.join(__dirname, '..', 'dist-front', 'castingsecret')));
-    // app.use(express.static(path.join(__dirname, '..', 'admin')));
     app.use(routes);
     app.use('/queue', UI);
-    // app.use(require('express-status-monitor')());
 
 
 
 
-
+    // socket io initialize handler
     io.on('connection', socket => {
 
         console.log(`socket.io connected: ${socket.id}`);
 
         // save socket.io socket in the session
         socket.request.session.socketio = socket.id;
-        //socket.request.session.save();
-        console.log('new socket session', socket.request.session);
         socket.on('disconnect', () => {
             console.log('user disconnected');
         });
@@ -117,27 +108,17 @@ createConnection().then(async connection => {
         res.status(404).send({ error: 'Not Found' });
     });
 
-    /**
-     * use queue
-     * 
-     * 
-     */
-
+    // excute each queue / cron job worker
     ChaneUsersOnlineSatusJob();
     setQueues([
         notificationQueue,
-        autoReplyMessageQueue,
     ]);
 
     notificationQueue.process(SendNotifiation);
-    autoReplyMessageQueue.process(AutoReplyMessagesJob);
 
     notificationQueue.on('failed', job => {
         console.log('****************** job fail ******** for job ' + job);
     })
 
-    autoReplyMessageQueue.on('failed', job => {
-        console.log('****************** job fail ******** for job ' + job);
-    })
 
 }).catch(error => console.log(error));

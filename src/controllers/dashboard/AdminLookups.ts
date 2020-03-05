@@ -1,14 +1,14 @@
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { HeightRangeLookup } from '../../models/newModels/height_range_lookup';
-import { WeightRangeLookup } from '../../models/newModels/weight_range_lookup';
-import { BuildLookup } from '../../models/newModels/build_lookup';
-import { HairLookup } from '../../models/newModels/hair_lookup';
-import { EyeLookup } from '../../models/newModels/eye_lookup';
-import { EthnicitiesLookup } from '../../models/newModels/ethnicities_lookup';
-import { Hobbies } from '../../models/newModels/profile_hobbies';
-import { TalentCategories } from '../../models/newModels/talent_categories';
-import { NewsLetter } from '../../models/newModels/news_letter';
+import { HeightRangeLookup } from '../../models/height_range_lookup';
+import { WeightRangeLookup } from '../../models/weight_range_lookup';
+import { BuildLookup } from '../../models/build_lookup';
+import { HairLookup } from '../../models/hair_lookup';
+import { EyeLookup } from '../../models/eye_lookup';
+import { EthnicitiesLookup } from '../../models/ethnicities_lookup';
+import { Hobbies } from '../../models/profile_hobbies';
+import { TalentCategories } from '../../models/talent_categories';
+import { NewsLetter } from '../../models/news_letter';
 
 function identifyLookupRepo(lookupString) {
     if (lookupString == 'height') { return HeightRangeLookup; }

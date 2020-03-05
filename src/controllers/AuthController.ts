@@ -5,11 +5,11 @@ import { transformAndValidate } from 'class-transformer-validator';
 import * as randomString from 'randomstring';
 import { JWTSECRET } from '../config/Secrets';
 import { verify } from 'jsonwebtoken';
-import { User } from '../models/newModels/auth_user';
+import { User } from '../models/auth_user';
 import { generateJwtToken } from '../helpers/GnerateJwt';
-import { Profile } from '../models/newModels/users_profile';
-import { ProfileSettings } from '../models/newModels/profile_settings';
-import { TalentCategories } from '../models/newModels/talent_categories';
+import { Profile } from '../models/users_profile';
+import { ProfileSettings } from '../models/profile_settings';
+import { TalentCategories } from '../models/talent_categories';
 import { sendMail, sendWelcomeMail } from '../helpers/sendMail';
 
 export class AuthController {

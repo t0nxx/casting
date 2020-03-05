@@ -1,15 +1,15 @@
 
 import { getRepository } from 'typeorm';
 import { NextFunction, Request, Response } from 'express';
-import { Company } from '../models/newModels/company';
-import { Profile } from '../models/newModels/users_profile';
-import { User } from '../models/newModels/auth_user';
-import { TalentCategories } from '../models/newModels/talent_categories';
-import { Jobs } from '../models/newModels/jobs';
+import { Company } from '../models/company';
+import { Profile } from '../models/users_profile';
+import { User } from '../models/auth_user';
+import { TalentCategories } from '../models/talent_categories';
+import { Jobs } from '../models/jobs';
 import { ApplyPagination } from '../helpers/pagination';
-import { JobApplicants } from '../models/newModels/jobs_applicants';
+import { JobApplicants } from '../models/jobs_applicants';
 import { getAllFriendSharedBtwnApp } from './FriendsController';
-import { WhoSeeMe } from '../models/newModels/who_see_me';
+import { WhoSeeMe } from '../models/who_see_me';
 export class SearchController {
 
 
