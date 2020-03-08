@@ -22,7 +22,7 @@ export class CommentController {
                 .addSelect(['profile.id', 'profile.slug', 'commentMention.id', 'commentMention.slug', 'thread.id'])
                 .where(`c.activityId = ${request.params.id}`)
                 .andWhere(`c.threadId is null`)
-                .orderBy('c.id','DESC');
+                .orderBy('c.id', 'DESC');
 
 
             const responseObject = await ApplyPagination(request, response, q, false);
@@ -43,7 +43,7 @@ export class CommentController {
                 ).then(rez => rez);
                 const commenterProfile = await profileRepository.findOne({ id: e.profile.id }, {
                     relations: ['user'],
-                    select: ['id', 'avatar', 'user','slug']
+                    select: ['id', 'avatar', 'user', 'slug']
                 })
                 const auth_user = {
                     pk: commenterProfile.id,
@@ -85,7 +85,7 @@ export class CommentController {
                 .leftJoin('c.thread', 'thread')
                 .addSelect(['profile.id', 'profile.slug', 'commentMention.id', 'commentMention.slug', 'thread.id'])
                 .where(`c.threadId = ${request.params.comId}`)
-                .orderBy('c.id','DESC');
+                .orderBy('c.id', 'DESC');
 
 
             const responseObject = await ApplyPagination(request, response, q, false);
@@ -106,7 +106,7 @@ export class CommentController {
                 ).then(rez => rez);
                 const commenterProfile = await profileRepository.findOne({ id: e.profile.id }, {
                     relations: ['user'],
-                    select: ['id', 'avatar', 'user','slug']
+                    select: ['id', 'avatar', 'user', 'slug']
                 })
                 const auth_user = {
                     pk: commenterProfile.id,
@@ -147,7 +147,8 @@ export class CommentController {
             if (!activity) { throw new Error('activivty not found'); }
 
             const newComment = new Comment();
-            newComment.comment = request.body.comment || '';
+            if (!request.body.comment) { throw new Error("you can't add empty comment"); }
+            newComment.comment = request.body.comment;
             newComment.profile = profile;
             newComment.activity = activity;
             if (request.body.thread) {
