@@ -39,7 +39,7 @@ export class JobsController {
             return response.status(200).send(jobs);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -66,7 +66,7 @@ export class JobsController {
             return response.status(200).send({ ...job, job_category, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -86,7 +86,7 @@ export class JobsController {
             return response.status(200).send({ ...job, job_category, is_admin: false });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -138,7 +138,7 @@ export class JobsController {
             return response.status(200).send({ success: true, slug: save.slug });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -178,7 +178,7 @@ export class JobsController {
 
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -203,7 +203,7 @@ export class JobsController {
 
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -230,15 +230,15 @@ export class JobsController {
             const isAlreadyHaveAnInterview = await JobInterviewRepository.findOne({ job, profile });
 
             if (isAlreadyApplied) {
-                throw new Error('You are already applied to this job');
+                throw new Error('You are already applied to this job before');
             }
 
             if (isAlreadyShortlisted) {
-                throw new Error('You are already shortlisted to this job');
+                throw new Error('You are already shortlisted to this job before');
             }
 
             if (isAlreadyHaveAnInterview) {
-                throw new Error('You are already have interview to this job');
+                throw new Error('You are already have interview to this job before');
             }
 
             const newApplicant = new JobApplicants();
@@ -267,7 +267,7 @@ export class JobsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -303,7 +303,7 @@ export class JobsController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -339,7 +339,7 @@ export class JobsController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -369,7 +369,7 @@ export class JobsController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -413,7 +413,7 @@ export class JobsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -436,7 +436,7 @@ export class JobsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -503,12 +503,12 @@ export class JobsController {
             const formatedDate = `'${saudiDate}'`.split('GMT')[0];
             const jobLink = `https://castingsecret.com/job/job-page/${job.slug}/${job.company.slug}`;
 
-            sendInterviewDate(profile.user.email, profile.user.first_name, formatedDate, saveInterview.location, saveInterview.interviewer , jobLink);
+            sendInterviewDate(profile.user.email, profile.user.first_name, formatedDate, saveInterview.location, saveInterview.interviewer, jobLink);
 
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 }

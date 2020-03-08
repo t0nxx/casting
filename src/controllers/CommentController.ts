@@ -147,7 +147,7 @@ export class CommentController {
             if (!activity) { throw new Error('activivty not found'); }
 
             const newComment = new Comment();
-            newComment.comment = request.body.comment;
+            newComment.comment = request.body.comment || '';
             newComment.profile = profile;
             newComment.activity = activity;
             if (request.body.thread) {
