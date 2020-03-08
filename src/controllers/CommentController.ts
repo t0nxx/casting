@@ -146,8 +146,8 @@ export class CommentController {
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
             if (!activity) { throw new Error('activivty not found'); }
 
-            const newComment = new Comment();
             if (!request.body.comment) { throw new Error("you can't add empty comment"); }
+            const newComment = new Comment();
             newComment.comment = request.body.comment;
             newComment.profile = profile;
             newComment.activity = activity;
