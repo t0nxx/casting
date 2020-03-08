@@ -8,7 +8,7 @@ export class Comment {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'text', default: '' })
+    @Column({type : 'text' , nullable : true})
     comment: string;
 
     @CreateDateColumn()
