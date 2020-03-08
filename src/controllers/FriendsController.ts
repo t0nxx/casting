@@ -65,7 +65,7 @@ export class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -153,7 +153,7 @@ export class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -182,7 +182,7 @@ export class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -210,7 +210,7 @@ export class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -247,7 +247,7 @@ export class FriendsController {
             return response.status(200).send({ results, count });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -360,7 +360,7 @@ export class FriendsController {
             return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -397,7 +397,7 @@ export class FriendsController {
             return response.status(200).send({ results, count: 10 });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -477,7 +477,7 @@ export class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -506,7 +506,7 @@ export class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
 
         }
     }
@@ -592,7 +592,7 @@ export async function getAllFriendSharedBtwnApp(request, response: Response, slu
         return results;
     } catch (error) {
         const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-        return response.status(400).send({ success: false, error: err });
+        return response.status(400).send({ error: err });
 
     }
 

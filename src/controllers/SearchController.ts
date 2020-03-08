@@ -63,7 +63,7 @@ export class SearchController {
             return response.status(200).send(jobs);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -121,7 +121,7 @@ export class SearchController {
             return response.status(200).send(compaines);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -239,7 +239,7 @@ export class SearchController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -283,7 +283,7 @@ export class SearchController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -324,7 +324,7 @@ export class SearchController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -341,7 +341,7 @@ export class SearchController {
             return response.status(200).send(myFollowed);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -370,7 +370,7 @@ export class SearchController {
             return response.status(200).send(jobs);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -394,7 +394,7 @@ export class SearchController {
             return response.status(200).send(jobs);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 

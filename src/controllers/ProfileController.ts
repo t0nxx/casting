@@ -99,7 +99,7 @@ export class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
     /**
@@ -117,7 +117,7 @@ export class ProfileController {
             return response.status(200).send({ success: true, ...settings });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -141,7 +141,7 @@ export class ProfileController {
             return response.status(200).send(profile.albums);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
     /**
@@ -160,7 +160,7 @@ export class ProfileController {
             return response.status(200).send(album);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -186,7 +186,7 @@ export class ProfileController {
             return response.status(200).send(afterUpdate);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
     /**
@@ -209,7 +209,7 @@ export class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -234,7 +234,7 @@ export class ProfileController {
             return response.status(200).send(newAlbum);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -267,7 +267,7 @@ export class ProfileController {
             return response.status(200).send({ height_range, weight_range, build, hair, eye, ethnicities, hobbies });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -300,7 +300,7 @@ export class ProfileController {
                 relations: ['user']
             });
             /// extract auth_user object for response
-            const { first_name, last_name, email, username , isAdmin } = data.user;
+            const { first_name, last_name, email, username, isAdmin } = data.user;
             // important to not retrive all user data
             delete data.user;
             const responseObject = { ...data, isSuperAdmin: isAdmin, auth_user: { pk: data.id, first_name, last_name, email, username } }
@@ -310,7 +310,7 @@ export class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -334,7 +334,7 @@ export class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -358,7 +358,7 @@ export class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -382,7 +382,7 @@ export class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -404,7 +404,7 @@ export class ProfileController {
             return response.status(200).send({ success: true, ...newSettings });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -426,7 +426,7 @@ export class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -450,7 +450,7 @@ export class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -475,7 +475,7 @@ export class ProfileController {
             return response.status(200).send(newNetwork);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -496,7 +496,7 @@ export class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -519,7 +519,7 @@ export class ProfileController {
             return response.status(200).send(networkAfterUpdate);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -540,7 +540,7 @@ export class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -562,7 +562,7 @@ export class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 

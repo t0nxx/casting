@@ -70,7 +70,7 @@ export class CommentController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -133,7 +133,7 @@ export class CommentController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -207,7 +207,7 @@ export class CommentController {
             return response.status(200).send({ ...getAfterSave, ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -265,7 +265,7 @@ export class CommentController {
             return response.status(200).send({ ...getAfterSave, ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -285,7 +285,7 @@ export class CommentController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ success: false, error: err });
+            return response.status(400).send({ error: err });
         }
     }
 
