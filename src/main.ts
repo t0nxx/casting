@@ -54,7 +54,7 @@ io.use((socket, next) => {
 });
 
 createConnection().then(async connection => {
-    await connection.runMigrations();
+    // await connection.runMigrations();
 
     app.use(bodyParser.json({ limit: '100mb' }));
     app.use(cors({
