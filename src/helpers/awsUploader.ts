@@ -18,7 +18,7 @@ export const UploadToS3 = (file, type) => {
         Key: `${Date.now().toString()} - ${file.name}`,
         ACL: 'public-read',
         ContentType: file.mimetype,
-        CacheControl: 'max-age=2628000',
+        CacheControl: 'max-age=31536000',
     })
         .promise()
         .then(data => {
