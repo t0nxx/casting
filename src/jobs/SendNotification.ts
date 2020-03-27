@@ -27,7 +27,7 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
             verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
              on ${formatedDate.split('GMT')[0]},
              location ${interviewLocation}
-             With Mr/ ${interviewName}`;
+             Contact Number ${interviewName}`;
             break;
         case 5:
             verb = `New Applicant On Your Job! Have A Good Chance :) `;
