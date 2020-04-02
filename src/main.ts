@@ -74,6 +74,8 @@ createConnection().then(async connection => {
     }));
     app.use(fileupload({
         limits: { fileSize: 100 * 1024 * 1024 },
+        useTempFiles: true,
+        tempFileDir: '/tmp/',
     }));
 
     // join chat rooms middleware
