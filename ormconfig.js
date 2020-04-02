@@ -25,7 +25,7 @@ module.exports = {
 
    ],
    "migrations": [
-      "dist/migration/**/*.js"
+      "dist/migration/*.js"
    ],
    "subscribers": [
       "src/subscriber/**/*.ts"
