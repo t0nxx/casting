@@ -19,7 +19,7 @@ export class ActivityAttachment {
     @CreateDateColumn()
     publish_date: Date;
 
-    @Column()
+    @Column('text')
     path: string;
 
     @Column()
