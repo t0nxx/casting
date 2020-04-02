@@ -69,7 +69,8 @@ createConnection().then(async connection => {
             'http://casting-admin-panel.s3.eu-central-1.amazonaws.com',
             'http://casting-admin-panel.s3-website.eu-central-1.amazonaws.com',
             'http://3.125.225.214', 'http://3.125.225.214:3000',
-            'https://admin.castingsecret.com', 'https://d32dm90ra3bag1.cloudfront.net'
+            'https://admin.castingsecret.com', 'https://d32dm90ra3bag1.cloudfront.net',
+            'https://castingsecret.com/', 'https://www.castingsecret.com/',
         ],
     }));
     app.use(fileupload({
