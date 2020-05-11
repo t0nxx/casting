@@ -14,7 +14,7 @@ module.exports = {
    // "password": "123456",
    "database": "casting_dev",
 
-   "synchronize": true,
+   "synchronize": false,
    "logging": true,
    "cache" : true,
    "charset": "UTF8MB4_GENERAL_CI",
@@ -25,7 +25,7 @@ module.exports = {
 
    ],
    "migrations": [
-      "dist/migration/*.js"
+      "src/migration/*.ts"
    ],
    "subscribers": [
       "src/subscriber/**/*.ts"
