@@ -89,9 +89,10 @@ export class AdminLookupsController {
                 if (!request.body.name) { throw new Error('name is required'); }
                 item.name = request.body.name;
             } else {
-                if (!request.body.name_en) { throw new Error('name is required'); }
+                if (!request.body.name_en) { throw new Error('name en is required'); }
+                if (!request.body.name_en) { throw new Error('name ar is required'); }
                 item.name_en = request.body.name_en;
-                // item.name_ar = request.body.name_ar;
+                item.name_ar = request.body.name_ar;
             }
             const data = await LookupRepository.save(item);
             return response.status(200).send({ data });

@@ -8,7 +8,7 @@ services:
       MYSQL_USER: root
       MYSQL_DATABASE: "casting_dev"
     ports:
-      - 3306:3306
+      - 3307:3306
     healthcheck:
       test: "mysql --password=tonitonitoni --user=root -e 'SELECT VERSION();SELECT NOW()'"
       interval: 5s
