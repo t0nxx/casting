@@ -14,8 +14,8 @@ module.exports = {
    // "password": "123456",
    "database": "casting_dev",
 
-   "synchronize": false,
-   "logging": true,
+   "synchronize": true,
+   "logging": false,
    "cache" : true,
    "charset": "UTF8MB4_GENERAL_CI",
    "entities": [
