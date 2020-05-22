@@ -17,7 +17,7 @@ export async function ApplyPagination(request, response, q, sendToClient: boolea
         responseObject.count = count;
         if (endIndex < count) {
             // responseObject.next = `${request.protocol}://${request.get('host')}${request.baseUrl}${request.path}?page=${page + 1}&limit=${limit}`;
-            responseObject.next = `https://${request.get('host')}${request.baseUrl}${request.path}?page=${page + 1}&limit=${limit}`;
+            responseObject.next = `${request.protocol}://${request.get('host')}${request.baseUrl}${request.path}?page=${page + 1}&limit=${limit}`;
 
         }
         if (sendToClient == true) {

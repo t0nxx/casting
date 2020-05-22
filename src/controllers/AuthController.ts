@@ -10,7 +10,7 @@ import { generateJwtToken } from '../helpers/GnerateJwt';
 import { Profile } from '../models/users_profile';
 import { ProfileSettings } from '../models/profile_settings';
 import { TalentCategories } from '../models/talent_categories';
-import { sendMail, sendWelcomeMail } from '../helpers/sendMail';
+import { sendMail, sendWelcomeMail, sendActivationMail } from '../helpers/sendMail';
 
 export class AuthController {
 
@@ -25,6 +25,8 @@ export class AuthController {
             if (!user) { throw new Error('invalid username / password'); }
             const checkPass = await compare(request.body.password, user.password);
             if (!checkPass) { throw new Error('invalid username / password'); }
+
+            if (user.is_active !== true) { throw new Error('please activate you account first , check your email'); }
 
             const data = await profileRepository.findOne({ slug: request.body.username }, {
                 relations: ['user']
@@ -106,6 +108,8 @@ export class AuthController {
             newProfile.user = create;
             newProfile.categories = categories;
             newProfile.about = request.body.about;
+            newProfile.phone = request.body.phone;
+            newProfile.birthDate = request.body.birthDate;
             const createProfile = await profileRepository.save(newProfile);
             // end create profile for the new user
             // start create settings for the new user
@@ -115,18 +119,21 @@ export class AuthController {
             newProfileSettings.response_message = '';
             const crateProfileSettings = await profileSettingsRepository.save(newProfileSettings);
             // start create settings for the new user
-            const token = await generateJwtToken({
-                id: create.id,
-                isAdmin: create.isAdmin,
-            });
-            const data = await profileRepository.findOne({ slug: createProfile.slug }, {
-                relations: ['user']
-            });
-            delete data.user;
-            const { first_name, last_name, id, email, username } = create;
-            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
-            sendWelcomeMail(create.email, create.first_name);
-            return response.status(200).send({ success: true, token, user: { ...responseObject } });
+            // const token = await generateJwtToken({
+            //     id: create.id,
+            //     isAdmin: create.isAdmin,
+            // });
+            // const data = await profileRepository.findOne({ slug: createProfile.slug }, {
+            //     relations: ['user']
+            // });
+            // delete data.user;
+            // const { first_name, last_name, id, email, username } = create;
+            // const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            const activationLink = `https://api.castingsecret.com/auth/registration/activation/${create.activationCode}`;
+            sendActivationMail(create.email, create.first_name, activationLink);
+            // return response.status(200).send({ success: true, token, user: { ...responseObject } });
+            return response.status(200).send({ success: true });
+
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -441,6 +448,27 @@ export class AuthController {
             let newPass = await hash(request.body.new_password1, 10);
             await userRepository.update({ email: request.body.email }, { password: newPass });
             return response.status(200).send({ msg: 'password reset is done' });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send(err);
+        }
+    }
+
+    /**
+   * @Get
+   * @description verify uuid token to active user account 
+   */
+
+    async activateAccount(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        try {
+            const isExist = await userRepository.findOne({ activationCode: request.params.token });
+            if (!isExist) { throw new Error('email not found'); }
+
+            isExist.is_active = true;
+            await userRepository.save(isExist);
+
+            return response.redirect('https://castingsecret.com/account/login');
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send(err);

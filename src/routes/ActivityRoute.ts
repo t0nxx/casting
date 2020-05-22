@@ -2,12 +2,15 @@ import { Router } from 'express';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 import { ActivityController } from '../controllers/ActivityController';
 import { CommentController } from '../controllers/CommentController';
+import { AdvertisementController } from '../controllers/dashboard/advertisements';
 
 const router = Router();
 const activityController = new ActivityController();
 const commentController = new CommentController();
+const advertisementController = new AdvertisementController();
 
 router.get('/', AuthMiddleWare, activityController.getAllActivityTest);
+router.get('/advertisement', AuthMiddleWare, advertisementController.getAllAdvertisement);
 router.post('/', AuthMiddleWare, activityController.AddNewActivity);
 router.get('/saved', AuthMiddleWare, activityController.getAllBookmarkedActivity);
 router.get('/:id', AuthMiddleWare, activityController.getOneActivity);

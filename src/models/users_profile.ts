@@ -59,6 +59,9 @@ export class Profile {
     @Column({ default: 'Not Provided' })
     location: string;
 
+    @Column({ default: 'Not Provided' })
+    birthDate: string;
+
     @Column('longtext')
     about: string;
 

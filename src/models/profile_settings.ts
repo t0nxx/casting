@@ -41,6 +41,9 @@ export class ProfileSettings {
     @Column({ default: settingsView.ALL })
     can_see_friends: settingsView;
 
+    @Column({ default: settingsView.ALL })
+    can_see_phone: settingsView;
+
     @Column({ default: false })
     response_all_time: boolean;
 

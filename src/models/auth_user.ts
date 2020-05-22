@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, CreateDateColumn, Generated } from 'typeorm';
 import { IsNotEmpty, IsEmail, MinLength } from 'class-validator';
 import { AccountEmailaddresss } from './account_emailaddress';
 import { Profile } from './users_profile';
@@ -67,6 +67,10 @@ export class User {
 
     @Column({ default: 'noResetPass' })
     resetPassCode: string;
+
+    @Column()
+    @Generated('uuid')
+    activationCode: string;
 
     @Column({ default: false })
     isAdmin: boolean;
