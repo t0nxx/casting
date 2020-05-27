@@ -46,6 +46,7 @@
       "jsonwebtoken": "^8.5.1",
       "mailgun-js": "^0.22.0",
       "moment": "^2.24.0",
+      "moment-timezone": "^0.5.31",
       "mysql": "^2.17.1",
       "node-cron": "^2.0.3",
       "nodemon": "^1.19.2",
@@ -61,7 +62,7 @@
    },
    "scripts": {
       "dev": "npm-run-all -p start:dev:*",
-      "start:dev:server": "DB_Dir=src nodemon",
+      "start:dev": "DB_Dir=src nodemon",
       "start:dev:queue": "ts-node -r tsconfig-paths/register",
       "start:debug": "DB_Dir=src nodemon --config nodemon-debug.json",
       "build": "tsc -p tsconfig.build.json",

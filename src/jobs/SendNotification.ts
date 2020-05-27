@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import { Notification } from '../models/notify_notification';
 import { Profile } from '../models/users_profile';
+import * as moment from 'moment-timezone'
 
 
 function getVerbType(type: number, interviewDate?: Date, interviewName?: string, interviewLocation?: string, msg?: string) {
@@ -21,12 +22,12 @@ function getVerbType(type: number, interviewDate?: Date, interviewName?: string,
         case 4:
             // add 3 hourse cause server in europe and client in ksa +3 gmt
             // i add 2 not three for hours cause server in frankfurt 1+gmt
-            const date = new Date(interviewDate)
-            date.setHours(date.getHours() + 2);
-            const formatedDate = `'${date}'`;
-            verb = `Congratulation! You Accept In Job And Have Inivitation For Interview
-             on ${formatedDate.split('GMT')[0]},
-             location ${interviewLocation}
+            // finally i've give up an used moment js to do that
+            const date = moment(interviewDate).tz('Asia/Riyadh').format('dddd Do MMMM YYYY ha');
+            // Friday 15th May 2020 6pm
+            verb = `Congratulation! You Accept In Job And Have Invitation For Interview \n
+             on ${date}, \n
+             location ${interviewLocation} , \n
              Contact Number ${interviewName}`;
             break;
         case 5:

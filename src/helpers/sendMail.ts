@@ -515,9 +515,9 @@ export function sendInterviewDate(mail, userName, date, interviewLocation, inter
                                   Hello&nbsp ${userName};,<br>
                                   <br>
                                      <p> Congratulation! You Accept In Job And Have Inivitation For Interview
-                                     on ${date} 
-                                     location  :  ${interviewLocation}
-                                     With Mr/ ${interviewName} </p>
+                                     on ${date} \n
+                                     location  :  ${interviewLocation} \n
+                                     Contact Number  ${interviewName} </p>
                                   <br>
                                   <a href="${jobLink}"
                                   style="background-color: #3c2b3f;border-radius:5px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:15px;font-weight:bold;line-height:45px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;">Go

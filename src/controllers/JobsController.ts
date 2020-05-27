@@ -14,6 +14,8 @@ import { transformAndValidate } from 'class-transformer-validator';
 import { notificationQueue } from '../main';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 import { sendInterviewDate } from '../helpers/sendMail';
+import * as moment from 'moment-timezone';
+
 export class JobsController {
 
     /**
@@ -498,12 +500,16 @@ export class JobsController {
             }
             await notificationQueue.add(notiToQueu);
             // i add 2 not three for hours cause server in frankfurt 1+gmt
-            const saudiDate = new Date(saveInterview.interview_date)
-            saudiDate.setHours(saudiDate.getHours() + 2);
-            const formatedDate = `'${saudiDate}'`.split('GMT')[0];
+            // i give up and use moment js
+
+            // const saudiDate = new Date(saveInterview.interview_date)
+            // saudiDate.setHours(saudiDate.getHours() + 2);
+            // const formatedDate = `'${saudiDate}'`.split('GMT')[0];
+            const date = moment(saveInterview.interview_date).tz('Asia/Riyadh').format('dddd Do MMMM YYYY ha');
+
             const jobLink = `https://castingsecret.com/job/job-page/${job.slug}/${job.company.slug}`;
 
-            sendInterviewDate(profile.user.email, profile.user.first_name, formatedDate, saveInterview.location, saveInterview.interviewer, jobLink);
+            sendInterviewDate(profile.user.email, profile.user.first_name, date, saveInterview.location, saveInterview.interviewer, jobLink);
 
             return response.status(200).send({ success: true });
         } catch (error) {
