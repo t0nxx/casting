@@ -16,7 +16,7 @@ export class AdminAdditionController {
             //     order: { id: 'DESC' }
             // });
             const q = await userRepository.createQueryBuilder('u')
-                .select(['u.id', 'u.isAdmin', 'u.first_name', 'u.last_name', 'u.email', 'u.username'])
+                .select(['u.id', 'u.isAdmin', 'u.is_active','u.first_name', 'u.last_name', 'u.email', 'u.username'])
                 .orderBy('u.id', 'DESC');
             if (request.query.query) {
                 q.andWhere(`u.first_name like '%${request.query.query}%' or u.last_name like '%${request.query.query}%' or u.username like '%${request.query.query}%' or u.email like '%${request.query.query}%'`);
@@ -41,7 +41,7 @@ export class AdminAdditionController {
         const userRepository = getRepository(User);
         try {
             const data = await userRepository.findOne({ id: parseInt(request.params.id, 10) }, {
-                select: ['id', 'isAdmin', 'first_name', 'last_name', 'email', 'username'],
+                select: ['id', 'isAdmin','is_active', 'first_name', 'last_name', 'email', 'username'],
                 order: { id: 'DESC' }
             });
             if (!data) { throw new Error('User not found'); }
