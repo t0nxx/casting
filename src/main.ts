@@ -114,8 +114,8 @@ createConnection().then(async connection => {
     });
 
     // excute each queue / cron job worker
-    // ChaneUsersOnlineSatusJob();
-    // dbDailyBackup();
+    ChaneUsersOnlineSatusJob();
+    dbDailyBackup();
     setQueues([
         notificationQueue,
         sendEmailsQueue,
