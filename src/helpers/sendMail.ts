@@ -1,7 +1,8 @@
 const mailgun = require('mailgun-js');
 const DOMAIN = 'castingsecret.com';
-const mg = mailgun({ apiKey: '13c992e774b054f494bbd805381e4816-f696beb4-b9c906c7', domain: DOMAIN, host: "api.eu.mailgun.net" });
-export function sendMail(mail, resetCode) {
+export const mg = mailgun({ apiKey: '13c992e774b054f494bbd805381e4816-f696beb4-b9c906c7', domain: DOMAIN, host: "api.eu.mailgun.net" });
+
+export function sendResetPasswordMail(mail, resetCode) {
   const data = {
     from: 'Casting mail@castingsecret.com',
     to: `${mail}`,
@@ -13,7 +14,22 @@ export function sendMail(mail, resetCode) {
     console.log(body);
   });
 }
-export function sendActivationMail(mail, userName,link) {
+
+export function sendMailWithCustomHtmlTemplate(mails: string[], template: string) {
+  mails.forEach(email => {
+    const data = {
+      from: 'Casting info@castingsecret.com',
+      to: `${email}`,
+      subject: 'Casting Secret News Letter',
+      html: template,
+    };
+    mg.messages().send(data, (error, body) => {
+      console.log(body);
+    });
+  })
+}
+
+export function sendActivationMail(mail, userName, link) {
   const data = {
     from: 'Casting mail@castingsecret.com',
     to: `${mail}`,

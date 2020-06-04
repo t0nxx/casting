@@ -19,13 +19,15 @@ const { setQueues, UI } = require('bull-board');
  * i put them here to run directly with the main process
  */
 
-import SendNotifiation from './jobs/SendNotification';
+import SendNotifiationJob from './jobs/SendNotification';
+import SendEmailsJob from './jobs/SendEmails';
 import { ChaneUsersOnlineSatusJob } from './jobs/cron/OnlineStatusJob';
 import { dbDailyBackup } from './jobs/cron/dbBackup';
 
 // create queues in redis
 export const notificationQueue = new Queue('notiQueue', { redis: { host: '127.0.0.1', port: 6379 } });
 export const autoReplyMessageQueue = new Queue('autoReplyMsg', { redis: { host: '127.0.0.1', port: 6379 } });
+export const sendEmailsQueue = new Queue('emailsQueue', { redis: { host: '127.0.0.1', port: 6379 } });
 
 // create express app
 const app = express();
@@ -116,11 +118,16 @@ createConnection().then(async connection => {
     // dbDailyBackup();
     setQueues([
         notificationQueue,
+        sendEmailsQueue,
     ]);
 
-    notificationQueue.process(SendNotifiation);
+    notificationQueue.process(SendNotifiationJob);
+    sendEmailsQueue.process(SendEmailsJob);
 
     notificationQueue.on('failed', job => {
+        console.log('****************** job fail ******** for job ' + job);
+    });
+    sendEmailsQueue.on('failed', job => {
         console.log('****************** job fail ******** for job ' + job);
     })
 

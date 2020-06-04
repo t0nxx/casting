@@ -10,7 +10,7 @@ import { generateJwtToken } from '../helpers/GnerateJwt';
 import { Profile } from '../models/users_profile';
 import { ProfileSettings } from '../models/profile_settings';
 import { TalentCategories } from '../models/talent_categories';
-import { sendMail, sendWelcomeMail, sendActivationMail } from '../helpers/sendMail';
+import { sendResetPasswordMail, sendWelcomeMail, sendActivationMail } from '../helpers/sendMail';
 
 export class AuthController {
 
@@ -422,7 +422,7 @@ export class AuthController {
             /**
              * mail service here
              */
-            sendMail(isExist.email, randomReset);
+            sendResetPasswordMail(isExist.email, randomReset);
             return response.status(200).send({ msg: 'An Email will be sent with code' });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];

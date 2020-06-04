@@ -15,7 +15,7 @@ export class Jobs {
     @CreateDateColumn()
     publish_date: Date;
 
-    @Column({ default : null, nullable: true })
+    @Column({ default: null, nullable: true })
     end_date: Date;
 
     @Column()
@@ -69,7 +69,7 @@ export class Jobs {
     @Column({ unique: true })
     slug: string;
 
-    @ManyToOne(type => Company, { eager: true })
+    @ManyToOne(type => Company, { eager: true, onDelete: 'CASCADE' })
     company: Company;
 
     @ManyToMany(type => TalentCategories, { onDelete: 'CASCADE' })
