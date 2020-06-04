@@ -56,7 +56,7 @@ export class AdminSendMailsController {
             const ignoredUsersFromSend = await (await ignoredUsersFromSendRepository.find({ select: ['email'] })).map(e => e.email)
 
             // const usersToSent = _.difference(users, ignoredUsersFromSend);
-            const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
+            const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com', 'castingsecretdev@gmail.com'];
             /**
              * send mail function here
              */
@@ -70,7 +70,7 @@ export class AdminSendMailsController {
 
             // sendMailWithCustomHtmlTemplate(['mahmoudko1500@hotmail.com','hhacker95@gmail.com'],mailHtmlBody);
 
-            return response.status(200).send({ data: usersToSent });
+            return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
             return response.status(400).send({ success: false, error: err });
