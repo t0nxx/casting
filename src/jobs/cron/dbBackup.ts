@@ -20,7 +20,7 @@ export const dbDailyBackup = () => {
 
         try {
             const dumpCommand = `mysqldump -uroot -ptonitonitoni casting_dev`;
-            childProcess.exec(dumpCommand, (error, stdout, stderr) => {
+            childProcess.exec(dumpCommand,{maxBuffer : Infinity}, (error, stdout, stderr) => {
                 const bufferData = Buffer.from(stdout, 'utf8');
                 const fileName = `${moment().format('YYYY-MM-DD-HH-mm-ss')}.sql`;
 
