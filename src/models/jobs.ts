@@ -15,6 +15,9 @@ export class Jobs {
     @CreateDateColumn()
     publish_date: Date;
 
+    @Column({ default : null, nullable: true })
+    end_date: Date;
+
     @Column()
     title: string;
 
