@@ -69,6 +69,7 @@
       "prestart:prod": "rimraf dist && npm run build",
       "start:prod": "DB_Dir=dist pm2 start dist/main.js -i max",
       "start:queue": "pm2 start dist/jobs/Queue.js",
-      "start:win": "set DB_Dir=dist && node dist/main.js"
+      "start:win": "set DB_Dir=dist && node dist/main.js",
+      "db:migration" : "ts-node ./node_modules/typeorm/cli.js migration:run"
    }
 }
