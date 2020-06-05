@@ -1,18 +1,19 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const randomString = require("randomstring");
-const users_profile_1 = require("../models/newModels/users_profile");
-const talent_categories_1 = require("../models/newModels/talent_categories");
-const company_1 = require("../models/newModels/company");
+const users_profile_1 = require("../models/users_profile");
+const talent_categories_1 = require("../models/talent_categories");
+const company_1 = require("../models/company");
 const awsUploader_1 = require("../helpers/awsUploader");
 class CompanyController {
     getAllCompanies(request, response, next) {
@@ -28,7 +29,7 @@ class CompanyController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -37,27 +38,32 @@ class CompanyController {
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             const companyRepository = typeorm_1.getRepository(company_1.Company);
             try {
-                const company = yield companyRepository.findOne({ slug: request.params.slug }, { relations: ['followers', 'profile', 'tags'] });
-                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                const company = yield companyRepository.createQueryBuilder('c')
+                    .leftJoin('c.followers', 'followers')
+                    .leftJoin('c.profile', 'profile')
+                    .leftJoin('c.tags', 'tags')
+                    .addSelect(['followers.slug', 'profile.slug', 'tags.id', 'tags.name_en', 'tags.name_ar'])
+                    .where(`c.slug like '${request.params.slug}'`)
+                    .getOne();
                 if (!company) {
                     throw new Error('company Not Found');
                 }
                 let is_follow = false;
                 let is_admin = false;
-                if (company.profile.id === profile.id) {
+                if (company.profile.slug === request['user'].username) {
                     is_admin = true;
                 }
-                const isfollowCompany = company.followers.find(f => f.id === profile.id);
+                const isfollowCompany = company.followers.find(f => f.slug === request['user'].username);
                 if (isfollowCompany) {
                     is_follow = true;
                 }
                 delete company.followers;
                 delete company.profile;
-                return response.status(200).send(Object.assign({}, company, { is_follow, is_admin }));
+                return response.status(200).send(Object.assign(Object.assign({}, company), { is_follow, is_admin }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -81,7 +87,7 @@ class CompanyController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -105,7 +111,7 @@ class CompanyController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -130,13 +136,14 @@ class CompanyController {
                 }
                 newCompany.profile = profile;
                 newCompany.slug = newCompany.name + '-' + randomString.generate({ length: 5 });
+                newCompany.about = request.body.about ? request.body.about : '';
                 const save = yield companyRepository.save(newCompany);
                 delete save.followers;
                 return response.status(200).send(Object.assign({}, save));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -167,7 +174,7 @@ class CompanyController {
                     delete request.body.tags;
                 }
                 let newDataWitoutTags = Object.keys(request.body).length;
-                if (newDataWitoutTags > 1) {
+                if (newDataWitoutTags >= 1) {
                     yield companyRepository.update({ slug: request.params.slug }, request.body);
                 }
                 const afterUpdate = yield companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile', 'followers', 'tags'] });
@@ -182,11 +189,11 @@ class CompanyController {
                 }
                 delete afterUpdate.followers;
                 delete afterUpdate.profile;
-                return response.status(200).send(Object.assign({}, afterUpdate, { is_follow, is_admin }));
+                return response.status(200).send(Object.assign(Object.assign({}, afterUpdate), { is_follow, is_admin }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -228,11 +235,11 @@ class CompanyController {
                 }
                 delete afterUpdate.followers;
                 delete afterUpdate.profile;
-                return response.status(200).send(Object.assign({}, afterUpdate, { is_follow, is_admin }));
+                return response.status(200).send(Object.assign(Object.assign({}, afterUpdate), { is_follow, is_admin }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -258,7 +265,7 @@ class CompanyController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -281,7 +288,7 @@ class CompanyController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -307,7 +314,31 @@ class CompanyController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
+            }
+        });
+    }
+    resetCompanyCover(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const companyRepository = typeorm_1.getRepository(company_1.Company);
+            try {
+                const company = yield companyRepository.findOne({ slug: request.params.slug }, { relations: ['profile'] });
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
+                if (!company) {
+                    throw new Error('company Not Found');
+                }
+                if (company.profile.id !== profile.id) {
+                    throw new Error('Not authorize to edit this company');
+                }
+                const resetCover = 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/banner.jpg';
+                yield companyRepository.update({ slug: request.params.slug }, { cover: resetCover });
+                const afterUpdate = yield companyRepository.findOne({ slug: request.params.slug });
+                return response.status(200).send({ cover: resetCover });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -329,7 +360,7 @@ class CompanyController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }

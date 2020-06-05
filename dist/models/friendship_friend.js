@@ -10,38 +10,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const auth_user_1 = require("./auth_user");
-let friendship_friend = class friendship_friend {
+const users_profile_1 = require("./users_profile");
+let FriendshipFriend = class FriendshipFriend {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], friendship_friend.prototype, "id", void 0);
+], FriendshipFriend.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("timestamp with time zone", {
-        nullable: false,
-        name: "created"
-    }),
+    typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
-], friendship_friend.prototype, "created", void 0);
+], FriendshipFriend.prototype, "created", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => auth_user_1.auth_user, (auth_user) => auth_user.friendshipFriends, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'from_user_id' }),
-    __metadata("design:type", auth_user_1.auth_user)
-], friendship_friend.prototype, "fromUser", void 0);
+    typeorm_1.ManyToOne(type => users_profile_1.Profile, { onDelete: 'CASCADE' }),
+    __metadata("design:type", users_profile_1.Profile)
+], FriendshipFriend.prototype, "fromUser", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => auth_user_1.auth_user, (auth_user) => auth_user.friendshipFriends2, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'to_user_id' }),
-    __metadata("design:type", auth_user_1.auth_user)
-], friendship_friend.prototype, "toUser", void 0);
-friendship_friend = __decorate([
-    typeorm_1.Entity("friendship_friend", { schema: "public" }),
-    typeorm_1.Index("friendship_friend_from_user_id_f229f783", ["fromUser",]),
-    typeorm_1.Index("friendship_friend_from_user_id_to_user_id_5aa078c0_uniq", ["fromUser", "toUser",], { unique: true }),
-    typeorm_1.Index("friendship_friend_to_user_id_0de15f5e", ["toUser",])
-], friendship_friend);
-exports.friendship_friend = friendship_friend;
+    typeorm_1.ManyToOne(type => users_profile_1.Profile, { onDelete: 'CASCADE' }),
+    __metadata("design:type", users_profile_1.Profile)
+], FriendshipFriend.prototype, "toUser", void 0);
+__decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], FriendshipFriend.prototype, "room", void 0);
+FriendshipFriend = __decorate([
+    typeorm_1.Entity('friendship_friend')
+], FriendshipFriend);
+exports.FriendshipFriend = FriendshipFriend;
 //# sourceMappingURL=friendship_friend.js.map

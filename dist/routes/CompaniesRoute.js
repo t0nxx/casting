@@ -14,6 +14,7 @@ router.patch('/:slug', AuthMiddleWare_1.AuthMiddleWare, companyController.update
 router.patch('/:slug/removetags', AuthMiddleWare_1.AuthMiddleWare, companyController.removeTagsCompany);
 router.patch('/:slug/avatar', AuthMiddleWare_1.AuthMiddleWare, companyController.updateCompanyAvatar);
 router.patch('/:slug/cover', AuthMiddleWare_1.AuthMiddleWare, companyController.updateCompanyCover);
+router.post('/:slug/cover/reset', AuthMiddleWare_1.AuthMiddleWare, companyController.resetCompanyCover);
 router.post('/:slug/follow', AuthMiddleWare_1.AuthMiddleWare, companyController.followCompany);
 router.post('/:slug/un-follow', AuthMiddleWare_1.AuthMiddleWare, companyController.unFollowCompany);
 router.delete('/:slug', AuthMiddleWare_1.AuthMiddleWare, companyController.deleteCompany);

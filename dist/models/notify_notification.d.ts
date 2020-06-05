@@ -1,25 +1,16 @@
-import { django_content_type } from "./django_content_type";
-import { auth_user } from "./auth_user";
-export declare class notify_notification {
+import { Profile } from './users_profile';
+export declare class Notification {
     id: number;
-    actor_object_id: number | null;
-    actor_text: string | null;
-    actor_url_text: string | null;
     verb: string;
-    description: string | null;
-    nf_type: string;
-    target_object_id: number | null;
-    target_text: string | null;
-    target_url_text: string | null;
-    obj_object_id: number | null;
-    obj_text: string | null;
-    obj_url_text: string | null;
-    extra: object | null;
+    type: number;
+    target_job_slug: string;
+    target_profile_slug: string;
+    target_company: string;
+    target_activity_id: number;
     created: Date;
     read: boolean;
-    deleted: boolean;
-    actorContentType: django_content_type | null;
-    objContentType: django_content_type | null;
-    recipient: auth_user | null;
-    targetContentType: django_content_type | null;
+    actor_first_name: string;
+    actor_last_name: string;
+    actor_avatar: string;
+    recipient: Profile;
 }

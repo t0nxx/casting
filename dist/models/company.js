@@ -11,122 +11,78 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const users_profile_1 = require("./users_profile");
+const talent_categories_1 = require("./talent_categories");
 const activity_1 = require("./activity");
-const company_tags_1 = require("./company_tags");
-const jobs_1 = require("./jobs");
-let company = class company {
+let Company = class Company {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], company.prototype, "id", void 0);
+], Company.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 150,
-        name: "avatar"
-    }),
+    typeorm_1.Column({ default: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/company-avatar.png' }),
     __metadata("design:type", String)
-], company.prototype, "avatar", void 0);
+], Company.prototype, "avatar", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 150,
-        name: "cover"
-    }),
+    typeorm_1.Column({ default: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/banner.jpg' }),
     __metadata("design:type", String)
-], company.prototype, "cover", void 0);
+], Company.prototype, "cover", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: false,
-        length: 150,
-        name: "name"
-    }),
+    typeorm_1.Column(),
     __metadata("design:type", String)
-], company.prototype, "name", void 0);
+], Company.prototype, "name", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: true,
-        name: "about"
-    }),
+    typeorm_1.Column('longtext'),
     __metadata("design:type", String)
-], company.prototype, "about", void 0);
+], Company.prototype, "about", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: true,
-        name: "headquarter"
-    }),
+    typeorm_1.Column({ default: 'no data provided' }),
     __metadata("design:type", String)
-], company.prototype, "headquarter", void 0);
+], Company.prototype, "headquarter", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "is_address_public"
-    }),
+    typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
-], company.prototype, "is_address_public", void 0);
+], Company.prototype, "is_address_public", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 200,
-        name: "website"
-    }),
+    typeorm_1.Column({ default: 'castingsecret.com' }),
     __metadata("design:type", String)
-], company.prototype, "website", void 0);
+], Company.prototype, "website", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: true,
-        name: "since"
-    }),
+    typeorm_1.Column({ default: '2000' }),
     __metadata("design:type", String)
-], company.prototype, "since", void 0);
+], Company.prototype, "since", void 0);
 __decorate([
-    typeorm_1.Column("integer", {
-        nullable: true,
-        name: "size_from"
-    }),
+    typeorm_1.Column({ default: 1 }),
     __metadata("design:type", Number)
-], company.prototype, "size_from", void 0);
+], Company.prototype, "size_from", void 0);
 __decorate([
-    typeorm_1.Column("integer", {
-        nullable: true,
-        name: "size_to"
-    }),
+    typeorm_1.Column({ default: 100 }),
     __metadata("design:type", Number)
-], company.prototype, "size_to", void 0);
+], Company.prototype, "size_to", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: false,
-        length: 50,
-        name: "slug"
-    }),
+    typeorm_1.Column({ unique: true }),
     __metadata("design:type", String)
-], company.prototype, "slug", void 0);
+], Company.prototype, "slug", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_profile_1.users_profile, (users_profile) => users_profile.companys, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'profile_id' }),
-    __metadata("design:type", users_profile_1.users_profile)
-], company.prototype, "profile", void 0);
+    typeorm_1.ManyToOne(type => users_profile_1.Profile, p => p.companies, { onDelete: 'CASCADE' }),
+    __metadata("design:type", users_profile_1.Profile)
+], Company.prototype, "profile", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_1.activity, (activity) => activity.company),
+    typeorm_1.ManyToMany(type => talent_categories_1.TalentCategories, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], company.prototype, "activitys", void 0);
+], Company.prototype, "tags", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => company_tags_1.company_tags, (company_tags) => company_tags.company),
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], company.prototype, "companyTagss", void 0);
+], Company.prototype, "followers", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => jobs_1.jobs, (jobs) => jobs.profile),
+    typeorm_1.OneToMany(type => activity_1.Activity, a => a.company),
     __metadata("design:type", Array)
-], company.prototype, "jobss", void 0);
-company = __decorate([
-    typeorm_1.Entity("company", { schema: "public" }),
-    typeorm_1.Index("company_profile_id_8cfef0e4", ["profile",]),
-    typeorm_1.Index("company_slug_b6928c11_like", ["slug",]),
-    typeorm_1.Index("company_slug_b6928c11", ["slug",])
-], company);
-exports.company = company;
+], Company.prototype, "activity", void 0);
+Company = __decorate([
+    typeorm_1.Entity('company')
+], Company);
+exports.Company = Company;
 //# sourceMappingURL=company.js.map

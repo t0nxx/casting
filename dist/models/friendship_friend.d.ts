@@ -1,7 +1,8 @@
-import { auth_user } from "./auth_user";
-export declare class friendship_friend {
+import { Profile } from './users_profile';
+export declare class FriendshipFriend {
     id: number;
     created: Date;
-    fromUser: auth_user | null;
-    toUser: auth_user | null;
+    fromUser: Profile;
+    toUser: Profile;
+    room: string;
 }

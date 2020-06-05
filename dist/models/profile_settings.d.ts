@@ -1,18 +1,31 @@
-import { users_profile } from "./users_profile";
-export declare class profile_settings {
+import { Profile } from './users_profile';
+export declare enum settingsView {
+    ONLY_FRIENDS = "ONLY_FRIENDS",
+    COMPANY = "COMPANY",
+    ALL = "ALL"
+}
+export declare enum myStatus {
+    ONLINE = "ONLINE",
+    OFFLINE = "OFFLINE"
+}
+export declare class ProfileSettings {
     id: number;
-    can_see_profile: string | null;
-    can_see_wall: string | null;
-    can_comment: string | null;
-    can_contact_info: string | null;
-    can_send_message: string | null;
+    can_see_profile: settingsView;
+    can_see_wall: settingsView;
+    can_comment: settingsView;
+    can_contact_info: settingsView;
+    can_send_message: settingsView;
+    can_see_friends: settingsView;
+    can_see_phone: settingsView;
     response_all_time: boolean;
-    response_from: Date | null;
-    response_to: Date | null;
-    response_message: string | null;
+    response_from: Date;
+    response_to: Date;
+    response_message: string;
     auto_play_video: boolean;
     jobs_notification: boolean;
-    userProfile: users_profile | null;
-    can_see_friends: string | null;
-    my_status: string | null;
+    mute_all_chats: boolean;
+    sound_alert: boolean;
+    my_status: myStatus;
+    latest_action: Date;
+    profile: Profile;
 }

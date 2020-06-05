@@ -10,33 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const users_profile_1 = require("./users_profile");
-let ethnicities_lookup = class ethnicities_lookup {
+let EthnicitiesLookup = class EthnicitiesLookup {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], ethnicities_lookup.prototype, "id", void 0);
+], EthnicitiesLookup.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        unique: true,
-        length: 150,
-        name: "name"
-    }),
+    typeorm_1.Column({ unique: true }),
     __metadata("design:type", String)
-], ethnicities_lookup.prototype, "name", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => users_profile_1.users_profile, (users_profile) => users_profile.ethnicity),
-    __metadata("design:type", Array)
-], ethnicities_lookup.prototype, "usersProfiles", void 0);
-ethnicities_lookup = __decorate([
-    typeorm_1.Entity("ethnicities_lookup", { schema: "public" }),
-    typeorm_1.Index("ethnicities_lookup_name_key", ["name",], { unique: true }),
-    typeorm_1.Index("ethnicities_lookup_name_69edbb64_like", ["name",])
-], ethnicities_lookup);
-exports.ethnicities_lookup = ethnicities_lookup;
+], EthnicitiesLookup.prototype, "name", void 0);
+EthnicitiesLookup = __decorate([
+    typeorm_1.Entity('ethnicities_lookup')
+], EthnicitiesLookup);
+exports.EthnicitiesLookup = EthnicitiesLookup;
 //# sourceMappingURL=ethnicities_lookup.js.map

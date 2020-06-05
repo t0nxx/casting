@@ -1,7 +1,4 @@
-import { hobbies_lookup } from "./hobbies_lookup";
-import { users_profile } from "./users_profile";
-export declare class profile_hobbies {
+export declare class Hobbies {
     id: number;
-    hobbies: hobbies_lookup | null;
-    userProfile: users_profile | null;
+    name: string;
 }

@@ -1,18 +1,19 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const users_profile_1 = require("../models/newModels/users_profile");
-const comments_1 = require("../models/newModels/comments");
+const users_profile_1 = require("../models/users_profile");
+const comments_1 = require("../models/comments");
 const pagination_1 = require("../helpers/pagination");
-const activity_1 = require("../models/newModels/activity");
+const activity_1 = require("../models/activity");
 class CommentController {
     getAllCommentsOfACtivity(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,13 +60,13 @@ class CommentController {
                     if (e.thread) {
                         e.thread = e.thread.id;
                     }
-                    return Object.assign({}, e, { auth_user, comment_mention });
+                    return Object.assign(Object.assign({}, e), { auth_user, comment_mention });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -113,13 +114,13 @@ class CommentController {
                     if (e.thread) {
                         e.thread = e.thread.id;
                     }
-                    return Object.assign({}, e, { auth_user, comment_mention });
+                    return Object.assign(Object.assign({}, e), { auth_user, comment_mention });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -133,6 +134,9 @@ class CommentController {
                 const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
                 if (!activity) {
                     throw new Error('activivty not found');
+                }
+                if (!request.body.comment) {
+                    throw new Error("you can't add empty comment");
                 }
                 const newComment = new comments_1.Comment();
                 newComment.comment = request.body.comment;
@@ -186,11 +190,11 @@ class CommentController {
                     slug: profile.slug,
                     avatar: profile.avatar,
                 };
-                return response.status(200).send(Object.assign({}, getAfterSave, responseObject));
+                return response.status(200).send(Object.assign(Object.assign({}, getAfterSave), responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -242,11 +246,11 @@ class CommentController {
                     slug: profile.slug,
                     avatar: profile.avatar,
                 };
-                return response.status(200).send(Object.assign({}, getAfterSave, responseObject));
+                return response.status(200).send(Object.assign(Object.assign({}, getAfterSave), responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -267,7 +271,7 @@ class CommentController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }

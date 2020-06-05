@@ -9,119 +9,97 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var activity_1;
 const typeorm_1 = require("typeorm");
-const auth_user_1 = require("./auth_user");
 const company_1 = require("./company");
 const activity_attachment_1 = require("./activity_attachment");
-const activity_bookmark_1 = require("./activity_bookmark");
-const activity_control_1 = require("./activity_control");
-const activity_ignore_1 = require("./activity_ignore");
-const activity_mention_1 = require("./activity_mention");
-const activity_report_1 = require("./activity_report");
-const activity_social_actions_1 = require("./activity_social_actions");
+const users_profile_1 = require("./users_profile");
 const comments_1 = require("./comments");
-let activity = activity_1 = class activity {
+const activity_reports_1 = require("./activity_reports");
+let Activity = class Activity {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], activity.prototype, "id", void 0);
+], Activity.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: true,
-        name: "content"
-    }),
+    typeorm_1.Column('longtext'),
     __metadata("design:type", String)
-], activity.prototype, "content", void 0);
+], Activity.prototype, "content", void 0);
 __decorate([
-    typeorm_1.Column("timestamp with time zone", {
-        nullable: false,
-        name: "publish_date"
-    }),
+    typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
-], activity.prototype, "publish_date", void 0);
+], Activity.prototype, "publish_date", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "is_blocked"
-    }),
+    typeorm_1.Column({ default: true }),
     __metadata("design:type", Boolean)
-], activity.prototype, "is_blocked", void 0);
+], Activity.prototype, "uploadingComment", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 150,
-        name: "action"
-    }),
-    __metadata("design:type", String)
-], activity.prototype, "action", void 0);
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Activity.prototype, "comments_count", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "is_active"
-    }),
-    __metadata("design:type", Boolean)
-], activity.prototype, "is_active", void 0);
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Activity.prototype, "share_count", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => auth_user_1.auth_user, (auth_user) => auth_user.activitys, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'auth_user_id' }),
-    __metadata("design:type", auth_user_1.auth_user)
-], activity.prototype, "authUser", void 0);
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Activity.prototype, "like_count", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => company_1.company, (company) => company.activitys, {}),
-    typeorm_1.JoinColumn({ name: 'company_id' }),
-    __metadata("design:type", company_1.company)
-], activity.prototype, "company", void 0);
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Activity.prototype, "dislike_count", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => activity_1, (activity) => activity.activitys, {}),
-    typeorm_1.JoinColumn({ name: 'original_activity' }),
-    __metadata("design:type", activity)
-], activity.prototype, "originalActivity", void 0);
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Activity.prototype, "resports_count", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_1, (activity) => activity.originalActivity),
+    typeorm_1.ManyToOne(type => users_profile_1.Profile, p => p.activity, { onDelete: 'CASCADE' }),
+    __metadata("design:type", users_profile_1.Profile)
+], Activity.prototype, "profile", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => company_1.Company, c => c.activity, { onDelete: 'CASCADE' }),
+    __metadata("design:type", company_1.Company)
+], Activity.prototype, "company", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_attachment_1.ActivityAttachment, ac => ac.activity),
     __metadata("design:type", Array)
-], activity.prototype, "activitys", void 0);
+], Activity.prototype, "activity_attachment", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_attachment_1.activity_attachment, (activity_attachment) => activity_attachment.activity),
+    typeorm_1.OneToMany(type => comments_1.Comment, ac => ac.activity),
     __metadata("design:type", Array)
-], activity.prototype, "activityAttachments", void 0);
+], Activity.prototype, "activity_Comments", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_bookmark_1.activity_bookmark, (activity_bookmark) => activity_bookmark.activity),
+    typeorm_1.OneToMany(type => activity_reports_1.ActivityReports, ac => ac.activity),
     __metadata("design:type", Array)
-], activity.prototype, "activityBookmarks", void 0);
+], Activity.prototype, "reports", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_control_1.activity_control, (activity_control) => activity_control.activity),
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, p => p.likes),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], activity.prototype, "activityControls", void 0);
+], Activity.prototype, "activity_likers", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_ignore_1.activity_ignore, (activity_ignore) => activity_ignore.activity),
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, p => p.dislikes),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], activity.prototype, "activityIgnores", void 0);
+], Activity.prototype, "activity_dislikers", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_mention_1.activity_mention, (activity_mention) => activity_mention.activity),
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, p => p.bookmarks),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], activity.prototype, "activityMentions", void 0);
+], Activity.prototype, "activity_bookmarks", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_report_1.activity_report, (activity_report) => activity_report.activity),
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, p => p.hidden),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], activity.prototype, "activityReports", void 0);
+], Activity.prototype, "activity_hidden", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => activity_social_actions_1.activity_social_actions, (activity_social_actions) => activity_social_actions.activity),
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, p => p.activity_mentions),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], activity.prototype, "activitySocialActionss", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => comments_1.comments, (comments) => comments.activity),
-    __metadata("design:type", Array)
-], activity.prototype, "commentss", void 0);
-activity = activity_1 = __decorate([
-    typeorm_1.Entity("activity", { schema: "public" }),
-    typeorm_1.Index("activity_auth_user_id_faff7f0e", ["authUser",]),
-    typeorm_1.Index("activity_company_id_484a766d", ["company",]),
-    typeorm_1.Index("activity_original_activity_974d22b8", ["originalActivity",])
-], activity);
-exports.activity = activity;
+], Activity.prototype, "activityMention", void 0);
+Activity = __decorate([
+    typeorm_1.Entity('activity')
+], Activity);
+exports.Activity = Activity;
 //# sourceMappingURL=activity.js.map

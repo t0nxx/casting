@@ -1,10 +1,8 @@
-import { auth_user } from "./auth_user";
-export declare class friendship_friendshiprequest {
+import { Profile } from './users_profile';
+export declare class FriendshipFriendshipRequest {
     id: number;
     message: string;
     created: Date;
-    rejected: Date | null;
-    viewed: Date | null;
-    fromUser: auth_user | null;
-    toUser: auth_user | null;
+    fromUser: Profile;
+    toUser: Profile;
 }

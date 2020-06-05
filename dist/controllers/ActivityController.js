@@ -1,26 +1,27 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const auth_user_1 = require("../models/newModels/auth_user");
-const users_profile_1 = require("../models/newModels/users_profile");
+const auth_user_1 = require("../models/auth_user");
+const users_profile_1 = require("../models/users_profile");
 const pagination_1 = require("../helpers/pagination");
-const activity_1 = require("../models/newModels/activity");
-const profile_settings_1 = require("../models/newModels/profile_settings");
+const activity_1 = require("../models/activity");
+const profile_settings_1 = require("../models/profile_settings");
 const FriendsController_1 = require("./FriendsController");
-const activity_attachment_1 = require("../models/newModels/activity_attachment");
+const activity_attachment_1 = require("../models/activity_attachment");
 const awsUploader_1 = require("../helpers/awsUploader");
-const company_1 = require("../models/newModels/company");
-const activity_reports_1 = require("../models/newModels/activity_reports");
+const company_1 = require("../models/company");
+const activity_reports_1 = require("../models/activity_reports");
 const SendNotification_1 = require("../jobs/SendNotification");
-const Queue_1 = require("../jobs/Queue");
+const main_1 = require("../main");
 class ActivityController {
     getActivityOfUser(request, response) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -48,7 +49,8 @@ class ActivityController {
                 const myDisLikes = me.dislikes.map(ac => ac.id);
                 const myBookMarks = me.bookmarks.map(ac => ac.id);
                 responseObject.results = yield Promise.all(responseObject.results.map((ac) => __awaiter(this, void 0, void 0, function* () {
-                    const author_settings = yield profileSettingsRepository.findOne({ profile: ac.profile }, { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
+                    const author_settings = yield profileSettingsRepository.findOne({ profile: ac.profile });
+                    delete author_settings.profile;
                     const liked = myLikes.includes(ac.id);
                     const disliked = myDisLikes.includes(ac.id);
                     const bookmarked = myBookMarks.includes(ac.id);
@@ -78,13 +80,13 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
+                    return Object.assign(Object.assign({}, ac), { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -144,13 +146,13 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
+                    return Object.assign(Object.assign({}, ac), { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -165,7 +167,7 @@ class ActivityController {
                     relations: ['activityMention', 'activity_attachment', 'profile', 'company']
                 });
                 if (!activity) {
-                    throw new Error('activivty not found');
+                    throw new Error('activivty not found or deleted');
                 }
                 const profile = yield profileRepository.findOne({ id: activity.profile.id }, { relations: ['user'] });
                 const author_settings = yield profileSettingsRepository.findOne({ profile }, { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
@@ -191,12 +193,12 @@ class ActivityController {
                 };
                 delete activity.activityMention;
                 delete activity.profile;
-                return response.status(200).send(Object.assign({}, activity, { auth_user, author_settings,
+                return response.status(200).send(Object.assign(Object.assign({}, activity), { auth_user, author_settings,
                     activity_mention, liked: false, disliked: false, bookmarked: false }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -257,13 +259,13 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked });
+                    return Object.assign(Object.assign({}, ac), { auth_user, author_settings, liked, disliked, bookmarked });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -313,12 +315,24 @@ class ActivityController {
                     slug: profile.slug,
                     avatar: profile.avatar,
                 };
-                return response.status(200).send(Object.assign({}, getAfterSave, { auth_user, author_settings,
+                mentions.map((e) => __awaiter(this, void 0, void 0, function* () {
+                    console.log(e);
+                    const notiToQueu = {
+                        actor_first_name: profile.user.first_name,
+                        actor_last_name: profile.user.last_name,
+                        actor_avatar: profile.avatar,
+                        type: SendNotification_1.NotificationTypeEnum.mentionOnPost,
+                        target_id: save.id,
+                        recipient: e,
+                    };
+                    yield main_1.notificationQueue.add(notiToQueu);
+                }));
+                return response.status(200).send(Object.assign(Object.assign({}, getAfterSave), { auth_user, author_settings,
                     activity_mention, liked: false, disliked: false, bookmarked: false }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -374,12 +388,23 @@ class ActivityController {
                     slug: profile.slug,
                     avatar: profile.avatar,
                 };
-                return response.status(200).send(Object.assign({}, getAfterSave, { auth_user, author_settings,
+                mentions.map((e) => __awaiter(this, void 0, void 0, function* () {
+                    console.log(e);
+                    const notiToQueu = {
+                        actor_first_name: company.name,
+                        actor_avatar: company.avatar,
+                        type: SendNotification_1.NotificationTypeEnum.mentionOnPost,
+                        target_id: save.id,
+                        recipient: e,
+                    };
+                    yield main_1.notificationQueue.add(notiToQueu);
+                }));
+                return response.status(200).send(Object.assign(Object.assign({}, getAfterSave), { auth_user, author_settings,
                     activity_mention, liked: false, disliked: false, bookmarked: false }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -393,9 +418,9 @@ class ActivityController {
                 });
                 const myLikes = profile.likes.map(ac => ac.id);
                 const myDisLikes = profile.dislikes.map(ac => ac.id);
-                const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+                const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
                 if (!activity) {
-                    throw new Error('activivty not found');
+                    throw new Error('activivty not found or deleted');
                 }
                 const liked = myLikes.includes(activity.id);
                 const disliked = myDisLikes.includes(activity.id);
@@ -425,14 +450,14 @@ class ActivityController {
                     actor_avatar: profile.avatar,
                     type: SendNotification_1.NotificationTypeEnum.like,
                     target_id: activity.id,
-                    recipient: profile.id,
+                    recipient: activity.profile.id,
                 };
-                yield Queue_1.default.add(notiToQueu);
+                yield main_1.notificationQueue.add(notiToQueu);
                 return response.status(200).send({ success: true });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -446,9 +471,9 @@ class ActivityController {
                 });
                 const myLikes = profile.likes.map(ac => ac.id);
                 const myDisLikes = profile.dislikes.map(ac => ac.id);
-                const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+                const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
                 if (!activity) {
-                    throw new Error('activivty not found');
+                    throw new Error('activivty not found or deleted');
                 }
                 const liked = myLikes.includes(activity.id);
                 const disliked = myDisLikes.includes(activity.id);
@@ -472,11 +497,20 @@ class ActivityController {
                 activity.dislike_count = activity.dislike_count + 1;
                 let saveLikedActivity = yield ActivityRepository.save(activity);
                 yield profileRepository.save(profile);
+                const notiToQueu = {
+                    actor_first_name: profile.user.first_name,
+                    actor_last_name: profile.user.last_name,
+                    actor_avatar: profile.avatar,
+                    type: SendNotification_1.NotificationTypeEnum.dislike,
+                    target_id: activity.id,
+                    recipient: activity.profile.id,
+                };
+                yield main_1.notificationQueue.add(notiToQueu);
                 return response.status(200).send({ success: true });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -491,7 +525,7 @@ class ActivityController {
                 const myBookMarks = profile.bookmarks.map(ac => ac.id);
                 const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
                 if (!activity) {
-                    throw new Error('activivty not found');
+                    throw new Error('activivty not found or deleted');
                 }
                 const bookmarked = myBookMarks.includes(activity.id);
                 if (bookmarked) {
@@ -505,7 +539,7 @@ class ActivityController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -518,7 +552,7 @@ class ActivityController {
                 const profile = yield profileRepository.findOne({ slug: request['user'].username });
                 const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
                 if (!activity) {
-                    throw new Error('activivty not found');
+                    throw new Error('activivty not found or deleted');
                 }
                 if (!request.body.reason) {
                     throw new Error('you must enter reason');
@@ -534,7 +568,7 @@ class ActivityController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -549,7 +583,7 @@ class ActivityController {
                 const myHiddenActivity = profile.hidden.map(ac => ac.id);
                 const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
                 if (!activity) {
-                    throw new Error('activivty not found');
+                    throw new Error('activivty not found or deleted');
                 }
                 const hidden = myHiddenActivity.includes(activity.id);
                 if (hidden) {
@@ -563,7 +597,7 @@ class ActivityController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -578,7 +612,7 @@ class ActivityController {
                 const author_settings = yield profileSettingsRepository.findOne({ profile }, { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
                 const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
                 if (!activity) {
-                    throw new Error('activivty not found');
+                    throw new Error('activivty not found or deleted');
                 }
                 const file = request.files.file;
                 const mime = file.mimetype;
@@ -617,13 +651,12 @@ class ActivityController {
                     slug: profile.slug,
                     avatar: profile.avatar,
                 };
-                return response.status(200).send(Object.assign({}, getAfterSave, { auth_user, author_settings,
+                return response.status(200).send(Object.assign(Object.assign({}, getAfterSave), { auth_user, author_settings,
                     activity_mention, liked: false, disliked: false, bookmarked: false }));
-                return response.status(200).send({ success: true });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -694,13 +727,13 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, liked, disliked, bookmarked });
+                    return Object.assign(Object.assign({}, ac), { auth_user, liked, disliked, bookmarked });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -740,11 +773,11 @@ class ActivityController {
                 const getActivityAfterInsert = yield ActivityRepository.findOne({ id: saveActivity.id }, {
                     relations: ['activity_attachment']
                 });
-                return response.status(200).send(Object.assign({}, getActivityAfterInsert, { auth_user }));
+                return response.status(200).send(Object.assign(Object.assign({}, getActivityAfterInsert), { auth_user }));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -802,13 +835,13 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
+                    return Object.assign(Object.assign({}, ac), { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -866,13 +899,13 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
+                    return Object.assign(Object.assign({}, ac), { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
                 }))).then(rez => rez);
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -895,7 +928,7 @@ class ActivityController {
                     .andWhere(`activity_attachment.type like 'IMG' `)
                     .orderBy('activity.publish_date', 'DESC')
                     .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
-                let responseObject = {};
+                const responseObject = yield pagination_1.ApplyPagination(request, response, q, false);
                 responseObject.results = yield q.getMany();
                 const myLikes = profile.likes.map(ac => ac.id);
                 const myDisLikes = profile.dislikes.map(ac => ac.id);
@@ -931,16 +964,16 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
+                    return Object.assign(Object.assign({}, ac), { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
                 }))).then(rez => rez);
                 if (request.query.some) {
-                    responseObject.results = responseObject.results.slice(0, 10);
+                    responseObject.results = responseObject.results.slice(0, 6);
                 }
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -999,13 +1032,13 @@ class ActivityController {
                     delete ac.profile;
                     delete ac['user'];
                     delete ac.activityMention;
-                    return Object.assign({}, ac, { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
+                    return Object.assign(Object.assign({}, ac), { auth_user, author_settings, liked, disliked, bookmarked, is_admin });
                 }))).then(rez => rez);
                 return response.status(200).send(responseObject.results);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -1023,7 +1056,25 @@ class ActivityController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
+            }
+        });
+    }
+    reomveImageFromAlbum(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const ActivityRepository = typeorm_1.getRepository(activity_1.Activity);
+            const ActivityAttachmentRepository = typeorm_1.getRepository(activity_attachment_1.ActivityAttachment);
+            try {
+                const activity = yield ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
+                yield ActivityAttachmentRepository.update({ activity }, { album_id: null });
+                activity.content = request.body.content;
+                yield ActivityRepository.save(activity);
+                return response.status(200).send({ success: true });
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -1043,7 +1094,7 @@ class ActivityController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }

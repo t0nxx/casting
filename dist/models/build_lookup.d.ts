@@ -1,6 +1,4 @@
-import { users_profile } from "./users_profile";
-export declare class build_lookup {
+export declare class BuildLookup {
     id: number;
-    name: string | null;
-    usersProfiles: users_profile[];
+    name: string;
 }

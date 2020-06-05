@@ -1,16 +1,18 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const news_letter_1 = require("../../models/newModels/news_letter");
+const news_letter_1 = require("../../models/news_letter");
 const class_transformer_validator_1 = require("class-transformer-validator");
+const sendMail_1 = require("../../helpers/sendMail");
 class NewsLetterController {
     getAllNewsLetterUsers(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -51,6 +53,7 @@ class NewsLetterController {
                 if (!request.body.email) {
                     throw new Error('email is required');
                 }
+                sendMail_1.sendInviteMail(request.body.email);
                 return response.status(200).send({ success: true });
             }
             catch (error) {

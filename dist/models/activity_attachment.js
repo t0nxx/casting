@@ -12,66 +12,49 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const activity_1 = require("./activity");
 const profile_album_1 = require("./profile_album");
-const auth_user_1 = require("./auth_user");
-let activity_attachment = class activity_attachment {
+const users_profile_1 = require("./users_profile");
+var AttachmentEnum;
+(function (AttachmentEnum) {
+    AttachmentEnum["VIEDO"] = "VIDEO";
+    AttachmentEnum["AUDIO"] = "AUDIO";
+    AttachmentEnum["IMG"] = "IMG";
+})(AttachmentEnum = exports.AttachmentEnum || (exports.AttachmentEnum = {}));
+let ActivityAttachment = class ActivityAttachment {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], activity_attachment.prototype, "id", void 0);
+], ActivityAttachment.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("timestamp with time zone", {
-        nullable: false,
-        name: "publish_date"
-    }),
+    typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
-], activity_attachment.prototype, "publish_date", void 0);
+], ActivityAttachment.prototype, "publish_date", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: true,
-        name: "path"
-    }),
+    typeorm_1.Column('text'),
     __metadata("design:type", String)
-], activity_attachment.prototype, "path", void 0);
+], ActivityAttachment.prototype, "path", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: false,
-        length: 25,
-        name: "type"
-    }),
+    typeorm_1.Column(),
     __metadata("design:type", String)
-], activity_attachment.prototype, "type", void 0);
+], ActivityAttachment.prototype, "type", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => activity_1.activity, (activity) => activity.activityAttachments, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'activity_id' }),
-    __metadata("design:type", activity_1.activity)
-], activity_attachment.prototype, "activity", void 0);
+    typeorm_1.ManyToOne(type => activity_1.Activity, a => a.activity_attachment, { onDelete: 'CASCADE' }),
+    __metadata("design:type", activity_1.Activity)
+], ActivityAttachment.prototype, "activity", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => profile_album_1.profile_album, (profile_album) => profile_album.activityAttachments, {}),
-    typeorm_1.JoinColumn({ name: 'album_id' }),
-    __metadata("design:type", profile_album_1.profile_album)
-], activity_attachment.prototype, "album", void 0);
+    typeorm_1.ManyToOne(type => users_profile_1.Profile, p => p.activity_attachment, { onDelete: 'CASCADE' }),
+    __metadata("design:type", users_profile_1.Profile)
+], ActivityAttachment.prototype, "profile", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => auth_user_1.auth_user, (auth_user) => auth_user.activityAttachments, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'auth_user_id' }),
-    __metadata("design:type", auth_user_1.auth_user)
-], activity_attachment.prototype, "authUser", void 0);
+    typeorm_1.ManyToOne(type => profile_album_1.ProfileAlbum, p => p.activity_attachment, { onDelete: 'CASCADE' }),
+    __metadata("design:type", profile_album_1.ProfileAlbum)
+], ActivityAttachment.prototype, "album", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: false,
-        length: 150,
-        name: "path_json"
-    }),
-    __metadata("design:type", String)
-], activity_attachment.prototype, "path_json", void 0);
-activity_attachment = __decorate([
-    typeorm_1.Entity("activity_attachment", { schema: "public" }),
-    typeorm_1.Index("activity_attachment_activity_id_306ddcd5", ["activity",]),
-    typeorm_1.Index("activity_attachment_album_id_66267b17", ["album",]),
-    typeorm_1.Index("activity_attachment_auth_user_id_7433c68f", ["authUser",])
-], activity_attachment);
-exports.activity_attachment = activity_attachment;
+    typeorm_1.Column({ nullable: true }),
+    __metadata("design:type", Number)
+], ActivityAttachment.prototype, "album_id", void 0);
+ActivityAttachment = __decorate([
+    typeorm_1.Entity("activity_attachment")
+], ActivityAttachment);
+exports.ActivityAttachment = ActivityAttachment;
 //# sourceMappingURL=activity_attachment.js.map

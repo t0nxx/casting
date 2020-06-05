@@ -11,189 +11,119 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const company_1 = require("./company");
-const job_applicants_1 = require("./job_applicants");
-const job_category_1 = require("./job_category");
-const job_schedules_1 = require("./job_schedules");
-const job_shortlisted_1 = require("./job_shortlisted");
-let jobs = class jobs {
+const talent_categories_1 = require("./talent_categories");
+const jobs_interview_1 = require("./jobs_interview");
+const jobs_shortlisted_1 = require("./jobs_shortlisted");
+const jobs_applicants_1 = require("./jobs_applicants");
+let Jobs = class Jobs {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], jobs.prototype, "id", void 0);
+], Jobs.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("timestamp with time zone", {
-        nullable: false,
-        name: "publish_date"
-    }),
+    typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
-], jobs.prototype, "publish_date", void 0);
+], Jobs.prototype, "publish_date", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: false,
-        unique: true,
-        length: 250,
-        name: "title"
-    }),
+    typeorm_1.Column({ default: null, nullable: true }),
+    __metadata("design:type", Date)
+], Jobs.prototype, "end_date", void 0);
+__decorate([
+    typeorm_1.Column(),
     __metadata("design:type", String)
-], jobs.prototype, "title", void 0);
+], Jobs.prototype, "title", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: false,
-        name: "description"
-    }),
+    typeorm_1.Column('longtext'),
     __metadata("design:type", String)
-], jobs.prototype, "description", void 0);
+], Jobs.prototype, "description", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "have_daily_perks"
-    }),
+    typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
-], jobs.prototype, "have_daily_perks", void 0);
+], Jobs.prototype, "have_daily_perks", void 0);
 __decorate([
-    typeorm_1.Column("numeric", {
-        nullable: false,
-        precision: 7,
-        scale: 2,
-        name: "daily_perks_budget"
-    }),
-    __metadata("design:type", String)
-], jobs.prototype, "daily_perks_budget", void 0);
-__decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "have_transportation"
-    }),
-    __metadata("design:type", Boolean)
-], jobs.prototype, "have_transportation", void 0);
-__decorate([
-    typeorm_1.Column("numeric", {
-        nullable: false,
-        precision: 7,
-        scale: 2,
-        name: "transportation_budget"
-    }),
-    __metadata("design:type", String)
-], jobs.prototype, "transportation_budget", void 0);
-__decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "have_meal"
-    }),
-    __metadata("design:type", Boolean)
-], jobs.prototype, "have_meal", void 0);
-__decorate([
-    typeorm_1.Column("numeric", {
-        nullable: false,
-        precision: 7,
-        scale: 2,
-        name: "meal_budget"
-    }),
-    __metadata("design:type", String)
-], jobs.prototype, "meal_budget", void 0);
-__decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "have_space_rest"
-    }),
-    __metadata("design:type", Boolean)
-], jobs.prototype, "have_space_rest", void 0);
-__decorate([
-    typeorm_1.Column("numeric", {
-        nullable: false,
-        precision: 7,
-        scale: 2,
-        name: "space_rest_budget"
-    }),
-    __metadata("design:type", String)
-], jobs.prototype, "space_rest_budget", void 0);
-__decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "is_male"
-    }),
-    __metadata("design:type", Boolean)
-], jobs.prototype, "is_male", void 0);
-__decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "is_female"
-    }),
-    __metadata("design:type", Boolean)
-], jobs.prototype, "is_female", void 0);
-__decorate([
-    typeorm_1.Column("integer", {
-        nullable: true,
-        name: "age"
-    }),
+    typeorm_1.Column({ default: 0 }),
     __metadata("design:type", Number)
-], jobs.prototype, "age", void 0);
+], Jobs.prototype, "daily_perks_budget", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "hide_company"
-    }),
+    typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
-], jobs.prototype, "hide_company", void 0);
+], Jobs.prototype, "have_transportation", void 0);
 __decorate([
-    typeorm_1.Column("numeric", {
-        nullable: true,
-        precision: 7,
-        scale: 2,
-        name: "latitude"
-    }),
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Jobs.prototype, "transportation_budget", void 0);
+__decorate([
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], Jobs.prototype, "have_meal", void 0);
+__decorate([
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Jobs.prototype, "meal_budget", void 0);
+__decorate([
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], Jobs.prototype, "have_space_rest", void 0);
+__decorate([
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Jobs.prototype, "space_rest_budget", void 0);
+__decorate([
+    typeorm_1.Column({ default: true }),
+    __metadata("design:type", Boolean)
+], Jobs.prototype, "is_male", void 0);
+__decorate([
+    typeorm_1.Column({ default: true }),
+    __metadata("design:type", Boolean)
+], Jobs.prototype, "is_female", void 0);
+__decorate([
+    typeorm_1.Column({ default: null }),
     __metadata("design:type", String)
-], jobs.prototype, "latitude", void 0);
+], Jobs.prototype, "age", void 0);
 __decorate([
-    typeorm_1.Column("numeric", {
-        nullable: true,
-        precision: 7,
-        scale: 2,
-        name: "longitude"
-    }),
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], Jobs.prototype, "hide_company", void 0);
+__decorate([
+    typeorm_1.Column({ default: null }),
     __metadata("design:type", String)
-], jobs.prototype, "longitude", void 0);
+], Jobs.prototype, "latitude", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: false,
-        unique: true,
-        length: 50,
-        name: "slug"
-    }),
+    typeorm_1.Column({ default: null }),
     __metadata("design:type", String)
-], jobs.prototype, "slug", void 0);
+], Jobs.prototype, "longitude", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => company_1.company, (company) => company.jobss, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'profile_id' }),
-    __metadata("design:type", company_1.company)
-], jobs.prototype, "profile", void 0);
+    typeorm_1.Column({ unique: true }),
+    __metadata("design:type", String)
+], Jobs.prototype, "slug", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => job_applicants_1.job_applicants, (job_applicants) => job_applicants.job),
+    typeorm_1.ManyToOne(type => company_1.Company, { eager: true, onDelete: 'CASCADE' }),
+    __metadata("design:type", company_1.Company)
+], Jobs.prototype, "company", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => talent_categories_1.TalentCategories, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], jobs.prototype, "jobApplicantss", void 0);
+], Jobs.prototype, "category", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => job_category_1.job_category, (job_category) => job_category.job),
-    __metadata("design:type", Array)
-], jobs.prototype, "jobCategorys", void 0);
+    typeorm_1.Column('longtext'),
+    __metadata("design:type", String)
+], Jobs.prototype, "location", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => job_schedules_1.job_schedules, (job_schedules) => job_schedules.job),
+    typeorm_1.OneToMany(type => jobs_interview_1.JobInterview, jI => jI.job, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)
-], jobs.prototype, "jobScheduless", void 0);
+], Jobs.prototype, "interviews", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => job_shortlisted_1.job_shortlisted, (job_shortlisted) => job_shortlisted.job),
+    typeorm_1.OneToMany(type => jobs_shortlisted_1.JobShortlist, jI => jI.job, { onDelete: 'CASCADE' }),
     __metadata("design:type", Array)
-], jobs.prototype, "jobShortlisteds", void 0);
-jobs = __decorate([
-    typeorm_1.Entity("jobs", { schema: "public" }),
-    typeorm_1.Index("jobs_profile_id_0453d121", ["profile",]),
-    typeorm_1.Index("jobs_slug_44de2c8b_like", ["slug",]),
-    typeorm_1.Index("jobs_slug_key", ["slug",], { unique: true }),
-    typeorm_1.Index("jobs_title_key", ["title",], { unique: true }),
-    typeorm_1.Index("jobs_title_5ec67837_like", ["title",])
-], jobs);
-exports.jobs = jobs;
+], Jobs.prototype, "shortlisted", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_applicants_1.JobApplicants, jI => jI.job, { onDelete: 'CASCADE' }),
+    __metadata("design:type", Array)
+], Jobs.prototype, "applicants", void 0);
+Jobs = __decorate([
+    typeorm_1.Entity('jobs')
+], Jobs);
+exports.Jobs = Jobs;
 //# sourceMappingURL=jobs.js.map

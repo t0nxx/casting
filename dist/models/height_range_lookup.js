@@ -10,33 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const users_profile_1 = require("./users_profile");
-let height_range_lookup = class height_range_lookup {
+let HeightRangeLookup = class HeightRangeLookup {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], height_range_lookup.prototype, "id", void 0);
+], HeightRangeLookup.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        unique: true,
-        length: 50,
-        name: "name"
-    }),
+    typeorm_1.Column({ unique: true }),
     __metadata("design:type", String)
-], height_range_lookup.prototype, "name", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => users_profile_1.users_profile, (users_profile) => users_profile.height),
-    __metadata("design:type", Array)
-], height_range_lookup.prototype, "usersProfiles", void 0);
-height_range_lookup = __decorate([
-    typeorm_1.Entity("height_range_lookup", { schema: "public" }),
-    typeorm_1.Index("height_range_lookup_name_e023aaa9_like", ["name",]),
-    typeorm_1.Index("height_range_lookup_name_key", ["name",], { unique: true })
-], height_range_lookup);
-exports.height_range_lookup = height_range_lookup;
+], HeightRangeLookup.prototype, "name", void 0);
+HeightRangeLookup = __decorate([
+    typeorm_1.Entity('height_range_lookup')
+], HeightRangeLookup);
+exports.HeightRangeLookup = HeightRangeLookup;
 //# sourceMappingURL=height_range_lookup.js.map

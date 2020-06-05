@@ -8,7 +8,7 @@ AWS.config.update({
     region: Secrets_1.AwsRegion,
 });
 const s3 = new AWS.S3();
-const bucketName = 'casting-secret';
+const bucketName = 'casting-secret-new';
 exports.UploadToS3 = (file, type) => {
     const folder = type === 'image' ? 'images' : type === 'video' ? 'videos' : type === 'audio' ? 'voices' : 'videos';
     return s3.upload({
@@ -17,6 +17,7 @@ exports.UploadToS3 = (file, type) => {
         Key: `${Date.now().toString()} - ${file.name}`,
         ACL: 'public-read',
         ContentType: file.mimetype,
+        CacheControl: 'max-age=31536000',
     })
         .promise()
         .then(data => {

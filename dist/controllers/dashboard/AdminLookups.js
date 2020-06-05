@@ -1,23 +1,24 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const height_range_lookup_1 = require("../../models/newModels/height_range_lookup");
-const weight_range_lookup_1 = require("../../models/newModels/weight_range_lookup");
-const build_lookup_1 = require("../../models/newModels/build_lookup");
-const hair_lookup_1 = require("../../models/newModels/hair_lookup");
-const eye_lookup_1 = require("../../models/newModels/eye_lookup");
-const ethnicities_lookup_1 = require("../../models/newModels/ethnicities_lookup");
-const profile_hobbies_1 = require("../../models/newModels/profile_hobbies");
-const talent_categories_1 = require("../../models/newModels/talent_categories");
-const news_letter_1 = require("../../models/newModels/news_letter");
+const height_range_lookup_1 = require("../../models/height_range_lookup");
+const weight_range_lookup_1 = require("../../models/weight_range_lookup");
+const build_lookup_1 = require("../../models/build_lookup");
+const hair_lookup_1 = require("../../models/hair_lookup");
+const eye_lookup_1 = require("../../models/eye_lookup");
+const ethnicities_lookup_1 = require("../../models/ethnicities_lookup");
+const profile_hobbies_1 = require("../../models/profile_hobbies");
+const talent_categories_1 = require("../../models/talent_categories");
+const news_letter_1 = require("../../models/news_letter");
 function identifyLookupRepo(lookupString) {
     if (lookupString == 'height') {
         return height_range_lookup_1.HeightRangeLookup;
@@ -128,9 +129,13 @@ class AdminLookupsController {
                 }
                 else {
                     if (!request.body.name_en) {
-                        throw new Error('name is required');
+                        throw new Error('name en is required');
+                    }
+                    if (!request.body.name_en) {
+                        throw new Error('name ar is required');
                     }
                     item.name_en = request.body.name_en;
+                    item.name_ar = request.body.name_ar;
                 }
                 const data = yield LookupRepository.save(item);
                 return response.status(200).send({ data });

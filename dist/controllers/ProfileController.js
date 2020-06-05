@@ -1,30 +1,32 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const users_profile_1 = require("../models/newModels/users_profile");
-const profile_settings_1 = require("../models/newModels/profile_settings");
-const height_range_lookup_1 = require("../models/newModels/height_range_lookup");
-const weight_range_lookup_1 = require("../models/newModels/weight_range_lookup");
-const build_lookup_1 = require("../models/newModels/build_lookup");
-const hair_lookup_1 = require("../models/newModels/hair_lookup");
-const eye_lookup_1 = require("../models/newModels/eye_lookup");
-const ethnicities_lookup_1 = require("../models/newModels/ethnicities_lookup");
-const profile_hobbies_1 = require("../models/newModels/profile_hobbies");
-const profile_courses_1 = require("../models/newModels/profile_courses");
-const friendship_friend_1 = require("../models/newModels/friendship_friend");
-const profile_social_1 = require("../models/newModels/profile_social");
+const users_profile_1 = require("../models/users_profile");
+const profile_settings_1 = require("../models/profile_settings");
+const height_range_lookup_1 = require("../models/height_range_lookup");
+const weight_range_lookup_1 = require("../models/weight_range_lookup");
+const build_lookup_1 = require("../models/build_lookup");
+const hair_lookup_1 = require("../models/hair_lookup");
+const eye_lookup_1 = require("../models/eye_lookup");
+const ethnicities_lookup_1 = require("../models/ethnicities_lookup");
+const profile_hobbies_1 = require("../models/profile_hobbies");
+const profile_courses_1 = require("../models/profile_courses");
+const friendship_friend_1 = require("../models/friendship_friend");
+const profile_social_1 = require("../models/profile_social");
 const awsUploader_1 = require("../helpers/awsUploader");
-const auth_user_1 = require("../models/newModels/auth_user");
-const profile_album_1 = require("../models/newModels/profile_album");
-const friendship_friendshiprequest_1 = require("../models/newModels/friendship_friendshiprequest");
+const auth_user_1 = require("../models/auth_user");
+const profile_album_1 = require("../models/profile_album");
+const friendship_friendshiprequest_1 = require("../models/friendship_friendshiprequest");
+const who_see_me_1 = require("../models/who_see_me");
 class ProfileController {
     all(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -42,11 +44,15 @@ class ProfileController {
         return __awaiter(this, void 0, void 0, function* () {
             const friendsRepository = typeorm_1.getRepository(friendship_friend_1.FriendshipFriend);
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const whoSeeMeRepository = typeorm_1.getRepository(who_see_me_1.WhoSeeMe);
             const friendRequestRepository = typeorm_1.getRepository(friendship_friendshiprequest_1.FriendshipFriendshipRequest);
             try {
                 const data = yield profileRepository.findOne({ slug: request.params.slug }, {
                     relations: ['user']
                 });
+                if (!data) {
+                    throw new Error('profile Not Found');
+                }
                 const Myprofile = yield profileRepository.findOne({ slug: request['user'].username });
                 let is_friends = false;
                 let is_IreceivedReqFromHim = false;
@@ -82,15 +88,21 @@ class ProfileController {
                 }
                 const { first_name, last_name, email, username, id } = data.user;
                 delete data.user;
-                const responseObject = Object.assign({}, data, { is_friends, is_IreceivedReqFromHim, is_IsendReqToHim, auth_user: { pk: id, first_name, last_name, email, username } });
-                if (!data) {
-                    throw new Error('profile Not Found');
+                const responseObject = Object.assign(Object.assign({}, data), { is_friends, is_IreceivedReqFromHim, is_IsendReqToHim, auth_user: { pk: id, first_name, last_name, email, username } });
+                if (data.id !== Myprofile.id) {
+                    const isViewdAlready = yield whoSeeMeRepository.findOne({ viewed: data.id, viewer: Myprofile.id });
+                    if (!isViewdAlready) {
+                        const newViewer = new who_see_me_1.WhoSeeMe();
+                        newViewer.viewed = data.id;
+                        newViewer.viewer = Myprofile.id;
+                        yield whoSeeMeRepository.save(newViewer);
+                    }
                 }
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -108,7 +120,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -130,7 +142,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -149,7 +161,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -173,7 +185,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -183,7 +195,7 @@ class ProfileController {
             const albumRepository = typeorm_1.getRepository(profile_album_1.ProfileAlbum);
             try {
                 const profile = yield profileRepository.findOne({ slug: request['user'].username });
-                const album = yield albumRepository.findOne({ id: parseInt(request.params.id, 10) });
+                const album = yield albumRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
                 if (!album) {
                     throw new Error('album Not Found');
                 }
@@ -195,7 +207,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -214,7 +226,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -241,7 +253,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -267,14 +279,14 @@ class ProfileController {
                 const data = yield profileRepository.findOne({ slug: request.params.slug }, {
                     relations: ['user']
                 });
-                const { first_name, last_name, email, username, id } = data.user;
+                const { first_name, last_name, email, username, isAdmin } = data.user;
                 delete data.user;
-                const responseObject = Object.assign({}, data, { auth_user: { pk: id, first_name, last_name, email, username } });
+                const responseObject = Object.assign(Object.assign({}, data), { isSuperAdmin: isAdmin, auth_user: { pk: data.id, first_name, last_name, email, username } });
                 return response.status(200).send(Object.assign({}, responseObject));
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -293,7 +305,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -305,14 +317,14 @@ class ProfileController {
                 if (!profile) {
                     throw new Error('profile Not Found');
                 }
-                const resetCover = 'https://casting-secret.s3.eu-central-1.amazonaws.com/banner.jpg';
+                const resetCover = 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/banner.jpg';
                 yield profileRepository.update({ id: profile.id }, { cover: resetCover });
                 const afterUpdate = yield profileRepository.findOne({ id: profile.id });
                 return response.status(200).send({ cover: resetCover });
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -331,7 +343,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -351,7 +363,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -371,7 +383,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -394,7 +406,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -417,7 +429,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -439,7 +451,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -462,7 +474,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -484,7 +496,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -507,7 +519,7 @@ class ProfileController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }

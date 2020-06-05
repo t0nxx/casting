@@ -8,63 +8,49 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var Comment_1;
 Object.defineProperty(exports, "__esModule", { value: true });
-var comments_1;
 const typeorm_1 = require("typeorm");
 const activity_1 = require("./activity");
-const auth_user_1 = require("./auth_user");
-const comment_mention_1 = require("./comment_mention");
-let comments = comments_1 = class comments {
+const users_profile_1 = require("./users_profile");
+let Comment = Comment_1 = class Comment {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], comments.prototype, "id", void 0);
+], Comment.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: false,
-        name: "comment"
-    }),
+    typeorm_1.Column({ type: 'text', nullable: true }),
     __metadata("design:type", String)
-], comments.prototype, "comment", void 0);
+], Comment.prototype, "comment", void 0);
 __decorate([
-    typeorm_1.Column("timestamp with time zone", {
-        nullable: false,
-        name: "publish_date"
-    }),
+    typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
-], comments.prototype, "publish_date", void 0);
+], Comment.prototype, "publish_date", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => activity_1.activity, (activity) => activity.commentss, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'activity_id' }),
-    __metadata("design:type", activity_1.activity)
-], comments.prototype, "activity", void 0);
+    typeorm_1.ManyToOne(type => activity_1.Activity, a => a.activity_Comments, { onDelete: 'CASCADE' }),
+    __metadata("design:type", activity_1.Activity)
+], Comment.prototype, "activity", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => auth_user_1.auth_user, (auth_user) => auth_user.commentss, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'auth_user_id' }),
-    __metadata("design:type", auth_user_1.auth_user)
-], comments.prototype, "authUser", void 0);
+    typeorm_1.ManyToOne(type => users_profile_1.Profile, p => p.activity_Comments, { onDelete: 'CASCADE' }),
+    __metadata("design:type", users_profile_1.Profile)
+], Comment.prototype, "profile", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => comments_1, (comments) => comments.commentss, {}),
-    typeorm_1.JoinColumn({ name: 'thread_id' }),
-    __metadata("design:type", comments)
-], comments.prototype, "thread", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => comment_mention_1.comment_mention, (comment_mention) => comment_mention.comment),
+    typeorm_1.ManyToMany(type => users_profile_1.Profile, p => p.comment_mentions),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], comments.prototype, "commentMentions", void 0);
+], Comment.prototype, "commentMention", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => comments_1, (comments) => comments.thread),
-    __metadata("design:type", Array)
-], comments.prototype, "commentss", void 0);
-comments = comments_1 = __decorate([
-    typeorm_1.Entity("comments", { schema: "public" }),
-    typeorm_1.Index("comments_activity_id_bc3e877f", ["activity",]),
-    typeorm_1.Index("comments_auth_user_id_e9f0858b", ["authUser",]),
-    typeorm_1.Index("comments_thread_id_8f492724", ["thread",])
-], comments);
-exports.comments = comments;
+    typeorm_1.ManyToOne(type => Comment_1, c => c.thread, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinColumn(),
+    __metadata("design:type", Comment)
+], Comment.prototype, "thread", void 0);
+__decorate([
+    typeorm_1.Column({ default: 0 }),
+    __metadata("design:type", Number)
+], Comment.prototype, "comments_count", void 0);
+Comment = Comment_1 = __decorate([
+    typeorm_1.Entity('comments')
+], Comment);
+exports.Comment = Comment;
 //# sourceMappingURL=comments.js.map

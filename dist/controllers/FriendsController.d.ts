@@ -7,6 +7,8 @@ export declare class FriendsController {
     getAllFriendsRequest(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
     getAllFriends(request: any, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     getSuggestedFriends(request: any, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    makeAllusersFriendWithAdminForDevOnly(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
+    removeAllusersFromFriendWithAdminForDevOnly(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
 }
 export declare function getAllFriendSharedBtwnApp(request: any, response: Response, slug: any): Promise<import("express-serve-static-core").Response | {
     pk: number;

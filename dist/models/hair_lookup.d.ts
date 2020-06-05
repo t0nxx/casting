@@ -1,6 +1,4 @@
-import { users_profile } from "./users_profile";
-export declare class hair_lookup {
+export declare class HairLookup {
     id: number;
-    name: string | null;
-    usersProfiles: users_profile[];
+    name: string;
 }

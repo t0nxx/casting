@@ -1,6 +1,4 @@
-import { users_profile } from "./users_profile";
-export declare class height_range_lookup {
+export declare class HeightRangeLookup {
     id: number;
-    name: string | null;
-    usersProfiles: users_profile[];
+    name: string;
 }

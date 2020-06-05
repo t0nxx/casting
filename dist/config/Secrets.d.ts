@@ -1,4 +1,4 @@
 export declare const JWTSECRET = "CastingSecretKey";
-export declare const AwsAccessKeyId = "AKIASQVWZ6T2FONZSZN2";
-export declare const AwsSecretAccessKey = "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";
+export declare const AwsAccessKeyId = "AKIAWSGMMQIXOWI2OKPS";
+export declare const AwsSecretAccessKey = "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";
 export declare const AwsRegion = "eu-central-1";

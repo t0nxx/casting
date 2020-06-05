@@ -10,5 +10,6 @@ export declare class CompanyController {
     updateCompanyAvatar(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     switchToCompany(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     updateCompanyCover(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    resetCompanyCover(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     deleteCompany(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
 }

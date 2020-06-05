@@ -11,198 +11,186 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const auth_user_1 = require("./auth_user");
-const build_lookup_1 = require("./build_lookup");
-const ethnicities_lookup_1 = require("./ethnicities_lookup");
+const talent_categories_1 = require("./talent_categories");
+const weight_range_lookup_1 = require("./weight_range_lookup");
+const height_range_lookup_1 = require("./height_range_lookup");
 const eye_lookup_1 = require("./eye_lookup");
 const hair_lookup_1 = require("./hair_lookup");
-const height_range_lookup_1 = require("./height_range_lookup");
-const weight_range_lookup_1 = require("./weight_range_lookup");
-const company_1 = require("./company");
-const job_applicants_1 = require("./job_applicants");
-const job_schedules_1 = require("./job_schedules");
-const job_shortlisted_1 = require("./job_shortlisted");
-const profile_album_1 = require("./profile_album");
+const build_lookup_1 = require("./build_lookup");
+const ethnicities_lookup_1 = require("./ethnicities_lookup");
 const profile_hobbies_1 = require("./profile_hobbies");
-const profile_settings_1 = require("./profile_settings");
-const profile_social_networks_1 = require("./profile_social_networks");
-const profile_training_1 = require("./profile_training");
-const profile_viewers_1 = require("./profile_viewers");
-const users_profile_categories_1 = require("./users_profile_categories");
-let users_profile = class users_profile {
+const profile_courses_1 = require("./profile_courses");
+const profile_social_1 = require("./profile_social");
+const company_1 = require("./company");
+const profile_album_1 = require("./profile_album");
+const activity_attachment_1 = require("./activity_attachment");
+const activity_1 = require("./activity");
+const comments_1 = require("./comments");
+const jobs_interview_1 = require("./jobs_interview");
+const jobs_applicants_1 = require("./jobs_applicants");
+const jobs_shortlisted_1 = require("./jobs_shortlisted");
+const activity_reports_1 = require("./activity_reports");
+const notify_notification_1 = require("./notify_notification");
+let Profile = class Profile {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], users_profile.prototype, "id", void 0);
+], Profile.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 150,
-        name: "avatar"
-    }),
+    typeorm_1.Column({ default: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/avatar1.png' }),
     __metadata("design:type", String)
-], users_profile.prototype, "avatar", void 0);
+], Profile.prototype, "avatar", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 150,
-        name: "cover"
-    }),
+    typeorm_1.Column({ default: 'https://casting-secret-new.s3.eu-central-1.amazonaws.com/banner.jpg' }),
     __metadata("design:type", String)
-], users_profile.prototype, "cover", void 0);
+], Profile.prototype, "cover", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "gender"
-    }),
+    typeorm_1.Column({ default: 'male' }),
     __metadata("design:type", String)
-], users_profile.prototype, "gender", void 0);
+], Profile.prototype, "gender", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 150,
-        name: "location"
-    }),
+    typeorm_1.Column({ default: 'Not Provided' }),
     __metadata("design:type", String)
-], users_profile.prototype, "location", void 0);
+], Profile.prototype, "location", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: true,
-        name: "about"
-    }),
+    typeorm_1.Column({ default: 'Not Provided' }),
     __metadata("design:type", String)
-], users_profile.prototype, "about", void 0);
+], Profile.prototype, "birthDate", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        unique: true,
-        length: 50,
-        name: "phone"
-    }),
+    typeorm_1.Column('longtext'),
     __metadata("design:type", String)
-], users_profile.prototype, "phone", void 0);
+], Profile.prototype, "about", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: false,
-        length: 50,
-        name: "slug"
-    }),
+    typeorm_1.Column({ default: 'Not Provided' }),
     __metadata("design:type", String)
-], users_profile.prototype, "slug", void 0);
+], Profile.prototype, "phone", void 0);
 __decorate([
-    typeorm_1.Column("integer", {
-        nullable: true,
-        name: "age_from"
-    }),
+    typeorm_1.Column({ nullable: false, unique: true }),
+    __metadata("design:type", String)
+], Profile.prototype, "slug", void 0);
+__decorate([
+    typeorm_1.Column({ default: 5 }),
     __metadata("design:type", Number)
-], users_profile.prototype, "age_from", void 0);
+], Profile.prototype, "age_from", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => auth_user_1.auth_user, (auth_user) => auth_user.usersProfiles, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'auth_user_id' }),
-    __metadata("design:type", auth_user_1.auth_user)
-], users_profile.prototype, "authUser", void 0);
-__decorate([
-    typeorm_1.ManyToOne(() => build_lookup_1.build_lookup, (build_lookup) => build_lookup.usersProfiles, {}),
-    typeorm_1.JoinColumn({ name: 'build_id' }),
-    __metadata("design:type", build_lookup_1.build_lookup)
-], users_profile.prototype, "build", void 0);
-__decorate([
-    typeorm_1.ManyToOne(() => ethnicities_lookup_1.ethnicities_lookup, (ethnicities_lookup) => ethnicities_lookup.usersProfiles, {}),
-    typeorm_1.JoinColumn({ name: 'ethnicity_id' }),
-    __metadata("design:type", ethnicities_lookup_1.ethnicities_lookup)
-], users_profile.prototype, "ethnicity", void 0);
-__decorate([
-    typeorm_1.ManyToOne(() => eye_lookup_1.eye_lookup, (eye_lookup) => eye_lookup.usersProfiles, {}),
-    typeorm_1.JoinColumn({ name: 'eye_id' }),
-    __metadata("design:type", eye_lookup_1.eye_lookup)
-], users_profile.prototype, "eye", void 0);
-__decorate([
-    typeorm_1.ManyToOne(() => hair_lookup_1.hair_lookup, (hair_lookup) => hair_lookup.usersProfiles, {}),
-    typeorm_1.JoinColumn({ name: 'hair_id' }),
-    __metadata("design:type", hair_lookup_1.hair_lookup)
-], users_profile.prototype, "hair", void 0);
-__decorate([
-    typeorm_1.ManyToOne(() => height_range_lookup_1.height_range_lookup, (height_range_lookup) => height_range_lookup.usersProfiles, {}),
-    typeorm_1.JoinColumn({ name: 'height_id' }),
-    __metadata("design:type", height_range_lookup_1.height_range_lookup)
-], users_profile.prototype, "height", void 0);
-__decorate([
-    typeorm_1.ManyToOne(() => weight_range_lookup_1.weight_range_lookup, (weight_range_lookup) => weight_range_lookup.usersProfiles, {}),
-    typeorm_1.JoinColumn({ name: 'weight_id' }),
-    __metadata("design:type", weight_range_lookup_1.weight_range_lookup)
-], users_profile.prototype, "weight", void 0);
-__decorate([
-    typeorm_1.Column("integer", {
-        nullable: true,
-        name: "age_to"
-    }),
+    typeorm_1.Column({ default: 100 }),
     __metadata("design:type", Number)
-], users_profile.prototype, "age_to", void 0);
+], Profile.prototype, "age_to", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => company_1.company, (company) => company.profile),
-    __metadata("design:type", Array)
-], users_profile.prototype, "companys", void 0);
+    typeorm_1.ManyToOne(type => auth_user_1.User, user => user.profiles, { onDelete: 'CASCADE' }),
+    __metadata("design:type", auth_user_1.User)
+], Profile.prototype, "user", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => job_applicants_1.job_applicants, (job_applicants) => job_applicants.profile),
+    typeorm_1.ManyToMany(type => talent_categories_1.TalentCategories, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], users_profile.prototype, "jobApplicantss", void 0);
+], Profile.prototype, "categories", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => job_schedules_1.job_schedules, (job_schedules) => job_schedules.profile),
+    typeorm_1.ManyToMany(type => profile_hobbies_1.Hobbies, { onDelete: 'CASCADE', eager: true }),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], users_profile.prototype, "jobScheduless", void 0);
+], Profile.prototype, "users_profile_hobbies", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => job_shortlisted_1.job_shortlisted, (job_shortlisted) => job_shortlisted.profile),
+    typeorm_1.ManyToMany(type => profile_courses_1.Courses, { onDelete: 'CASCADE', eager: true }),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], users_profile.prototype, "jobShortlisteds", void 0);
+], Profile.prototype, "users_profile_courses", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => profile_album_1.profile_album, (profile_album) => profile_album.userProfile),
+    typeorm_1.ManyToMany(type => profile_social_1.ProfileSocialNetworks, { onDelete: 'CASCADE', eager: true }),
+    typeorm_1.JoinTable(),
     __metadata("design:type", Array)
-], users_profile.prototype, "profileAlbums", void 0);
+], Profile.prototype, "users_profile_social", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => profile_hobbies_1.profile_hobbies, (profile_hobbies) => profile_hobbies.userProfile),
+    typeorm_1.OneToMany(type => company_1.Company, c => c.profile),
     __metadata("design:type", Array)
-], users_profile.prototype, "profileHobbiess", void 0);
+], Profile.prototype, "companies", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => profile_settings_1.profile_settings, (profile_settings) => profile_settings.userProfile),
+    typeorm_1.OneToMany(type => profile_album_1.ProfileAlbum, p => p.profile),
     __metadata("design:type", Array)
-], users_profile.prototype, "profileSettingss", void 0);
+], Profile.prototype, "albums", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => profile_social_networks_1.profile_social_networks, (profile_social_networks) => profile_social_networks.userProfile),
-    __metadata("design:type", Array)
-], users_profile.prototype, "profileSocialNetworkss", void 0);
+    typeorm_1.ManyToOne(type => weight_range_lookup_1.WeightRangeLookup, { eager: true }),
+    __metadata("design:type", weight_range_lookup_1.WeightRangeLookup)
+], Profile.prototype, "weight", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => profile_training_1.profile_training, (profile_training) => profile_training.userProfile),
-    __metadata("design:type", Array)
-], users_profile.prototype, "profileTrainings", void 0);
+    typeorm_1.ManyToOne(type => height_range_lookup_1.HeightRangeLookup, { eager: true }),
+    __metadata("design:type", height_range_lookup_1.HeightRangeLookup)
+], Profile.prototype, "height", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => profile_viewers_1.profile_viewers, (profile_viewers) => profile_viewers.userProfile),
-    __metadata("design:type", Array)
-], users_profile.prototype, "profileViewerss", void 0);
+    typeorm_1.ManyToOne(type => eye_lookup_1.EyeLookup, { eager: true }),
+    __metadata("design:type", eye_lookup_1.EyeLookup)
+], Profile.prototype, "eye", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => profile_viewers_1.profile_viewers, (profile_viewers) => profile_viewers.visitorProfile),
-    __metadata("design:type", Array)
-], users_profile.prototype, "profileViewerss2", void 0);
+    typeorm_1.ManyToOne(type => hair_lookup_1.HairLookup, { eager: true }),
+    __metadata("design:type", hair_lookup_1.HairLookup)
+], Profile.prototype, "hair", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => users_profile_categories_1.users_profile_categories, (users_profile_categories) => users_profile_categories.userProfile),
+    typeorm_1.ManyToOne(type => build_lookup_1.BuildLookup, { eager: true }),
+    __metadata("design:type", build_lookup_1.BuildLookup)
+], Profile.prototype, "build", void 0);
+__decorate([
+    typeorm_1.ManyToOne(type => ethnicities_lookup_1.EthnicitiesLookup, { eager: true }),
+    __metadata("design:type", ethnicities_lookup_1.EthnicitiesLookup)
+], Profile.prototype, "ethnicity", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_attachment_1.ActivityAttachment, ac => ac.profile),
     __metadata("design:type", Array)
-], users_profile.prototype, "usersProfileCategoriess", void 0);
-users_profile = __decorate([
-    typeorm_1.Entity("users_profile", { schema: "public" }),
-    typeorm_1.Index("users_profile_auth_user_id_6e00984f", ["authUser",]),
-    typeorm_1.Index("users_profile_build_id_5c61d7f6", ["build",]),
-    typeorm_1.Index("users_profile_ethnicity_id_f8c974d4", ["ethnicity",]),
-    typeorm_1.Index("users_profile_eye_id_0cae2b23", ["eye",]),
-    typeorm_1.Index("users_profile_hair_id_21319060", ["hair",]),
-    typeorm_1.Index("users_profile_height_id_f83e4305", ["height",]),
-    typeorm_1.Index("users_profile_phone_key", ["phone",], { unique: true }),
-    typeorm_1.Index("users_profile_phone_0ff15728_like", ["phone",]),
-    typeorm_1.Index("users_profile_slug_809f9137", ["slug",]),
-    typeorm_1.Index("users_profile_slug_809f9137_like", ["slug",]),
-    typeorm_1.Index("users_profile_weight_id_fabe992c", ["weight",])
-], users_profile);
-exports.users_profile = users_profile;
+], Profile.prototype, "activity_attachment", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_1.Activity, a => a.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_likers),
+    __metadata("design:type", Array)
+], Profile.prototype, "likes", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_dislikers),
+    __metadata("design:type", Array)
+], Profile.prototype, "dislikes", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_bookmarks),
+    __metadata("design:type", Array)
+], Profile.prototype, "bookmarks", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activity_hidden),
+    __metadata("design:type", Array)
+], Profile.prototype, "hidden", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => activity_1.Activity, ac => ac.activityMention),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity_mentions", void 0);
+__decorate([
+    typeorm_1.ManyToMany(type => comments_1.Comment, c => c.commentMention),
+    __metadata("design:type", Array)
+], Profile.prototype, "comment_mentions", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => comments_1.Comment, c => c.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity_Comments", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => notify_notification_1.Notification, n => n.recipient),
+    __metadata("design:type", Array)
+], Profile.prototype, "notifications", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_interview_1.JobInterview, j => j.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "interview_jobs", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_applicants_1.JobApplicants, j => j.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "applied_jobs", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => jobs_shortlisted_1.JobShortlist, j => j.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "shortlisted_jobs", void 0);
+__decorate([
+    typeorm_1.OneToMany(type => activity_reports_1.ActivityReports, a => a.profile),
+    __metadata("design:type", Array)
+], Profile.prototype, "activity_reports", void 0);
+Profile = __decorate([
+    typeorm_1.Entity('users_profile')
+], Profile);
+exports.Profile = Profile;
 //# sourceMappingURL=users_profile.js.map

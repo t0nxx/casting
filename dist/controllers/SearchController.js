@@ -1,20 +1,23 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const company_1 = require("../models/newModels/company");
-const users_profile_1 = require("../models/newModels/users_profile");
-const auth_user_1 = require("../models/newModels/auth_user");
-const jobs_1 = require("../models/newModels/jobs");
+const company_1 = require("../models/company");
+const users_profile_1 = require("../models/users_profile");
+const auth_user_1 = require("../models/auth_user");
+const jobs_1 = require("../models/jobs");
 const pagination_1 = require("../helpers/pagination");
-const jobs_applicants_1 = require("../models/newModels/jobs_applicants");
+const jobs_applicants_1 = require("../models/jobs_applicants");
+const FriendsController_1 = require("./FriendsController");
+const who_see_me_1 = require("../models/who_see_me");
 class SearchController {
     searchJobs(request, response, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -57,13 +60,13 @@ class SearchController {
                     let job_category = [];
                     job_category = element.category;
                     delete element.category;
-                    return Object.assign({}, element, { job_category });
+                    return Object.assign(Object.assign({}, element), { job_category });
                 });
                 return response.status(200).send(jobs);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -72,9 +75,11 @@ class SearchController {
             const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
             const companyRepository = typeorm_1.getRepository(company_1.Company);
             try {
-                const user = yield profileRepository.findOne({ slug: request['user'].username });
+                const profile = yield profileRepository.findOne({ slug: request['user'].username });
                 const q = companyRepository.createQueryBuilder('c')
                     .leftJoin('c.followers', 'followers')
+                    .leftJoin('c.profile', 'profile')
+                    .addSelect(['followers.id', 'profile.id'])
                     .orderBy('c.id', 'DESC');
                 if (request.query.search && request.query.search !== null) {
                     q.andWhere(`c.name like '%${request.query.search}%' `);
@@ -96,11 +101,25 @@ class SearchController {
                     q.leftJoinAndSelect('c.tags', 'tags');
                 }
                 const compaines = yield pagination_1.ApplyPagination(request, response, q, false);
+                compaines.results = compaines.results.map(element => {
+                    let is_follow = false;
+                    let is_admin = false;
+                    if (element.profile.id === profile.id) {
+                        is_admin = true;
+                    }
+                    const isfollowCompany = element.followers.find(f => f.id === profile.id);
+                    if (isfollowCompany) {
+                        is_follow = true;
+                    }
+                    delete element.followers;
+                    delete element.profile;
+                    return Object.assign(Object.assign({}, element), { is_admin, is_follow });
+                });
                 return response.status(200).send(compaines);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -173,6 +192,8 @@ class SearchController {
                         .addSelect(['activity_attachment.id', 'activity_attachment.type']);
                 }
                 const people = yield pagination_1.ApplyPagination(request, response, q, false);
+                const friends = yield FriendsController_1.getAllFriendSharedBtwnApp(request, response, user.slug);
+                const friendsArray = friends.map(e => e.pk);
                 people.results = people.results.map(e => {
                     const { first_name, last_name, email, username } = e['user'];
                     const auth_user = {
@@ -182,14 +203,90 @@ class SearchController {
                     const has_photo = e.activity_attachment.some(a => a.type === 'IMG');
                     const has_audio = e.activity_attachment.some(a => a.type === 'AUDIO');
                     const has_video = e.activity_attachment.some(a => a.type === 'VIDEO');
-                    return Object.assign({}, e, { auth_user, has_photo, has_video, has_audio });
+                    let is_friends = false;
+                    let isFriendWithMe = friendsArray.includes(e.id);
+                    if (isFriendWithMe) {
+                        is_friends = true;
+                    }
+                    return Object.assign(Object.assign({}, e), { auth_user, is_friends, has_photo, has_video, has_audio });
                 });
                 people.results = people.results.filter(e => e.id !== user.id);
                 return response.status(200).send(people);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
+            }
+        });
+    }
+    searchPeopleLandingPage(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const userRepository = typeorm_1.getRepository(auth_user_1.User);
+            try {
+                const q = profileRepository.createQueryBuilder('p')
+                    .innerJoinAndMapOne('p.user', auth_user_1.User, 'user', 'user.id = p.userId')
+                    .leftJoinAndSelect('p.weight', 'weight')
+                    .leftJoinAndSelect('p.height', 'height')
+                    .leftJoinAndSelect('p.eye', 'eye')
+                    .leftJoinAndSelect('p.hair', 'hair')
+                    .leftJoinAndSelect('p.build', 'build')
+                    .leftJoinAndSelect('p.ethnicity', 'ethnicity');
+                if (request.query.search && request.query.search !== null) {
+                    q.andWhere(`user.username like '%${request.query.search}%' or user.first_name like '%${request.query.search}%' or user.last_name like '%${request.query.search}%'`);
+                }
+                const people = yield pagination_1.ApplyPagination(request, response, q, false);
+                people.results = people.results.map(e => {
+                    const { first_name, last_name, email, username } = e['user'];
+                    const auth_user = {
+                        first_name, last_name, email, username, pk: e.id,
+                    };
+                    const has_photo = true;
+                    const has_audio = true;
+                    const has_video = true;
+                    const is_friends = false;
+                    return Object.assign(Object.assign({}, e), { auth_user, is_friends, has_photo, has_video, has_audio });
+                });
+                return response.status(200).send(people);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ error: err });
+            }
+        });
+    }
+    getWhoSeeMePeople(request, response, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const profileRepository = typeorm_1.getRepository(users_profile_1.Profile);
+            const userRepository = typeorm_1.getRepository(auth_user_1.User);
+            const whoSeeMeRepository = typeorm_1.getRepository(who_see_me_1.WhoSeeMe);
+            try {
+                const user = yield profileRepository.findOne({ slug: request['user'].username });
+                const q = whoSeeMeRepository.createQueryBuilder('w')
+                    .innerJoinAndMapOne('w.viewer', users_profile_1.Profile, 'profile', 'profile.id = w.viewer')
+                    .innerJoinAndMapOne('w.user', auth_user_1.User, 'user', 'profile.userId = user.id')
+                    .where(`w.viewed = ${user.id}`);
+                const people = yield pagination_1.ApplyPagination(request, response, q, false);
+                const friends = yield FriendsController_1.getAllFriendSharedBtwnApp(request, response, user.slug);
+                const friendsArray = friends.map(e => e.pk);
+                people.results = people.results.map(e => {
+                    const { first_name, last_name, email, username } = e['user'];
+                    const auth_user = {
+                        first_name, last_name, email, username, pk: e.viewer.id,
+                    };
+                    delete e['user'];
+                    let is_friends = false;
+                    let isFriendWithMe = friendsArray.includes(e.viewer.id);
+                    if (isFriendWithMe) {
+                        is_friends = true;
+                    }
+                    return Object.assign(Object.assign({}, e.viewer), { auth_user, is_friends });
+                });
+                return response.status(200).send(people);
+            }
+            catch (error) {
+                const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -208,7 +305,7 @@ class SearchController {
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -221,20 +318,22 @@ class SearchController {
                 const myCate = user.categories.map(e => e.id);
                 const q = JobRepository.createQueryBuilder('j')
                     .innerJoinAndSelect('j.company', 'company')
-                    .innerJoinAndSelect('j.category', 'category', `category.id In (${myCate})`)
                     .orderBy('j.id', 'DESC');
+                if (myCate.length > 1) {
+                    q.innerJoinAndSelect('j.category', 'category', `category.id In (${myCate})`);
+                }
                 const jobs = yield pagination_1.ApplyPagination(request, response, q, false);
                 jobs.results = jobs.results.map(element => {
                     let job_category = [];
                     job_category = element.category;
                     delete element.category;
-                    return Object.assign({}, element, { job_category });
+                    return Object.assign(Object.assign({}, element), { job_category });
                 });
                 return response.status(200).send(jobs);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }
@@ -251,13 +350,13 @@ class SearchController {
                     .orderBy('j.id', 'DESC');
                 const jobs = yield pagination_1.ApplyPagination(request, response, q, false);
                 jobs.results = jobs.results.map(element => {
-                    return Object.assign({}, element.job, { company: element.company });
+                    return Object.assign(Object.assign({}, element.job), { company: element.company });
                 });
                 return response.status(200).send(jobs);
             }
             catch (error) {
                 const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-                return response.status(400).send({ success: false, error: err });
+                return response.status(400).send({ error: err });
             }
         });
     }

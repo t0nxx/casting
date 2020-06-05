@@ -1,10 +1,9 @@
-import { auth_user } from "./auth_user";
-import { account_emailconfirmation } from "./account_emailconfirmation";
-export declare class account_emailaddress {
+import { User } from './auth_user';
+export declare class AccountEmailaddresss {
     id: number;
     email: string;
     verified: boolean;
     primary: boolean;
-    user: auth_user | null;
-    accountEmailconfirmations: account_emailconfirmation[];
+    ConfirmKey: string;
+    user: User;
 }

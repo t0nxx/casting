@@ -10,33 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const users_profile_1 = require("./users_profile");
-let hair_lookup = class hair_lookup {
+let HairLookup = class HairLookup {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], hair_lookup.prototype, "id", void 0);
+], HairLookup.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        unique: true,
-        length: 50,
-        name: "name"
-    }),
+    typeorm_1.Column({ unique: true }),
     __metadata("design:type", String)
-], hair_lookup.prototype, "name", void 0);
-__decorate([
-    typeorm_1.OneToMany(() => users_profile_1.users_profile, (users_profile) => users_profile.hair),
-    __metadata("design:type", Array)
-], hair_lookup.prototype, "usersProfiles", void 0);
-hair_lookup = __decorate([
-    typeorm_1.Entity("hair_lookup", { schema: "public" }),
-    typeorm_1.Index("hair_lookup_name_key", ["name",], { unique: true }),
-    typeorm_1.Index("hair_lookup_name_065f4ae1_like", ["name",])
-], hair_lookup);
-exports.hair_lookup = hair_lookup;
+], HairLookup.prototype, "name", void 0);
+HairLookup = __decorate([
+    typeorm_1.Entity('hair_lookup')
+], HairLookup);
+exports.HairLookup = HairLookup;
 //# sourceMappingURL=hair_lookup.js.map

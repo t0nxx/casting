@@ -11,121 +11,98 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const users_profile_1 = require("./users_profile");
-let profile_settings = class profile_settings {
+var settingsView;
+(function (settingsView) {
+    settingsView["ONLY_FRIENDS"] = "ONLY_FRIENDS";
+    settingsView["COMPANY"] = "COMPANY";
+    settingsView["ALL"] = "ALL";
+})(settingsView = exports.settingsView || (exports.settingsView = {}));
+var myStatus;
+(function (myStatus) {
+    myStatus["ONLINE"] = "ONLINE";
+    myStatus["OFFLINE"] = "OFFLINE";
+})(myStatus = exports.myStatus || (exports.myStatus = {}));
+let ProfileSettings = class ProfileSettings {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
-        type: "integer",
-        name: "id"
-    }),
+    typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], profile_settings.prototype, "id", void 0);
+], ProfileSettings.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "can_see_profile"
-    }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
-], profile_settings.prototype, "can_see_profile", void 0);
+], ProfileSettings.prototype, "can_see_profile", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "can_see_wall"
-    }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
-], profile_settings.prototype, "can_see_wall", void 0);
+], ProfileSettings.prototype, "can_see_wall", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "can_comment"
-    }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
-], profile_settings.prototype, "can_comment", void 0);
+], ProfileSettings.prototype, "can_comment", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "can_contact_info"
-    }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
-], profile_settings.prototype, "can_contact_info", void 0);
+], ProfileSettings.prototype, "can_contact_info", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "can_send_message"
-    }),
+    typeorm_1.Column({ default: settingsView.ALL }),
     __metadata("design:type", String)
-], profile_settings.prototype, "can_send_message", void 0);
+], ProfileSettings.prototype, "can_send_message", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "response_all_time"
-    }),
+    typeorm_1.Column({ default: settingsView.ALL }),
+    __metadata("design:type", String)
+], ProfileSettings.prototype, "can_see_friends", void 0);
+__decorate([
+    typeorm_1.Column({ default: settingsView.ALL }),
+    __metadata("design:type", String)
+], ProfileSettings.prototype, "can_see_phone", void 0);
+__decorate([
+    typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
-], profile_settings.prototype, "response_all_time", void 0);
+], ProfileSettings.prototype, "response_all_time", void 0);
 __decorate([
-    typeorm_1.Column("timestamp with time zone", {
-        nullable: true,
-        name: "response_from"
-    }),
+    typeorm_1.Column({ default: null }),
     __metadata("design:type", Date)
-], profile_settings.prototype, "response_from", void 0);
+], ProfileSettings.prototype, "response_from", void 0);
 __decorate([
-    typeorm_1.Column("timestamp with time zone", {
-        nullable: true,
-        name: "response_to"
-    }),
+    typeorm_1.Column({ default: null }),
     __metadata("design:type", Date)
-], profile_settings.prototype, "response_to", void 0);
+], ProfileSettings.prototype, "response_to", void 0);
 __decorate([
-    typeorm_1.Column("text", {
-        nullable: true,
-        name: "response_message"
-    }),
+    typeorm_1.Column('longtext'),
     __metadata("design:type", String)
-], profile_settings.prototype, "response_message", void 0);
+], ProfileSettings.prototype, "response_message", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "auto_play_video"
-    }),
+    typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
-], profile_settings.prototype, "auto_play_video", void 0);
+], ProfileSettings.prototype, "auto_play_video", void 0);
 __decorate([
-    typeorm_1.Column("boolean", {
-        nullable: false,
-        name: "jobs_notification"
-    }),
+    typeorm_1.Column({ default: false }),
     __metadata("design:type", Boolean)
-], profile_settings.prototype, "jobs_notification", void 0);
+], ProfileSettings.prototype, "jobs_notification", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => users_profile_1.users_profile, (users_profile) => users_profile.profileSettingss, { nullable: false, }),
-    typeorm_1.JoinColumn({ name: 'user_profile_id' }),
-    __metadata("design:type", users_profile_1.users_profile)
-], profile_settings.prototype, "userProfile", void 0);
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], ProfileSettings.prototype, "mute_all_chats", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "can_see_friends"
-    }),
+    typeorm_1.Column({ default: true }),
+    __metadata("design:type", Boolean)
+], ProfileSettings.prototype, "sound_alert", void 0);
+__decorate([
+    typeorm_1.Column({ default: myStatus.ONLINE }),
     __metadata("design:type", String)
-], profile_settings.prototype, "can_see_friends", void 0);
+], ProfileSettings.prototype, "my_status", void 0);
 __decorate([
-    typeorm_1.Column("character varying", {
-        nullable: true,
-        length: 50,
-        name: "my_status"
-    }),
-    __metadata("design:type", String)
-], profile_settings.prototype, "my_status", void 0);
-profile_settings = __decorate([
-    typeorm_1.Entity("profile_settings", { schema: "public" }),
-    typeorm_1.Index("profile_settings_user_profile_id_1e134e75", ["userProfile",])
-], profile_settings);
-exports.profile_settings = profile_settings;
+    typeorm_1.CreateDateColumn(),
+    __metadata("design:type", Date)
+], ProfileSettings.prototype, "latest_action", void 0);
+__decorate([
+    typeorm_1.OneToOne(type => users_profile_1.Profile, { onDelete: 'CASCADE' }),
+    typeorm_1.JoinColumn(),
+    __metadata("design:type", users_profile_1.Profile)
+], ProfileSettings.prototype, "profile", void 0);
+ProfileSettings = __decorate([
+    typeorm_1.Entity('profile_settings')
+], ProfileSettings);
+exports.ProfileSettings = ProfileSettings;
 //# sourceMappingURL=profile_settings.js.map

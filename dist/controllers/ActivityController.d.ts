@@ -19,5 +19,6 @@ export declare class ActivityController {
     getAllImagesOfUser(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
     getAllImagesOfAlbum(request: Request, response: Response): Promise<import("express-serve-static-core").Response>;
     addImageToAlbum(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
+    reomveImageFromAlbum(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
     deleteActivity(request: Request, response: Response, next: NextFunction): Promise<import("express-serve-static-core").Response>;
 }

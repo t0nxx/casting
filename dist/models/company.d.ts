@@ -1,22 +1,21 @@
-import { users_profile } from "./users_profile";
-import { activity } from "./activity";
-import { company_tags } from "./company_tags";
-import { jobs } from "./jobs";
-export declare class company {
+import { Profile } from './users_profile';
+import { TalentCategories } from './talent_categories';
+import { Activity } from './activity';
+export declare class Company {
     id: number;
-    avatar: string | null;
-    cover: string | null;
+    avatar: string;
+    cover: string;
     name: string;
-    about: string | null;
-    headquarter: string | null;
+    about: string;
+    headquarter: string;
     is_address_public: boolean;
-    website: string | null;
-    since: string | null;
-    size_from: number | null;
-    size_to: number | null;
+    website: string;
+    since: string;
+    size_from: number;
+    size_to: number;
     slug: string;
-    profile: users_profile | null;
-    activitys: activity[];
-    companyTagss: company_tags[];
-    jobss: jobs[];
+    profile: Profile;
+    tags: TalentCategories[];
+    followers: Profile[];
+    activity: Activity[];
 }
