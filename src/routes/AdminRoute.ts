@@ -22,7 +22,7 @@ const adminSendMailsController = new AdminSendMailsController();
 const ignoredEmailsFromNewsletterController = new IgnoredEmailsFromNewsletterController()
 const authController = new AuthController();
 // not add auth middle ware in dev 
-router.post('/login', AuthMiddleWare, authController.adminLogin);
+router.post('/login', authController.adminLogin);
 router.get('/notifications', AuthMiddleWare, notificationController.getAllNotificationsForAdmin);
 router.post('/notifications', AuthMiddleWare, notificationController.addNotificationsFromAdmin);
 
