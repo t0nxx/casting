@@ -11,7 +11,7 @@ import { AdminSendMailsController } from '../controllers/dashboard/newslettersma
 import { IgnoredEmailsFromNewsletterController } from '../controllers/dashboard/newsLetterIgnoredEmails';
 
 const router = Router();
-router.use(AuthMiddleWare);
+// router.use(AuthMiddleWare);
 const adminLookupsController = new AdminLookupsController();
 const adminAdditionController = new AdminAdditionController();
 const notificationController = new NotificationsController();
@@ -22,54 +22,54 @@ const adminSendMailsController = new AdminSendMailsController();
 const ignoredEmailsFromNewsletterController = new IgnoredEmailsFromNewsletterController()
 const authController = new AuthController();
 // not add auth middle ware in dev 
-router.post('/login', authController.adminLogin);
-router.get('/notifications', notificationController.getAllNotificationsForAdmin);
-router.post('/notifications', notificationController.addNotificationsFromAdmin);
+router.post('/login', AuthMiddleWare, authController.adminLogin);
+router.get('/notifications', AuthMiddleWare, notificationController.getAllNotificationsForAdmin);
+router.post('/notifications', AuthMiddleWare, notificationController.addNotificationsFromAdmin);
 
-router.get('/user', adminAdditionController.getAllUsers);
-router.get('/user/:id', adminAdditionController.getOneUser);
-router.put('/user/:id', adminAdditionController.updateUser);
-router.delete('/user/:id', adminAdditionController.deleteUser);
-
-
-router.get('/company', adminCompaniesController.getAllCompanies);
-router.get('/company/:id', adminCompaniesController.getOneCompanies);
-router.delete('/company/:id', adminCompaniesController.deleteOneCompanies);
-
-router.get('/jobs', adminJobsController.getAllJobs);
-router.get('/jobs/:id', adminJobsController.getOneJobs);
-router.delete('/jobs/:id', adminJobsController.deleteOneJobs);
+router.get('/user', AuthMiddleWare, adminAdditionController.getAllUsers);
+router.get('/user/:id', AuthMiddleWare, adminAdditionController.getOneUser);
+router.put('/user/:id', AuthMiddleWare, adminAdditionController.updateUser);
+router.delete('/user/:id', AuthMiddleWare, adminAdditionController.deleteUser);
 
 
-router.get('/getmaildesgin', adminSendMailsController.getHtmlMailTemplate);
-router.post('/savemaildesgin', adminSendMailsController.saveHtmlMailTemplate);
-router.post('/sendnewslettermail', adminSendMailsController.sendNewsLetterMail);
+router.get('/company', AuthMiddleWare, adminCompaniesController.getAllCompanies);
+router.get('/company/:id', AuthMiddleWare, adminCompaniesController.getOneCompanies);
+router.delete('/company/:id', AuthMiddleWare, adminCompaniesController.deleteOneCompanies);
+
+router.get('/jobs', AuthMiddleWare, adminJobsController.getAllJobs);
+router.get('/jobs/:id', AuthMiddleWare, adminJobsController.getOneJobs);
+router.delete('/jobs/:id', AuthMiddleWare, adminJobsController.deleteOneJobs);
 
 
-router.get('/ignoredfrommails', ignoredEmailsFromNewsletterController.getAllIgnoredEmailsFromNewsletter);
-router.post('/ignoredfrommails', ignoredEmailsFromNewsletterController.createNewIgnoredEmailsFromNewsletter);
-router.get('/ignoredfrommails/:id', ignoredEmailsFromNewsletterController.getOneIgnoredEmailsFromNewsletter);
-router.put('/ignoredfrommails/:id', ignoredEmailsFromNewsletterController.updateOneIgnoredEmailsFromNewsletter);
-router.delete('/ignoredfrommails/:id', ignoredEmailsFromNewsletterController.deleteOneIgnoredEmailsFromNewsletter);
+router.get('/getmaildesgin', AuthMiddleWare, adminSendMailsController.getHtmlMailTemplate);
+router.post('/savemaildesgin', AuthMiddleWare, adminSendMailsController.saveHtmlMailTemplate);
+router.post('/sendnewslettermail', AuthMiddleWare, adminSendMailsController.sendNewsLetterMail);
 
 
-router.get('/advertisement', advertisementController.getAllAdvertisement);
-router.post('/advertisement', advertisementController.createNewAdvertisement);
-router.get('/advertisement/:id', advertisementController.getOneAdvertisement);
-router.put('/advertisement/:id', advertisementController.updateOneAdvertisement);
-router.delete('/advertisement/:id', advertisementController.deleteOneAdvertisement);
+router.get('/ignoredfrommails', AuthMiddleWare, ignoredEmailsFromNewsletterController.getAllIgnoredEmailsFromNewsletter);
+router.post('/ignoredfrommails', AuthMiddleWare, ignoredEmailsFromNewsletterController.createNewIgnoredEmailsFromNewsletter);
+router.get('/ignoredfrommails/:id', AuthMiddleWare, ignoredEmailsFromNewsletterController.getOneIgnoredEmailsFromNewsletter);
+router.put('/ignoredfrommails/:id', AuthMiddleWare, ignoredEmailsFromNewsletterController.updateOneIgnoredEmailsFromNewsletter);
+router.delete('/ignoredfrommails/:id', AuthMiddleWare, ignoredEmailsFromNewsletterController.deleteOneIgnoredEmailsFromNewsletter);
 
 
-router.get('/reports', adminAdditionController.getActivityReports);
-router.delete('/reports/:id', adminAdditionController.deleteReportedActivityFromAdmin);
+router.get('/advertisement', AuthMiddleWare, advertisementController.getAllAdvertisement);
+router.post('/advertisement', AuthMiddleWare, advertisementController.createNewAdvertisement);
+router.get('/advertisement/:id', AuthMiddleWare, advertisementController.getOneAdvertisement);
+router.put('/advertisement/:id', AuthMiddleWare, advertisementController.updateOneAdvertisement);
+router.delete('/advertisement/:id', AuthMiddleWare, advertisementController.deleteOneAdvertisement);
+
+
+router.get('/reports', AuthMiddleWare, adminAdditionController.getActivityReports);
+router.delete('/reports/:id', AuthMiddleWare, adminAdditionController.deleteReportedActivityFromAdmin);
 
 
 
-router.get('/:lookupRepo', adminLookupsController.getAllTemplate);
-router.get('/:lookupRepo/:id', adminLookupsController.getOneTemplate);
-router.post('/:lookupRepo', adminLookupsController.createNewTemplate);
-router.put('/:lookupRepo/:id', adminLookupsController.updateOneTemplate);
-router.delete('/:lookupRepo/:id', adminLookupsController.deleteOneTemplate);
+router.get('/:lookupRepo', AuthMiddleWare, adminLookupsController.getAllTemplate);
+router.get('/:lookupRepo/:id', AuthMiddleWare, adminLookupsController.getOneTemplate);
+router.post('/:lookupRepo', AuthMiddleWare, adminLookupsController.createNewTemplate);
+router.put('/:lookupRepo/:id', AuthMiddleWare, adminLookupsController.updateOneTemplate);
+router.delete('/:lookupRepo/:id', AuthMiddleWare, adminLookupsController.deleteOneTemplate);
 
 
 
