@@ -2,29 +2,6 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn, CreateDateColumn, Ge
 import { IsNotEmpty, IsEmail, MinLength } from 'class-validator';
 import { AccountEmailaddresss } from './account_emailaddress';
 import { Profile } from './users_profile';
-// import {account_emailaddress} from "./account_emailaddress";
-// import {activity} from "./activity";
-// import {activity_attachment} from "./activity_attachment";
-// import {activity_bookmark} from "./activity_bookmark";
-// import {activity_control} from "./activity_control";
-// import {activity_ignore} from "./activity_ignore";
-// import {activity_mention} from "./activity_mention";
-// import {activity_report} from "./activity_report";
-// import {activity_social_actions} from "./activity_social_actions";
-// import {auth_user_groups} from "./auth_user_groups";
-// import {auth_user_user_permissions} from "./auth_user_user_permissions";
-// import {authtoken_token} from "./authtoken_token";
-// import {comment_mention} from "./comment_mention";
-// import {comments} from "./comments";
-// import {django_admin_log} from "./django_admin_log";
-// import {friendship_block} from "./friendship_block";
-// import {friendship_follow} from "./friendship_follow";
-// import {friendship_friend} from "./friendship_friend";
-// import {friendship_friendshiprequest} from "./friendship_friendshiprequest";
-// import {notify_notification} from "./notify_notification";
-// import {socialaccount_socialaccount} from "./socialaccount_socialaccount";
-// import {users_profile} from "./users_profile";
-
 
 @Entity('auth_user')
 export class User {
