@@ -1,15 +1,18 @@
-import { sendMailWithCustomHtmlTemplate } from '../helpers/sendMail';
+import { sendMailWithCustomHtmlTemplate, sendNewJobToMail } from '../helpers/sendMail';
 
 export enum EmailsToSendType {
     NewsLetter = 'NewsLetter',
     NewJobAdded = 'NewJobAdded',
 }
 
+
 export interface EmailQueueInterface {
     type: EmailsToSendType;
     recipients: string[];
     htmlTemplate?: string;
-
+    jobTitle?: string;
+    jobDescription?: string;
+    jobLink?: string;
 }
 
 export default async function ({ data }) {
@@ -19,7 +22,7 @@ export default async function ({ data }) {
                 sendMailWithCustomHtmlTemplate(data.recipients, data.htmlTemplate);
                 break;
             case EmailsToSendType.NewJobAdded:
-                // toDo();
+                sendNewJobToMail(data.recipients, data.jobTitle, data.jobDescription, data.jobLink);
                 break;
             default:
                 break;

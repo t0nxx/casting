@@ -11,10 +11,12 @@ import { JobInterview } from '../models/jobs_interview';
 import { JobApplicants } from '../models/jobs_applicants';
 import { JobShortlist } from '../models/jobs_shortlisted';
 import { transformAndValidate } from 'class-transformer-validator';
-import { notificationQueue } from '../main';
+import { notificationQueue, sendEmailsQueue } from '../main';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 import { sendInterviewDate } from '../helpers/sendMail';
 import * as moment from 'moment-timezone';
+import { IgnoredMailsFromNewsletter } from '../models/ignored_users_from_newsletter';
+import { EmailQueueInterface, EmailsToSendType } from '../jobs/SendEmails';
 
 class JobsController {
 
@@ -100,6 +102,8 @@ class JobsController {
         const companyRepository = getRepository(Company);
         const JobRepository = getRepository(Jobs);
         const talentCategoryRepository = getRepository(TalentCategories);
+        const userRepository = getRepository(User);
+        const ignoredUsersFromSendRepository = getRepository(IgnoredMailsFromNewsletter);
         try {
             const company = await companyRepository.createQueryBuilder('q')
                 .leftJoin('q.followers', 'followers')
@@ -135,7 +139,26 @@ class JobsController {
                     recipient: e.id,
                 }
                 await notificationQueue.add(notiToQueu);
-            })
+            });
+
+            const users = (await userRepository.find({ select: ['email'] })).map(e => e.email)
+            const ignoredUsersFromSend = await (await ignoredUsersFromSendRepository.find({ select: ['email'] })).map(e => e.email)
+            const jobLink = `https://castingsecret.com/job/job-page/${save.slug}/${company.slug}`;
+
+            // const usersToSent = _.difference(users, ignoredUsersFromSend);
+            const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
+            /**
+             * send mail function here
+             */
+            const newEmailToSend: EmailQueueInterface = {
+                type: EmailsToSendType.NewJobAdded,
+                recipients: usersToSent,
+                jobTitle: save.title,
+                jobDescription: save.description,
+                jobLink,
+            }
+
+            await sendEmailsQueue.add(newEmailToSend);
 
             return response.status(200).send({ success: true, slug: save.slug });
         } catch (error) {
