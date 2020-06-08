@@ -1,13 +1,10 @@
 import { Router } from 'express';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
-import { ActivityController } from '../controllers/ActivityController';
-import { CommentController } from '../controllers/CommentController';
-import { AdvertisementController } from '../controllers/dashboard/advertisements';
+import { activityController } from '../controllers/ActivityController';
+import { commentController } from '../controllers/CommentController';
+import { advertisementController } from '../controllers/dashboard/advertisements';
 
 const router = Router();
-const activityController = new ActivityController();
-const commentController = new CommentController();
-const advertisementController = new AdvertisementController();
 
 router.get('/', AuthMiddleWare, activityController.getAllActivityTest);
 router.get('/advertisement', AuthMiddleWare, advertisementController.getAllAdvertisement);

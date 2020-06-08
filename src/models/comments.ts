@@ -31,18 +31,4 @@ export class Comment {
     @Column({ default: 0 })
     comments_count: number;
 
-    // @ManyToOne(() => auth_user, (auth_user: auth_user) => auth_user.commentss, { nullable: false, })
-    // @JoinColumn({ name: 'auth_user_id' })
-    // authUser: auth_user | null;
-
-    // @ManyToOne(() => comments, (comments: comments) => comments.commentss, {})
-    // @JoinColumn({ name: 'thread_id' })
-    // thread: comments | null;
-
-    // @OneToMany(() => comment_mention, (comment_mention: comment_mention) => comment_mention.comment)
-    // commentMentions: comment_mention[];
-
-    // @OneToMany(() => comments, (comments: comments) => comments.thread)
-    // commentss: comments[];
-
 }

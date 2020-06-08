@@ -4,12 +4,12 @@ import { User } from '../../models/auth_user';
 import { Jobs } from '../../models/jobs';
 import { UploadToS3 } from '../../helpers/awsUploader';
 
-export class AdminJobsController {
+class AdminJobsController {
 
     async getAllJobs(request: Request, response: Response, next: NextFunction) {
         try {
             const JobsRepository = getRepository(Jobs);
-            const [data, count] = await JobsRepository.findAndCount({order : {id : 'DESC'}});
+            const [data, count] = await JobsRepository.findAndCount({ order: { id: 'DESC' } });
             return response.status(200).send({ data, count });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
@@ -81,3 +81,5 @@ export class AdminJobsController {
     }
 
 }
+
+export const adminJobsController = new AdminJobsController();

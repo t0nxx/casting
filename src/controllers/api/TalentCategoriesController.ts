@@ -4,7 +4,7 @@ import { TalentCategories } from '../../models/talent_categories';
 import { transformAndValidate } from 'class-transformer-validator';
 
 
-export class TalentCategoriesController {
+class TalentCategoriesController {
 
     /**
     * @Get All
@@ -50,3 +50,4 @@ export class TalentCategoriesController {
 
     }
 }
+export const talentCategoriesController = new TalentCategoriesController();

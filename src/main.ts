@@ -34,8 +34,6 @@ const app = express();
 const server = app.listen(3000, () => 'running on port 3000');
 const io = socketio(server);
 app.set('io', io);
-// get it from any place 
-//  const ioS = request.app.get('io');
 
 /**
  * Here i'm storing the socket id for each user in the session
@@ -48,7 +46,7 @@ const sessionMiddleware = expsession({
 
 // run session middleware for regular http connections
 app.use(sessionMiddleware);
-app.use(cookieParser())
+app.use(cookieParser());
 
 // run session middleware for socket.io connections
 io.use((socket, next) => {
@@ -86,9 +84,6 @@ createConnection().then(async connection => {
     app.use(routes);
     app.use('/queue', UI);
 
-
-
-
     // socket io initialize handler
     io.on('connection', socket => {
 
@@ -101,13 +96,6 @@ createConnection().then(async connection => {
         });
     });
 
-    // app.get('/dashboard', (req, res) => {
-    //     res.sendFile(path.join(__dirname, '..', 'admin', 'index.html'));
-    // });
-
-    // app.get('*', (req, res) => {
-    //     res.sendFile(path.join(__dirname, '..', 'dist-front', 'castingsecret', 'index.html'));
-    // });
 
     app.get('*', (req, res) => {
         res.status(404).send({ error: 'Not Found' });

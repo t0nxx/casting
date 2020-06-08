@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { ChatController } from '../controllers/ChatController';
+import { chatController } from '../controllers/ChatController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 
 const router = Router();
-const chatController = new ChatController();
 
 router.get('/', AuthMiddleWare, chatController.getChats);
 router.post('/mute/:room', AuthMiddleWare, chatController.muteChatRoom);

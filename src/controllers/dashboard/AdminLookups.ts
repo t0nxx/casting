@@ -23,7 +23,7 @@ function identifyLookupRepo(lookupString) {
     else { return ''; }
 }
 
-export class AdminLookupsController {
+class AdminLookupsController {
     // i will make a temlate for get all, get one , update delete , for all lookups
     async getAllTemplate(request: Request, response: Response, next: NextFunction) {
         try {
@@ -133,3 +133,4 @@ export class AdminLookupsController {
     }
 }
 
+export const adminLookupsController = new AdminLookupsController();

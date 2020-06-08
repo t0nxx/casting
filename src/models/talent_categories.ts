@@ -17,13 +17,4 @@ export class TalentCategories {
     @Column({ default : '' })
     name_ar: string;
 
-    // @OneToMany(() => company_tags, (company_tags: company_tags) => company_tags.category)
-    // companyTagss: company_tags[];
-
-    // @OneToMany(() => job_category, (job_category: job_category) => job_category.jobCategory)
-    // jobCategorys: job_category[];
-
-    // @OneToMany(() => users_profile_categories, (users_profile_categories: users_profile_categories) => users_profile_categories.talentCategory)
-    // usersProfileCategoriess: users_profile_categories[];
-
 }

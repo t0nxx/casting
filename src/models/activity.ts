@@ -4,25 +4,9 @@ import { ActivityAttachment } from './activity_attachment';
 import { Profile } from './users_profile';
 import { Comment } from './comments';
 import { ActivityReports } from './activity_reports';
-// import {auth_user} from "./auth_user";
-// import {company} from "./company";
-// import {activity_attachment} from "./activity_attachment";
-// import {activity_bookmark} from "./activity_bookmark";
-// import {activity_control} from "./activity_control";
-// import {activity_ignore} from "./activity_ignore";
-// import {activity_mention} from "./activity_mention";
-// import {activity_report} from "./activity_report";
-// import {activity_social_actions} from "./activity_social_actions";
-// import {comments} from "./comments";
 
 @Entity('activity')
 export class Activity {
-
-    // PostComment: string,
-    // comments: any[],
-    // nextComments: string,
-    // activity_attachment: { IMG: any[] },
-    // blocked: string
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -32,12 +16,6 @@ export class Activity {
 
     @CreateDateColumn()
     publish_date: Date;
-
-    // @Column({ default: false })
-    // is_blocked: boolean;
-
-    // @Column()
-    // action: string;
 
     @Column({ default: true })
     uploadingComment: boolean;
@@ -91,27 +69,5 @@ export class Activity {
     @ManyToMany(type => Profile, p => p.activity_mentions)
     @JoinTable()
     activityMention: Profile[];
-
-
-    // @OneToMany(() => activity_bookmark, (activity_bookmark: activity_bookmark) => activity_bookmark.activity)
-    // activityBookmarks: activity_bookmark[];
-
-    // @OneToMany(() => activity_control, (activity_control: activity_control) => activity_control.activity)
-    // activityControls: activity_control[];
-
-    // @OneToMany(() => activity_ignore, (activity_ignore: activity_ignore) => activity_ignore.activity)
-    // activityIgnores: activity_ignore[];
-
-    // @OneToMany(() => activity_mention, (activity_mention: activity_mention) => activity_mention.activity)
-    // activityMentions: activity_mention[];
-
-    // @OneToMany(() => activity_report, (activity_report: activity_report) => activity_report.activity)
-    // activityReports: activity_report[];
-
-    // @OneToMany(() => activity_social_actions, (activity_social_actions: activity_social_actions) => activity_social_actions.activity)
-    // activitySocialActionss: activity_social_actions[];
-
-    // @OneToMany(() => comments, (comments: comments) => comments.activity)
-    // commentss: comments[];
 
 }

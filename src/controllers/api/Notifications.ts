@@ -9,7 +9,7 @@ import { notificationQueue } from '../../main';
 import { NotificationAdminPanel } from '../../models/notification_admin_panel';
 
 
-export class NotificationsController {
+class NotificationsController {
 
     /**
     * @Get All
@@ -200,3 +200,4 @@ export class NotificationsController {
 
     // }
 }
+export const notificationsController = new NotificationsController();

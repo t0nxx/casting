@@ -79,14 +79,6 @@ export class Jobs {
     @Column('longtext')
     location: string;
 
-
-    // @ManyToMany(type => Profile, p => p.applied_jobs)
-    // applicants: Profile[];
-
-
-    // @ManyToMany(type => Profile, p => p.shortListed_jobs)
-    // short_listed: Profile[];
-
     @OneToMany(type => JobInterview, jI => jI.job, { onDelete: 'CASCADE' })
     interviews: JobInterview[];
 

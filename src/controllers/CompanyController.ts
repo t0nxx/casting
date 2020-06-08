@@ -6,7 +6,7 @@ import { TalentCategories } from '../models/talent_categories';
 import { Company } from '../models/company';
 import { UploadToS3 } from '../helpers/awsUploader';
 
-export class CompanyController {
+class CompanyController {
     /**
        * @Get All  companies of user
        */
@@ -326,3 +326,5 @@ export class CompanyController {
         }
     }
 }
+
+export const companyController = new CompanyController();

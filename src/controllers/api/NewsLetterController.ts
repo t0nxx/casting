@@ -5,7 +5,7 @@ import { transformAndValidate } from 'class-transformer-validator';
 import { sendInviteMail } from '../../helpers/sendMail';
 
 
-export class NewsLetterController {
+class NewsLetterController {
 
     /**
     * @Get All
@@ -75,3 +75,5 @@ export class NewsLetterController {
 
     }
 }
+
+export const newsLetterController = new NewsLetterController();

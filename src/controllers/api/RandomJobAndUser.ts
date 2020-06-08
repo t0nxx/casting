@@ -4,7 +4,7 @@ import { Jobs } from '../../models/jobs';
 import { Profile } from '../../models/users_profile';
 
 
-export class RandomJobsAndUsersController {
+class RandomJobsAndUsersController {
 
     async getRandomJobs(request: Request, response: Response, next: NextFunction) {
 
@@ -62,3 +62,4 @@ export class RandomJobsAndUsersController {
 
 
 }
+export const randomJobsAndUsersController = new RandomJobsAndUsersController();

@@ -10,7 +10,7 @@ import { ApplyPagination } from '../helpers/pagination';
 import { JobApplicants } from '../models/jobs_applicants';
 import { getAllFriendSharedBtwnApp } from './FriendsController';
 import { WhoSeeMe } from '../models/who_see_me';
-export class SearchController {
+class SearchController {
 
 
     async searchJobs(request: any, response: Response, next: NextFunction) {
@@ -400,3 +400,4 @@ export class SearchController {
 
 
 }
+export const searchController = new SearchController();

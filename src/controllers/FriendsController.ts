@@ -13,7 +13,7 @@ import { Chat } from '../models/chat';
 import { ChatRoom } from '../models/chat_room';
 import { ProfileSettings } from '../models/profile_settings';
 
-export class FriendsController {
+class FriendsController {
 
     /**
      * @Post 
@@ -599,3 +599,4 @@ export async function getAllFriendSharedBtwnApp(request, response: Response, slu
 
 }
 
+export const friendsController = new FriendsController();

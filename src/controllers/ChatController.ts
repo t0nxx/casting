@@ -11,7 +11,7 @@ import { ApplyPagination } from '../helpers/pagination';
 import { ChatRoom } from '../models/chat_room';
 import { ProfileSettings } from '../models/profile_settings';
 
-export class ChatController {
+class ChatController {
 
     /**
       * @Post Send Message
@@ -439,3 +439,4 @@ export class ChatController {
 
 
 }
+export const chatController = new ChatController();

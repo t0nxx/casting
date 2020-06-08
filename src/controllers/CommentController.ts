@@ -7,7 +7,7 @@ import { Comment } from '../models/comments';
 import { ApplyPagination } from '../helpers/pagination';
 import { Activity } from '../models/activity';
 
-export class CommentController {
+class CommentController {
 
     async getAllCommentsOfACtivity(request: Request, response: Response) {
         // this without replies
@@ -292,3 +292,4 @@ export class CommentController {
 
 
 }
+export const commentController = new CommentController();

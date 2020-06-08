@@ -4,7 +4,7 @@ import { User } from '../../models/auth_user';
 import { IgnoredMailsFromNewsletter } from '../../models/ignored_users_from_newsletter';
 import { UploadToS3 } from '../../helpers/awsUploader';
 
-export class IgnoredEmailsFromNewsletterController {
+class IgnoredEmailsFromNewsletterController {
 
     async getAllIgnoredEmailsFromNewsletter(request: Request, response: Response, next: NextFunction) {
         try {
@@ -79,3 +79,4 @@ export class IgnoredEmailsFromNewsletterController {
     }
 
 }
+export const ignoredEmailsFromNewsletterController = new IgnoredEmailsFromNewsletterController();

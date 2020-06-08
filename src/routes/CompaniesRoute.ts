@@ -1,13 +1,10 @@
 import { Router } from 'express';
-import { CompanyController } from '../controllers/CompanyController';
-import { JobsController } from '../controllers/JobsController';
+import { companyController } from '../controllers/CompanyController';
+import { jobsController } from '../controllers/JobsController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
-import { ActivityController } from '../controllers/ActivityController';
+import { activityController } from '../controllers/ActivityController';
 
 const router = Router();
-const companyController = new CompanyController();
-const jobsController = new JobsController();
-const activityController = new ActivityController();
 
 router.get('/:slug', AuthMiddleWare, companyController.GetOneCompany);
 

@@ -22,24 +22,6 @@ import { JobShortlist } from './jobs_shortlisted';
 import { ActivityReports } from './activity_reports';
 import { Notification } from './notify_notification';
 import { WhoSeeMe } from './who_see_me';
-// import {auth_user} from "./auth_user";
-// import {build_lookup} from "./build_lookup";
-// import {ethnicities_lookup} from "./ethnicities_lookup";
-// import {eye_lookup} from "./eye_lookup";
-// import {hair_lookup} from "./hair_lookup";
-// import {height_range_lookup} from "./height_range_lookup";
-// import {weight_range_lookup} from "./weight_range_lookup";
-// import {company} from "./company";
-// import {job_applicants} from "./job_applicants";
-// import {job_schedules} from "./job_schedules";
-// import {job_shortlisted} from "./job_shortlisted";
-// import {profile_album} from "./profile_album";
-// import {profile_hobbies} from "./profile_hobbies";
-// import {profile_settings} from "./profile_settings";
-// import {profile_social_networks} from "./profile_social_networks";
-// import {profile_training} from "./profile_training";
-// import {profile_viewers} from "./profile_viewers";
-// import {users_profile_categories} from "./users_profile_categories";
 
 @Entity('users_profile')
 export class Profile {
@@ -156,16 +138,6 @@ export class Profile {
     @OneToMany(type => Notification, n => n.recipient)
     notifications: Notification[];
 
-
-    // @ManyToMany(type => Jobs, j => j.applicants)
-    // @JoinTable()
-    // applied_jobs: Jobs[];
-
-    // @ManyToMany(type => Jobs, j => j.short_listed)
-    // @JoinTable()
-    // shortListed_jobs: Jobs[];
-
-
     @OneToMany(type => JobInterview, j => j.profile)
     interview_jobs: JobInterview[];
 
@@ -177,29 +149,5 @@ export class Profile {
 
     @OneToMany(type => ActivityReports, a => a.profile)
     activity_reports: ActivityReports[];
-
-
-    // @OneToMany(() => job_applicants, (job_applicants: job_applicants) => job_applicants.profile)
-    // jobApplicantss: job_applicants[];
-
-    // @OneToMany(() => job_schedules, (job_schedules: job_schedules) => job_schedules.profile)
-    // jobScheduless: job_schedules[];
-
-    // @OneToMany(() => job_shortlisted, (job_shortlisted: job_shortlisted) => job_shortlisted.profile)
-    // jobShortlisteds: job_shortlisted[];
-
-    // @OneToMany(() => profile_album, (profile_album: profile_album) => profile_album.userProfile)
-    // profileAlbums: profile_album[];
-
-
-    // @OneToMany(() => profile_social_networks, (profile_social_networks: profile_social_networks) => profile_social_networks.userProfile)
-    // profileSocialNetworkss: profile_social_networks[];
-
-
-    // @OneToMany(() => profile_viewers, (profile_viewers: profile_viewers) => profile_viewers.userProfile)
-    // profileViewerss: profile_viewers[];
-
-    // @OneToMany(() => profile_viewers, (profile_viewers: profile_viewers) => profile_viewers.visitorProfile)
-    // profileViewerss2: profile_viewers[];
 
 }

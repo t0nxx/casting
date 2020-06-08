@@ -1,9 +1,8 @@
 import { Router } from 'express';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
-import { SearchController } from '../controllers/SearchController';
+import { searchController } from '../controllers/SearchController';
 
 const router = Router();
-const searchController = new SearchController();
 
 router.get('/jobs', AuthMiddleWare, searchController.searchJobs);
 router.get('/jobs/suitsme', AuthMiddleWare, searchController.getSuitesMeJobs);

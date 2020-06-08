@@ -26,7 +26,4 @@ export class ProfileAlbum {
     @OneToMany(type => ActivityAttachment, ac => ac.album, { onDelete: 'CASCADE' })
     activity_attachment: ActivityAttachment[];
 
-    // @OneToMany(() => activity_attachment, (activity_attachment: activity_attachment) => activity_attachment.album)
-    // activityAttachments: activity_attachment[];
-
 }

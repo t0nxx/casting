@@ -17,7 +17,7 @@ import { ActivityReports } from '../models/activity_reports';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 import { notificationQueue } from '../main';
 
-export class ActivityController {
+class ActivityController {
 
     async getActivityOfUser(request: Request, response: Response) {
         const profileRepository = getRepository(Profile);
@@ -1289,3 +1289,4 @@ export class ActivityController {
 
 
 }
+export const activityController = new ActivityController();

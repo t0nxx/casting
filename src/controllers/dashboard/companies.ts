@@ -4,7 +4,7 @@ import { User } from '../../models/auth_user';
 import { Company } from '../../models/company';
 import { UploadToS3 } from '../../helpers/awsUploader';
 
-export class AdminCompaniesController {
+class AdminCompaniesController {
 
     async getAllCompanies(request: Request, response: Response, next: NextFunction) {
         try {
@@ -81,3 +81,4 @@ export class AdminCompaniesController {
     }
 
 }
+export const adminCompaniesController = new AdminCompaniesController();

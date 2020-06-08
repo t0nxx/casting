@@ -18,7 +18,7 @@ import { ProfileAlbum } from '../models/profile_album';
 import { FriendshipFriendshipRequest } from '../models/friendship_friendshiprequest';
 import { WhoSeeMe } from '../models/who_see_me';
 
-export class ProfileController {
+class ProfileController {
 
     /**
     * @Get All
@@ -625,3 +625,4 @@ export class ProfileController {
     // }
 
 }
+export const profileController = new ProfileController();

@@ -16,7 +16,7 @@ import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotificatio
 import { sendInterviewDate } from '../helpers/sendMail';
 import * as moment from 'moment-timezone';
 
-export class JobsController {
+class JobsController {
 
     /**
       * @Get All  Jobs of Company
@@ -518,3 +518,5 @@ export class JobsController {
         }
     }
 }
+
+export const jobsController = new JobsController();

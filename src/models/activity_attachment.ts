@@ -38,11 +38,4 @@ export class ActivityAttachment {
     @Column({ nullable: true })
     album_id: number;
 
-    // @Column("character varying", {
-    //     nullable: false,
-    //     length: 150,
-    //     name: "path_json"
-    // })
-    // path_json: string;
-
 }

@@ -12,7 +12,7 @@ import { ProfileSettings } from '../models/profile_settings';
 import { TalentCategories } from '../models/talent_categories';
 import { sendResetPasswordMail, sendWelcomeMail, sendActivationMail } from '../helpers/sendMail';
 
-export class AuthController {
+class AuthController {
 
     /**
      * @Post
@@ -475,3 +475,4 @@ export class AuthController {
         }
     }
 }
+export const authController = new AuthController();

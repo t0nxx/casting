@@ -2,10 +2,6 @@ import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTabl
 import { Profile } from './users_profile';
 import { TalentCategories } from './talent_categories';
 import { Activity } from './activity';
-// import {users_profile} from "./users_profile";
-// import {activity} from "./activity";
-// import {company_tags} from "./company_tags";
-// import {jobs} from "./jobs";
 
 @Entity('company')
 export class Company {
@@ -59,8 +55,5 @@ export class Company {
 
     @OneToMany(type => Activity, a => a.company)
     activity: Activity[];
-
-    // @OneToMany(()=>activity, (activity: activity)=>activity.company)
-    // activitys:activity[];
 
 }

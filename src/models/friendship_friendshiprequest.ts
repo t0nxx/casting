@@ -14,18 +14,6 @@ export class FriendshipFriendshipRequest {
     @CreateDateColumn()
     created: Date;
 
-    // @Column("timestamp with time zone", {
-    //     nullable: true,
-    //     name: "rejected"
-    // })
-    // rejected: Date | null;
-
-    // @Column("timestamp with time zone", {
-    //     nullable: true,
-    //     name: "viewed"
-    // })
-    // viewed: Date | null;
-
     @ManyToOne(type => Profile, { onDelete: 'CASCADE' })
     fromUser: Profile;
 

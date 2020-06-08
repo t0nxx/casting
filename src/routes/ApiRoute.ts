@@ -1,24 +1,18 @@
 import { Router } from 'express';
-import { TalentCategoriesController } from '../controllers/api/TalentCategoriesController';
-import { NewsLetterController } from '../controllers/api/NewsLetterController';
-import { NotificationsController } from '../controllers/api/Notifications';
-import { AuthController } from '../controllers/AuthController';
+import { talentCategoriesController } from '../controllers/api/TalentCategoriesController';
+import { newsLetterController } from '../controllers/api/NewsLetterController';
+import { notificationsController } from '../controllers/api/Notifications';
+import { authController } from '../controllers/AuthController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
-import { RandomJobsAndUsersController } from '../controllers/api/RandomJobAndUser';
-import { SearchController } from '../controllers/SearchController';
+import { randomJobsAndUsersController } from '../controllers/api/RandomJobAndUser';
+import { searchController } from '../controllers/SearchController';
 
 const router = Router();
-const talentController = new TalentCategoriesController();
-const authController = new AuthController();
-const newsLetterController = new NewsLetterController();
-const notificationsController = new NotificationsController();
-const randomJobsAndUsersController = new RandomJobsAndUsersController();
-const searchController = new SearchController();
 
 // start talent categories
-router.get('/talent-categories', talentController.getAllTalentCategories);
+router.get('/talent-categories', talentCategoriesController.getAllTalentCategories);
 
-router.post('/new-category', talentController.createNewCategory);
+router.post('/new-category', talentCategoriesController.createNewCategory);
 // end talent categories
 
 // notifiactions
@@ -28,9 +22,9 @@ router.post('/notification/readall', AuthMiddleWare, notificationsController.mak
 router.post('/notification/:id/read', AuthMiddleWare, notificationsController.makeNotificationRead);
 
 router.get('/random/jobs', randomJobsAndUsersController.getRandomJobs);
-router.get('/random/users',randomJobsAndUsersController.getRandomUsers);
+router.get('/random/users', randomJobsAndUsersController.getRandomUsers);
 
-router.get('/landing/search',searchController.searchPeopleLandingPage);
+router.get('/landing/search', searchController.searchPeopleLandingPage);
 
 // start verify username , email is available
 router.post('/verifyusernameemail', authController.verifyEmailAndUsernamIsAvailable);

@@ -1,30 +1,21 @@
 import { Router } from 'express';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
-import { AdminLookupsController } from '../controllers/dashboard/AdminLookups';
-import { AdminAdditionController } from '../controllers/dashboard/AdminAddition';
-import { AuthController } from '../controllers/AuthController';
-import { NotificationsController } from '../controllers/api/Notifications';
-import { AdvertisementController } from '../controllers/dashboard/advertisements';
-import { AdminCompaniesController } from '../controllers/dashboard/companies';
-import { AdminJobsController } from '../controllers/dashboard/jobs';
-import { AdminSendMailsController } from '../controllers/dashboard/newslettersmails';
-import { IgnoredEmailsFromNewsletterController } from '../controllers/dashboard/newsLetterIgnoredEmails';
+import { adminLookupsController } from '../controllers/dashboard/AdminLookups';
+import { adminAdditionController } from '../controllers/dashboard/AdminAddition';
+import { authController } from '../controllers/AuthController';
+import { notificationsController } from '../controllers/api/Notifications';
+import { advertisementController } from '../controllers/dashboard/advertisements';
+import { adminCompaniesController } from '../controllers/dashboard/companies';
+import { adminJobsController } from '../controllers/dashboard/jobs';
+import { adminSendMailsController } from '../controllers/dashboard/newslettersmails';
+import { ignoredEmailsFromNewsletterController } from '../controllers/dashboard/newsLetterIgnoredEmails';
 
 const router = Router();
 // router.use(AuthMiddleWare);
-const adminLookupsController = new AdminLookupsController();
-const adminAdditionController = new AdminAdditionController();
-const notificationController = new NotificationsController();
-const advertisementController = new AdvertisementController();
-const adminCompaniesController = new AdminCompaniesController();
-const adminJobsController = new AdminJobsController();
-const adminSendMailsController = new AdminSendMailsController();
-const ignoredEmailsFromNewsletterController = new IgnoredEmailsFromNewsletterController()
-const authController = new AuthController();
-// not add auth middle ware in dev 
+
 router.post('/login', authController.adminLogin);
-router.get('/notifications', AuthMiddleWare, notificationController.getAllNotificationsForAdmin);
-router.post('/notifications', AuthMiddleWare, notificationController.addNotificationsFromAdmin);
+router.get('/notifications', AuthMiddleWare, notificationsController.getAllNotificationsForAdmin);
+router.post('/notifications', AuthMiddleWare, notificationsController.addNotificationsFromAdmin);
 
 router.get('/user', AuthMiddleWare, adminAdditionController.getAllUsers);
 router.get('/user/:id', AuthMiddleWare, adminAdditionController.getOneUser);

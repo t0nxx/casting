@@ -1,18 +1,14 @@
 import { Router } from 'express';
-import { ProfileController } from '../controllers/ProfileController';
-import { CompanyController } from '../controllers/CompanyController';
+import { profileController } from '../controllers/ProfileController';
+import { companyController } from '../controllers/CompanyController';
 import { AuthMiddleWare } from '../middlewares/AuthMiddleWare';
 import { UploadToS3 } from '../helpers/awsUploader';
-import { FriendsController } from '../controllers/FriendsController';
-import { ActivityController } from '../controllers/ActivityController';
-import { SearchController } from '../controllers/SearchController';
+import { friendsController } from '../controllers/FriendsController';
+import { activityController } from '../controllers/ActivityController';
+import { searchController } from '../controllers/SearchController';
 
 const router = Router();
-const profileController = new ProfileController();
-const companyController = new CompanyController();
-const friendsController = new FriendsController();
-const activityController = new ActivityController();
-const searchController = new SearchController();
+
 
 router.get('/lookups', profileController.getLookups);
 

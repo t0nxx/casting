@@ -9,7 +9,7 @@ import { sendEmailsQueue } from '../../main';
 import { EmailsToSendType, EmailQueueInterface } from '../../jobs/SendEmails'
 
 
-export class AdminSendMailsController {
+class AdminSendMailsController {
 
     async saveHtmlMailTemplate(request: Request, response: Response, next: NextFunction) {
         try {
@@ -97,3 +97,4 @@ export class AdminSendMailsController {
 
 
 }
+export const adminSendMailsController = new AdminSendMailsController();

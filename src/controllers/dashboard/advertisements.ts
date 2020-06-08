@@ -4,7 +4,7 @@ import { User } from '../../models/auth_user';
 import { Advertisement } from '../../models/ads';
 import { UploadToS3 } from '../../helpers/awsUploader';
 
-export class AdvertisementController {
+class AdvertisementController {
 
     async getAllAdvertisement(request: Request, response: Response, next: NextFunction) {
         try {
@@ -81,3 +81,4 @@ export class AdvertisementController {
     }
 
 }
+export const advertisementController = new AdvertisementController();
