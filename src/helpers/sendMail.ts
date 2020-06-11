@@ -468,7 +468,7 @@ export function sendInterviewDate(mail, userName, date, interviewLocation, inter
                 <tr width="100%" height="60">
                   <td valign="top" align="left"
                     style="border-top-left-radius:4px;border-top-right-radius:4px;background:#3c2b3f;padding:10px 18px;text-align:center">
-                    <img height="100" width="125" src="logo.jpg" title="Castingsecret"
+                    <img height="100" width="125" src="https://casting-secret-new.s3.eu-central-1.amazonaws.com/images/1582555484792%20-%20logo%2050.jpg" title="Castingsecret"
                       style="font-weight:bold;font-size:18px;color:#fff;vertical-align:top"> </td>
                 </tr>
                 <tr width="100%">
@@ -541,7 +541,7 @@ export function sendNewJobToMail(mails: string[], jobTitle, jobDescription, jobL
                             <tr width="100%" height="60">
                                 <td valign="top" align="left"
                                     style="border-top-left-radius:4px;border-top-right-radius:4px;background:#3c2b3f;padding:10px 18px;text-align:center">
-                                    <img height="100" width="125" src="logo.jpg" title="Castingsecret"
+                                    <img height="100" width="125" src="https://casting-secret-new.s3.eu-central-1.amazonaws.com/images/1582555484792%20-%20logo%2050.jpg" title="Castingsecret"
                                         style="font-weight:bold;font-size:18px;color:#fff;vertical-align:top"> </td>
                             </tr>
                             <tr width="100%">
