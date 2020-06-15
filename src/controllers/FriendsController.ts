@@ -127,14 +127,14 @@ class FriendsController {
             newMessage.room = room;
             newMessage.sender = fromUser;
             newMessage.recipient = toUser;
-            newMessage.message = 'Say hi to your new friend';
+            newMessage.message = 'قل مرحبا لصديقك الجديد';
             const createMsg1 = await ChatRepository.save(newMessage);
 
             const newMessage2 = new Chat();
             newMessage.room = room;
             newMessage.sender = toUser;
             newMessage.recipient = fromUser;
-            newMessage.message = 'Say hi to your new friend';
+            newMessage.message = 'قل مرحبا لصديقك الجديد';
             const createMsg2 = await ChatRepository.save(newMessage);
 
 
@@ -447,14 +447,14 @@ class FriendsController {
                 newMessage.room = room;
                 newMessage.sender = fromUser;
                 newMessage.recipient = toUser;
-                newMessage.message = 'Say hi to your new friend';
+                newMessage.message = 'قل مرحبا لصديقك الجديد';
                 const createMsg1 = await ChatRepository.save(newMessage);
 
                 const newMessage2 = new Chat();
                 newMessage.room = room;
                 newMessage.sender = toUser;
                 newMessage.recipient = fromUser;
-                newMessage.message = 'Say hi to your new friend';
+                newMessage.message = 'قل مرحبا لصديقك الجديد';
                 const createMsg2 = await ChatRepository.save(newMessage);
 
 
