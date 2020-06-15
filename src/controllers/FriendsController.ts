@@ -456,6 +456,7 @@ class FriendsController {
                 newMessage.recipient = fromUser;
                 newMessage.message = 'قل مرحبا لصديقك الجديد';
                 const createMsg2 = await ChatRepository.save(newMessage);
+                //
 
 
 
