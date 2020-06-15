@@ -2,13 +2,54 @@ const mailgun = require('mailgun-js');
 const DOMAIN = 'castingsecret.com';
 export const mg = mailgun({ apiKey: '13c992e774b054f494bbd805381e4816-f696beb4-b9c906c7', domain: DOMAIN, host: "api.eu.mailgun.net" });
 
-export function sendResetPasswordMail(mail, resetCode) {
+export function sendResetPasswordMail(mail, resetCode, userName) {
   const data = {
-    from: 'Casting mail@castingsecret.com',
+    from: 'Casting info@castingsecret.com',
     to: `${mail}`,
-    subject: 'Reset Password Code',
-    text: ` Hi , 
-        Your code is ${resetCode} .`
+    subject: 'Casting Reset Password Code',
+    html: `
+    <body>
+    <table cellspacing="0" cellpadding="0" border="0"
+      style="color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica">
+      <tbody>
+        <tr width="100%">
+          <td valign="top" align="left"
+            style="background:#eef0f1;font:15px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica">
+            <table style="border:none;padding:0 18px;margin:50px auto;width:500px">
+              <tbody>
+                <tr width="100%" height="60">
+                  <td valign="top" align="left"
+                    style="border-top-left-radius:4px;border-top-right-radius:4px;background:#3c2b3f;padding:10px 18px;text-align:center">
+                    <img height="100" width="125" src="https://casting-secret-new.s3.eu-central-1.amazonaws.com/images/1582555484792%20-%20logo%2050.jpg" title="Castingsecret"
+                      style="font-weight:bold;font-size:18px;color:#fff;vertical-align:top"> </td>
+                </tr>
+                <tr width="100%">
+                  <td valign="top" align="left" style="background:#fff;padding:18px">
+                    <h1 style="font-size:20px;margin:16px 0;color:#333;text-align:center"> Dear
+                      ${userName} , You Reset Password Code is  </h1>
+  
+                    <div style="background:#f6f7f8;border-radius:3px">
+                      <br>
+                      <h1
+                        style="font:40px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;text-align:center">
+                        ${resetCode} 
+                      </h1>
+                    </div>
+                    <p style="font:14px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;color:#333">
+                      <strong>Casting Secret </strong>
+                    <p>Copyright © 2020 castingsceret, All rights reserved. </p>
+                    <p> 9091 Abdulmajid
+                      Shubukshi · Jeddah 23434 · Saudi Arabia</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+    `
   };
   mg.messages().send(data, (error, body) => {
     console.log(body);

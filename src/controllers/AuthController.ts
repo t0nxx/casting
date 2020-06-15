@@ -422,7 +422,7 @@ class AuthController {
             /**
              * mail service here
              */
-            sendResetPasswordMail(isExist.email, randomReset);
+            sendResetPasswordMail(isExist.email, randomReset, isExist.username);
             return response.status(200).send({ msg: 'An Email will be sent with code' });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
