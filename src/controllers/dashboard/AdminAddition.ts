@@ -16,7 +16,8 @@ class AdminAdditionController {
             //     order: { id: 'DESC' }
             // });
             const q = await userRepository.createQueryBuilder('u')
-                .select(['u.id', 'u.isAdmin', 'u.is_active', 'u.first_name', 'u.last_name', 'u.email', 'u.username'])
+                .innerJoin('u.profiles', 'profile')
+                .select(['u.id', 'u.isAdmin', 'u.is_active', 'u.first_name', 'u.last_name', 'u.email', 'u.username', 'profile.phone'])
                 .orderBy('u.id', 'DESC');
             if (request.query.query) {
                 q.andWhere(`u.first_name like '%${request.query.query}%' or u.last_name like '%${request.query.query}%' or u.username like '%${request.query.query}%' or u.email like '%${request.query.query}%'`);
@@ -24,7 +25,14 @@ class AdminAdditionController {
 
             const [data, count] = await q.getManyAndCount();
 
-            return response.status(200).send({ data, count });
+            const formatedRes = data.map(e => {
+                const { phone } = e.profiles[0];
+                delete e.profiles;
+                return { ...e, phone }
+            });
+
+
+            return response.status(200).send({ data: formatedRes, count });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -40,12 +48,17 @@ class AdminAdditionController {
     async getOneUser(request: Request, response: Response) {
         const userRepository = getRepository(User);
         try {
-            const data = await userRepository.findOne({ id: parseInt(request.params.id, 10) }, {
-                select: ['id', 'isAdmin', 'is_active', 'first_name', 'last_name', 'email', 'username'],
-                order: { id: 'DESC' }
-            });
+            const data = await userRepository.createQueryBuilder('u')
+                .innerJoin('u.profiles', 'profile')
+                .select(['u.id', 'u.isAdmin', 'u.is_active', 'u.first_name', 'u.last_name', 'u.email', 'u.username', 'profile.phone'])
+                .where(`u.id = ${parseInt(request.params.id, 10)}`)
+                .getOne();
+
             if (!data) { throw new Error('User not found'); }
-            return response.status(200).send({ data });
+
+            const { profiles, ...rest } = data;
+
+            return response.status(200).send({ data: { ...rest, phone: profiles[0].phone } });
         } catch (error) {
             /**
              * if ther error from class validator , return first object . else message of error
@@ -63,6 +76,9 @@ class AdminAdditionController {
         try {
             const user = await userRepository.findOne({ id: parseInt(request.params.id, 10) });
             if (!user) { throw new Error('User not found'); }
+            // temp solution remove phone from body
+            delete request.body.phone;
+
             await userRepository.update({ id: parseInt(request.params.id, 10) }, request.body);
             const data = await userRepository.findOne({ id: parseInt(request.params.id, 10) });
             return response.status(200).send({ data });
