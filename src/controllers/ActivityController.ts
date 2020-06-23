@@ -192,7 +192,7 @@ class ActivityController {
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, {
                 relations: ['activityMention', 'activity_attachment', 'profile', 'company']
             });
-            if (!activity) { throw new Error('activivty not found or deleted'); }
+            if (!activity) { throw new Error('post has been deleted'); }
 
             const profile = await profileRepository.findOne({ id: activity.profile.id }, { relations: ['user'] });
             const author_settings = await profileSettingsRepository.findOne({ profile },
@@ -494,7 +494,7 @@ class ActivityController {
             const myDisLikes = profile.dislikes.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
-            if (!activity) { throw new Error('activivty not found or deleted'); }
+            if (!activity) { throw new Error('post has been deleted'); }
 
             const liked = myLikes.includes(activity.id);
             const disliked = myDisLikes.includes(activity.id);
@@ -559,7 +559,7 @@ class ActivityController {
             const myDisLikes = profile.dislikes.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) }, { relations: ['profile'] });
-            if (!activity) { throw new Error('activivty not found or deleted'); }
+            if (!activity) { throw new Error('post has been deleted'); }
 
             const liked = myLikes.includes(activity.id);
             const disliked = myDisLikes.includes(activity.id);
@@ -625,7 +625,7 @@ class ActivityController {
             const myBookMarks = profile.bookmarks.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found or deleted'); }
+            if (!activity) { throw new Error('post has been deleted'); }
 
             const bookmarked = myBookMarks.includes(activity.id);
             if (bookmarked) {
@@ -652,7 +652,7 @@ class ActivityController {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found or deleted'); }
+            if (!activity) { throw new Error('post has been deleted'); }
 
             if (!request.body.reason) { throw new Error('you must enter reason'); }
 
@@ -687,7 +687,7 @@ class ActivityController {
             const myHiddenActivity = profile.hidden.map(ac => ac.id);
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found or deleted'); }
+            if (!activity) { throw new Error('post has been deleted'); }
 
             const hidden = myHiddenActivity.includes(activity.id);
             if (hidden) {
@@ -718,7 +718,7 @@ class ActivityController {
                 { select: ['can_see_wall', 'can_see_profile', 'can_see_friends', 'can_comment', 'can_send_message', 'can_contact_info'] });
 
             const activity = await ActivityRepository.findOne({ id: parseInt(request.params.id, 10) });
-            if (!activity) { throw new Error('activivty not found or deleted'); }
+            if (!activity) { throw new Error('post has been deleted'); }
 
             const file: any = request.files.file;
             const mime = file.mimetype;
