@@ -17,6 +17,7 @@ import { sendInterviewDate } from '../helpers/sendMail';
 import * as moment from 'moment-timezone';
 import { IgnoredMailsFromNewsletter } from '../models/ignored_users_from_newsletter';
 import { EmailQueueInterface, EmailsToSendType } from '../jobs/SendEmails';
+import * as _ from 'underscore';
 
 class JobsController {
 
@@ -145,8 +146,8 @@ class JobsController {
             const ignoredUsersFromSend = await (await ignoredUsersFromSendRepository.find({ select: ['email'] })).map(e => e.email)
             const jobLink = `https://castingsecret.com/job/job-page/${save.slug}/${company.slug}`;
 
-            // const usersToSent = _.difference(users, ignoredUsersFromSend);
-            const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
+            const usersToSent = _.difference(users, ignoredUsersFromSend);
+            // const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
             /**
              * send mail function here
              */

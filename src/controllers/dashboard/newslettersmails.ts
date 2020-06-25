@@ -55,8 +55,8 @@ class AdminSendMailsController {
             const users = (await userRepository.find({ select: ['email'] })).map(e => e.email)
             const ignoredUsersFromSend = await (await ignoredUsersFromSendRepository.find({ select: ['email'] })).map(e => e.email)
 
-            // const usersToSent = _.difference(users, ignoredUsersFromSend);
-            const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com', 'castingsecretdev@gmail.com'];
+            const usersToSent = _.difference(users, ignoredUsersFromSend);
+            // const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com', 'castingsecretdev@gmail.com'];
             /**
              * send mail function here
              */
