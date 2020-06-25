@@ -547,6 +547,49 @@ class JobsController {
             return response.status(400).send({ error: err });
         }
     }
+
+
+    /**
+   * @send new job email
+   */
+    async newJobeMailDEVELOPMENTONLY(request: Request, response: Response, next: NextFunction) {
+
+        const userRepository = getRepository(User);
+        const ignoredUsersFromSendRepository = getRepository(IgnoredMailsFromNewsletter);
+        try {
+
+            const users = (await userRepository.find({ select: ['email'] })).map(e => e.email)
+            const ignoredUsersFromSend = await (await ignoredUsersFromSendRepository.find({ select: ['email'] })).map(e => e.email)
+            const usersToSent = _.difference(users, ignoredUsersFromSend);
+            // const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
+            /**
+             * send mail function here
+             */
+
+            if (!request.body.jobTitle || !request.body.jobDescription || !request.body.jobLink) {
+                throw new Error('jobTitle or jobDescription or jobLink is missing');
+            }
+            const chunkEmailsToReduceMailProviderRateLimit = _.chunk(usersToSent, 90);
+            chunkEmailsToReduceMailProviderRateLimit.map(async (chunckedArray, index) => {
+                const newEmailToSend: EmailQueueInterface = {
+                    type: EmailsToSendType.NewJobAdded,
+                    recipients: chunckedArray,
+                    jobTitle: request.body.jobTitle,
+                    jobDescription: request.body.jobDescription,
+                    jobLink: request.body.jobLink,
+                }
+                // the mail provider , has limit 100 mail/hour , so i'll delay each 90 mail to be sent in every hour
+                // 1000 millisec * 60 sec * 60 min ==== hour  * index , ex , first array delayed 1 hour , the secound 2 ....son on
+                await sendEmailsQueue.add(newEmailToSend, { delay: 1000 * 60 * 60 * index });
+
+            })
+
+            return response.status(200).send({ success: true, slug: usersToSent });
+        } catch (error) {
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            return response.status(400).send({ error: err });
+        }
+    }
 }
 
 export const jobsController = new JobsController();

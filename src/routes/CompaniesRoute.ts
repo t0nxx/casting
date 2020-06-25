@@ -42,6 +42,10 @@ router.get('/:slug/jobs/:jobSlug/interview', AuthMiddleWare, jobsController.getI
 
 router.post('/:slug/jobs', AuthMiddleWare, jobsController.createJob);
 
+// send mails for new job , it dev onlyyyyyyyyy ----------------------------------
+router.post('/:slug/jobs/testmails', AuthMiddleWare, jobsController.newJobeMailDEVELOPMENTONLY);
+/////////////////////////////////////////
+
 router.post('/:slug/jobs/:jobSlug/apply', AuthMiddleWare, jobsController.applyJob);
 
 router.post('/:slug/jobs/:jobSlug/shortlisted', AuthMiddleWare, jobsController.addApplicantsToShortList);
@@ -53,7 +57,6 @@ router.post('/:slug/jobs/:jobSlug/interview/:userSlug', AuthMiddleWare, jobsCont
 router.patch('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.updateJob);
 router.delete('/:slug/jobs/:jobSlug', AuthMiddleWare, jobsController.deleteJob);
 
-// create new job
 
 
 export default router;
