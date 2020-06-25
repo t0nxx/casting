@@ -8,7 +8,12 @@ export enum EmailsToSendType {
 
 export interface EmailQueueInterface {
     type: EmailsToSendType;
-    recipients: string[];
+    /**
+     * recipients: string[]; , it should like that , but i put any cause i need to split it in many situatuions 
+     * , the returned array of split operation is from type unknown which cause an error
+     */
+
+    recipients: any;
     htmlTemplate?: string;
     jobTitle?: string;
     jobDescription?: string;

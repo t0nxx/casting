@@ -151,15 +151,21 @@ class JobsController {
             /**
              * send mail function here
              */
-            const newEmailToSend: EmailQueueInterface = {
-                type: EmailsToSendType.NewJobAdded,
-                recipients: usersToSent,
-                jobTitle: save.title,
-                jobDescription: save.description,
-                jobLink,
-            }
 
-            await sendEmailsQueue.add(newEmailToSend);
+            const chunkEmailsToReduceMailProviderRateLimit = _.chunk(usersToSent, 90);
+            chunkEmailsToReduceMailProviderRateLimit.map(async (chunckedArray, index) => {
+                const newEmailToSend: EmailQueueInterface = {
+                    type: EmailsToSendType.NewJobAdded,
+                    recipients: chunckedArray,
+                    jobTitle: save.title,
+                    jobDescription: save.description,
+                    jobLink,
+                }
+                // the mail provider , has limit 100 mail/hour , so i'll delay each 90 mail to be sent in every hour
+                // 1000 millisec * 60 sec * 60 min ==== hour  * index , ex , first array delayed 1 hour , the secound 2 ....son on
+                await sendEmailsQueue.add(newEmailToSend, { delay: 1000 * 60 * 60 * index });
+
+            })
 
             return response.status(200).send({ success: true, slug: save.slug });
         } catch (error) {
