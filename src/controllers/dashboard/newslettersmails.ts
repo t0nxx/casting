@@ -56,23 +56,20 @@ class AdminSendMailsController {
             const ignoredUsersFromSend = await (await ignoredUsersFromSendRepository.find({ select: ['email'] })).map(e => e.email)
 
             const usersToSent = _.difference(users, ignoredUsersFromSend);
-            // const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com', 'castingsecretdev@gmail.com'];
+            // const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
             /**
              * send mail function here
              */
-            const chunkEmailsToReduceMailProviderRateLimit = _.chunk(usersToSent, 90);
-            chunkEmailsToReduceMailProviderRateLimit.map(async (chunckedArray, index) => {
-                const newEmailToSend: EmailQueueInterface = {
-                    type: EmailsToSendType.NewsLetter,
-                    recipients: chunckedArray,
-                    htmlTemplate: mailHtmlBody,
-                }
+            // const chunkEmailsToReduceMailProviderRateLimit = _.chunk(usersToSent, 90);
 
-                // the mail provider , has limit 100 mail/hour , so i'll delay each 90 mail to be sent in every hour
-                // 1000 millisec * 60 sec * 60 min ==== hour  * index , ex , first array delayed 1 hour , the secound 2 ....son on
-                await sendEmailsQueue.add(newEmailToSend, { delay: 1000 * 60 * 60 * index });
-
-            })
+            const newEmailToSend: EmailQueueInterface = {
+                type: EmailsToSendType.NewsLetter,
+                recipients: usersToSent,
+                htmlTemplate: mailHtmlBody,
+            }
+            // the mail provider , has limit 100 mail/hour , so i'll delay each 90 mail to be sent in every hour
+            // 1000 millisec * 60 sec * 60 min ==== hour  * index , ex , first array delayed 1 hour , the secound 2 ....son on
+            await sendEmailsQueue.add(newEmailToSend);
 
             // sendMailWithCustomHtmlTemplate(['mahmoudko1500@hotmail.com','hhacker95@gmail.com'],mailHtmlBody);
 

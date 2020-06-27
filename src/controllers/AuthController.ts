@@ -10,7 +10,7 @@ import { generateJwtToken } from '../helpers/GnerateJwt';
 import { Profile } from '../models/users_profile';
 import { ProfileSettings } from '../models/profile_settings';
 import { TalentCategories } from '../models/talent_categories';
-import { sendResetPasswordMail, sendWelcomeMail, sendActivationMail } from '../helpers/sendMail';
+import { sendResetPasswordMail, sendActivationMail } from '../helpers/sendMail';
 
 class AuthController {
 
