@@ -505,11 +505,12 @@ const SendFromSES = async (options: { subjectText: string, html_template: string
 
   const mailsToSend: string[] = options.singleMail ? [options.singleMail] : options.arrayOfMails;
 
+  // the logic here is to send 12 mail only per sec , the ses limit is 14 req/mail per sec
   let HourlyRateCounter = 0;
-
   for (const mail of mailsToSend) {
 
     if (HourlyRateCounter > 12) {
+      // when we reach 12 mail per sec , then wait 3 sec before send next
       await sleepForHourlySendingLimit(3000);
       HourlyRateCounter = 0;
     }
