@@ -196,6 +196,7 @@ class AuthController {
             newUser.email = request.body.user.email;
             newUser.first_name = request.body.user.first_name;
             newUser.last_name = request.body.user.last_name;
+            newUser.about = 'tell people about you';
             newUser.username = request.body.user.first_name + '-' + randomString.generate({ length: 5 });
             newUser.social_site = 'facebook';
 
@@ -211,8 +212,7 @@ class AuthController {
             const newProfile = new Profile();
             newProfile.slug = create.username;
             newProfile.user = create;
-            //newProfile.about = request.body.about;
-
+            newProfile.about = 'tell people about you';
 
             if (request.body.category) {
                 const categories = await talentCategoryRepository.findByIds(request.body.category);
@@ -297,6 +297,7 @@ class AuthController {
             newUser.email = request.body.user.email;
             newUser.first_name = request.body.user.given_name;
             newUser.last_name = request.body.user.family_name;
+            newUser.about = 'tell people about you';
             newUser.username = request.body.user.given_name + '-' + randomString.generate({ length: 5 });
             newUser.social_site = 'google';
 
@@ -311,6 +312,7 @@ class AuthController {
             const newProfile = new Profile();
             newProfile.slug = create.username;
             newProfile.user = create;
+            newProfile.about = 'tell people about you';
             // newProfile.about = request.body.about;
 
             if (request.body.category) {
