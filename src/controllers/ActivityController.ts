@@ -378,7 +378,7 @@ class ActivityController {
                 * 
                 * 
                 */
-                console.log(e);
+                // console.log(e);
                 const notiToQueu: NotificationShape = {
                     actor_first_name: profile.user.first_name,
                     actor_last_name: profile.user.last_name,
@@ -465,7 +465,7 @@ class ActivityController {
                 * 
                 * 
                 */
-                console.log(e);
+                // console.log(e);
                 const notiToQueu: NotificationShape = {
                     actor_first_name: company.name,
                     actor_avatar: company.avatar,
@@ -738,8 +738,8 @@ class ActivityController {
 
             const uploadAndGetUrl = await UploadToS3(request.files.file, splited);
             const type = splited === 'image' ? 'IMG' : splited === 'audio' ? 'AUDIO' : splited === 'video' ? 'VIDEO' : 'IMG'
-            console.log(type);
-            console.log(splited);
+            // console.log(type);
+            // console.log(splited);
             const media = new ActivityAttachment();
             media.profile = profile;
             media.activity = activity;
@@ -895,8 +895,8 @@ class ActivityController {
 
             const uploadAndGetUrl = await UploadToS3(request.files.file, splited);
             const type = splited === 'image' ? 'IMG' : splited === 'audio' ? 'AUDIO' : splited === 'video' ? 'VIDEO' : 'IMG'
-            console.log(type);
-            console.log(splited);
+            // console.log(type);
+            // console.log(splited);
             const media = new ActivityAttachment();
             media.profile = profile;
             media.activity = saveActivity;

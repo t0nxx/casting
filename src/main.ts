@@ -46,7 +46,10 @@ const sessionMiddleware = expsession({
 });
 
 // initailze sentry for error reporting
-Sentry.init({ dsn: 'https://4d868ea97fce4925b37c80b4b6a9d46f@o412866.ingest.sentry.io/5294024' });
+Sentry.init({
+    dsn: 'https://4d868ea97fce4925b37c80b4b6a9d46f@o412866.ingest.sentry.io/5294024',
+    attachStacktrace: true,
+});
 app.use(Sentry.Handlers.requestHandler());
 
 
@@ -93,12 +96,12 @@ createConnection().then(async connection => {
     // socket io initialize handler
     io.on('connection', socket => {
 
-        console.log(`socket.io connected: ${socket.id}`);
+        // console.log(`socket.io connected: ${socket.id}`);
 
         // save socket.io socket in the session
         socket.request.session.socketio = socket.id;
         socket.on('disconnect', () => {
-            console.log('user disconnected');
+            // console.log('user disconnected');
         });
     });
 

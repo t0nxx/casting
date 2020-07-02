@@ -536,12 +536,12 @@ const SendFromSES = async (options: { subjectText: string, html_template: string
     })
       .promise()
       .then(data => {
-        console.log('mails sent callback');
-        console.log(data);
+        // console.log('mails sent callback');
+        // console.log(data);
       })
       .catch(err => {
-        console.log('mails sent error');
-        console.log(err);
+        // console.log('mails sent error');
+        // console.log(err);
         Sentry.captureException(err);
       });
     HourlyRateCounter++;

@@ -119,7 +119,7 @@ class JobsController {
 
             if (!company) { throw new Error('company Not Found'); }
             // followers
-            console.log(company);
+            // console.log(company);
 
             const newJob = new Jobs();
             Object.assign(newJob, request.body);

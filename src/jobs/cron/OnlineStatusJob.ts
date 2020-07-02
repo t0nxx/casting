@@ -5,7 +5,7 @@ import { ProfileSettings, myStatus } from '../../models/profile_settings';
 
 export const ChaneUsersOnlineSatusJob = () => {
     cron.schedule('* * * * *', async () => {
-        console.log('running a task every minute');
+        // console.log('running a task every minute');
         const settingsRepository = getRepository(ProfileSettings);
         try {
             const setOnlineStaus = await settingsRepository.createQueryBuilder()
