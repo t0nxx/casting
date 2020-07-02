@@ -560,8 +560,8 @@ class JobsController {
 
             const users = (await userRepository.find({ select: ['email'] })).map(e => e.email)
             const ignoredUsersFromSend = await (await ignoredUsersFromSendRepository.find({ select: ['email'] })).map(e => e.email)
-            // const usersToSent = _.difference(users, ignoredUsersFromSend);
-            const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
+            const usersToSent = _.difference(users, ignoredUsersFromSend);
+            // const usersToSent = ['mahmoudko1500@hotmail.com', 'hhaker95@gmail.com'];
             /**
              * send mail function here
              */
