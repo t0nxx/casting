@@ -501,32 +501,50 @@ export function sendNewJobToMail(mails: string[], jobTitle, jobDescription, jobL
 }
 
 
-const SendFromSES = (options: { subjectText: string, html_template: string, singleMail?: string, arrayOfMails?: string[] }) => {
-  ses.sendEmail({
-    Destination: {
-      ToAddresses: options.singleMail ? [options.singleMail] : options.arrayOfMails,
-    },
-    Message: {
-      Body: {
-        Html: {
+const SendFromSES = async (options: { subjectText: string, html_template: string, singleMail?: string, arrayOfMails?: string[] }) => {
+
+  const mailsToSend: string[] = options.singleMail ? [options.singleMail] : options.arrayOfMails;
+
+  let HourlyRateCounter = 0;
+
+  for (const mail of mailsToSend) {
+
+    if (HourlyRateCounter > 12) {
+      await sleepForHourlySendingLimit(3000);
+      HourlyRateCounter = 0;
+    }
+    ses.sendEmail({
+      Destination: {
+        ToAddresses: [mail],
+      },
+      Message: {
+        Body: {
+          Html: {
+            Charset: 'UTF-8',
+            Data: options.html_template,
+          },
+        },
+        Subject: {
           Charset: 'UTF-8',
-          Data: options.html_template,
+          Data: options.subjectText,
         },
       },
-      Subject: {
-        Charset: 'UTF-8',
-        Data: options.subjectText,
-      },
-    },
-    Source: 'Casting Secret <noreply@jobs.castingsecret.com>',
-  })
-    .promise()
-    .then(data => {
-      console.log('mails sent callback');
-      console.log(data);
+      Source: 'Casting Secret <noreply@jobs.castingsecret.com>',
     })
-    .catch(err => {
-      console.log('mails sent error');
-      console.log(err);
-    });
+      .promise()
+      .then(data => {
+        console.log('mails sent callback');
+        console.log(data);
+      })
+      .catch(err => {
+        console.log('mails sent error');
+        console.log(err);
+      });
+    HourlyRateCounter++;
+  }
+
+}
+
+async function sleepForHourlySendingLimit(millis) {
+  return new Promise(resolve => setTimeout(resolve, millis));
 }
