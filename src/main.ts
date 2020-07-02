@@ -49,6 +49,7 @@ const sessionMiddleware = expsession({
 Sentry.init({
     dsn: 'https://4d868ea97fce4925b37c80b4b6a9d46f@o412866.ingest.sentry.io/5294024',
     attachStacktrace: true,
+    debug : true,
 });
 app.use(Sentry.Handlers.requestHandler());
 
