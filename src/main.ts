@@ -130,4 +130,7 @@ createConnection().then(async connection => {
     })
 
 
-}).catch(error => console.log(error));
+}).catch(error => {
+    console.log(error);
+    Sentry.captureException(error);
+});

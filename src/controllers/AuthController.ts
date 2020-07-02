@@ -11,6 +11,8 @@ import { Profile } from '../models/users_profile';
 import { ProfileSettings } from '../models/profile_settings';
 import { TalentCategories } from '../models/talent_categories';
 import { sendResetPasswordMail, sendActivationMail } from '../helpers/sendMail';
+import * as Sentry from '@sentry/node';
+
 
 class AuthController {
 
@@ -44,6 +46,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -139,6 +142,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -242,6 +246,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -340,6 +345,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -379,7 +385,8 @@ class AuthController {
             }
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send(err);
+            Sentry.captureException(err);
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -402,6 +409,7 @@ class AuthController {
             * if ther error from class validator , return first object . else message of error
             */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -426,7 +434,8 @@ class AuthController {
             return response.status(200).send({ msg: 'An Email will be sent with code' });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send(err);
+            Sentry.captureException(err);
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -450,7 +459,8 @@ class AuthController {
             return response.status(200).send({ msg: 'password reset is done' });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send(err);
+            Sentry.captureException(err);
+            return response.status(400).send({ error: err });
         }
     }
 
@@ -471,7 +481,8 @@ class AuthController {
             return response.redirect('https://castingsecret.com/account/login');
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send(err);
+            Sentry.captureException(err);
+            return response.status(400).send({ error: err });
         }
     }
 }
