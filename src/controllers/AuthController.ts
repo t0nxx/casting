@@ -228,6 +228,8 @@ class AuthController {
             // start create settings for the new user
             const newProfileSettings = new ProfileSettings();
             newProfileSettings.profile = createProfile;
+            // cause response message not have default value
+            newProfileSettings.response_message = '';
             const crateProfileSettings = await profileSettingsRepository.save(newProfileSettings);
             // start create settings for the new user
             const token = await generateJwtToken({
@@ -329,6 +331,8 @@ class AuthController {
             // start create settings for the new user
             const newProfileSettings = new ProfileSettings();
             newProfileSettings.profile = createProfile;
+            // cause response message not have default value
+            newProfileSettings.response_message = '';
             const crateProfileSettings = await profileSettingsRepository.save(newProfileSettings);
             // start create settings for the new user
             const token = await generateJwtToken({
