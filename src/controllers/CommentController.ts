@@ -6,6 +6,8 @@ import { Profile } from '../models/users_profile';
 import { Comment } from '../models/comments';
 import { ApplyPagination } from '../helpers/pagination';
 import { Activity } from '../models/activity';
+import * as Sentry from '@sentry/node';
+
 
 class CommentController {
 
@@ -70,7 +72,8 @@ class CommentController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ error: err });
+               Sentry.captureException(err);
+ return response.status(400).send({ error: err });
         }
     }
 
@@ -133,7 +136,8 @@ class CommentController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ error: err });
+               Sentry.captureException(err);
+ return response.status(400).send({ error: err });
         }
     }
 
@@ -207,7 +211,8 @@ class CommentController {
             return response.status(200).send({ ...getAfterSave, ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ error: err });
+               Sentry.captureException(err);
+ return response.status(400).send({ error: err });
         }
     }
 
@@ -265,7 +270,8 @@ class CommentController {
             return response.status(200).send({ ...getAfterSave, ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ error: err });
+               Sentry.captureException(err);
+ return response.status(400).send({ error: err });
         }
     }
 
@@ -285,7 +291,8 @@ class CommentController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            return response.status(400).send({ error: err });
+               Sentry.captureException(err);
+ return response.status(400).send({ error: err });
         }
     }
 

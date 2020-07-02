@@ -12,6 +12,7 @@ import { notificationQueue } from '../main';
 import { Chat } from '../models/chat';
 import { ChatRoom } from '../models/chat_room';
 import { ProfileSettings } from '../models/profile_settings';
+import * as Sentry from '@sentry/node';
 
 class FriendsController {
 
@@ -65,6 +66,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -153,6 +155,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -182,6 +185,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -210,6 +214,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -247,6 +252,7 @@ class FriendsController {
             return response.status(200).send({ results, count });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -360,6 +366,7 @@ class FriendsController {
             return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -397,6 +404,7 @@ class FriendsController {
             return response.status(200).send({ results, count: 10 });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -478,6 +486,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -507,6 +516,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -593,6 +603,7 @@ export async function getAllFriendSharedBtwnApp(request, response: Response, slu
         return results;
     } catch (error) {
         const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+        Sentry.captureException(err);
         return response.status(400).send({ error: err });
 
     }

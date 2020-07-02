@@ -4,6 +4,8 @@ export const mg = mailgun({ apiKey: '13c992e774b054f494bbd805381e4816-f696beb4-b
 // for bulk email send , note , mailgun is already runnig on some services , so i'll not touch it
 // rather i'll user ses for cating calls and newsletter
 import * as AWS from 'aws-sdk';
+import * as Sentry from '@sentry/node';
+
 import { AwsAccessKeyId, AwsSecretAccessKey, AwsRegion } from '../config/Secrets';
 AWS.config.update({
   accessKeyId: AwsAccessKeyId,
@@ -540,6 +542,7 @@ const SendFromSES = async (options: { subjectText: string, html_template: string
       .catch(err => {
         console.log('mails sent error');
         console.log(err);
+        Sentry.captureException(err);
       });
     HourlyRateCounter++;
   }

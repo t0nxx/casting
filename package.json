@@ -12,6 +12,7 @@
       "typescript": "^3.3.3333"
    },
    "dependencies": {
+      "@sentry/node": "5.19.0",
       "@types/bcryptjs": "^2.4.2",
       "@types/body-parser": "^1.17.1",
       "@types/cookie-session": "^2.0.37",
@@ -70,6 +71,6 @@
       "start:prod": "DB_Dir=dist pm2 start dist/main.js -i max",
       "start:queue": "pm2 start dist/jobs/Queue.js",
       "start:win": "set DB_Dir=dist && node dist/main.js",
-      "db:migration" : "ts-node ./node_modules/typeorm/cli.js migration:run"
+      "db:migration": "ts-node ./node_modules/typeorm/cli.js migration:run"
    }
 }

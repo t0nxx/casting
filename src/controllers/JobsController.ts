@@ -18,6 +18,8 @@ import * as moment from 'moment-timezone';
 import { IgnoredMailsFromNewsletter } from '../models/ignored_users_from_newsletter';
 import { EmailQueueInterface, EmailsToSendType } from '../jobs/SendEmails';
 import * as _ from 'underscore';
+import * as Sentry from '@sentry/node';
+
 
 class JobsController {
 
@@ -44,6 +46,7 @@ class JobsController {
             return response.status(200).send(jobs);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -71,6 +74,7 @@ class JobsController {
             return response.status(200).send({ ...job, job_category, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -91,6 +95,7 @@ class JobsController {
             return response.status(200).send({ ...job, job_category, is_admin: false });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -170,6 +175,7 @@ class JobsController {
             return response.status(200).send({ success: true, slug: save.slug });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -210,6 +216,7 @@ class JobsController {
 
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -235,6 +242,7 @@ class JobsController {
 
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -299,6 +307,7 @@ class JobsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -335,6 +344,7 @@ class JobsController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -371,6 +381,7 @@ class JobsController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -401,6 +412,7 @@ class JobsController {
             return response.status(200).send(people);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -445,6 +457,7 @@ class JobsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -468,6 +481,7 @@ class JobsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -544,6 +558,7 @@ class JobsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -597,6 +612,7 @@ class JobsController {
             return response.status(200).send({ success: true, slug: usersToSent });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }

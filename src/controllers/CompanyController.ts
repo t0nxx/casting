@@ -5,6 +5,8 @@ import { Profile } from '../models/users_profile';
 import { TalentCategories } from '../models/talent_categories';
 import { Company } from '../models/company';
 import { UploadToS3 } from '../helpers/awsUploader';
+import * as Sentry from '@sentry/node';
+
 
 class CompanyController {
     /**
@@ -21,6 +23,7 @@ class CompanyController {
             return response.status(200).send(companies);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -52,6 +55,7 @@ class CompanyController {
             return response.status(200).send({ ...company, is_follow, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -74,6 +78,7 @@ class CompanyController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -96,6 +101,7 @@ class CompanyController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -131,6 +137,7 @@ class CompanyController {
             return response.status(200).send({ ...save });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -176,6 +183,7 @@ class CompanyController {
             return response.status(200).send({ ...afterUpdate, is_follow, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -214,6 +222,7 @@ class CompanyController {
             return response.status(200).send({ ...afterUpdate, is_follow, is_admin });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -239,6 +248,7 @@ class CompanyController {
             return response.status(200).send({ success: true, ...afterUpdate });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -260,6 +270,7 @@ class CompanyController {
             return response.status(200).send({ success: true, ...company });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -284,6 +295,7 @@ class CompanyController {
             return response.status(200).send({ success: true, ...afterUpdate });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -303,6 +315,7 @@ class CompanyController {
             return response.status(200).send({ cover: resetCover });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -322,6 +335,7 @@ class CompanyController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }

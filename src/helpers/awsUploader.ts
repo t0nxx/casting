@@ -1,4 +1,5 @@
 import * as AWS from 'aws-sdk';
+import * as Sentry from '@sentry/node';
 import { AwsAccessKeyId, AwsSecretAccessKey, AwsRegion } from '../config/Secrets';
 AWS.config.update({
     accessKeyId: AwsAccessKeyId,
@@ -25,6 +26,7 @@ export const UploadToS3 = (file, type) => {
             return data.Location;
         }
             , err => {
+                Sentry.captureException(err);
                 return err;
             });
 };

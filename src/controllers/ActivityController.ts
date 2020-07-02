@@ -16,6 +16,7 @@ import { Company } from '../models/company';
 import { ActivityReports } from '../models/activity_reports';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
 import { notificationQueue } from '../main';
+import * as Sentry from '@sentry/node';
 
 class ActivityController {
 
@@ -96,6 +97,7 @@ class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -177,6 +179,7 @@ class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -230,6 +233,7 @@ class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -311,6 +315,7 @@ class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -392,6 +397,7 @@ class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -477,6 +483,7 @@ class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -542,6 +549,7 @@ class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -609,6 +617,7 @@ class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -640,6 +649,7 @@ class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -670,6 +680,7 @@ class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -702,6 +713,7 @@ class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -771,6 +783,7 @@ class ActivityController {
             });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -858,6 +871,7 @@ class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -905,6 +919,7 @@ class ActivityController {
             return response.status(200).send({ ...getActivityAfterInsert, auth_user });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -983,6 +998,7 @@ class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -1061,6 +1077,7 @@ class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -1145,6 +1162,7 @@ class ActivityController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -1224,6 +1242,7 @@ class ActivityController {
             return response.status(200).send(responseObject.results);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
 
         }
@@ -1243,6 +1262,7 @@ class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -1262,6 +1282,7 @@ class ActivityController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }
@@ -1283,6 +1304,7 @@ class ActivityController {
 
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(err);
             return response.status(400).send({ error: err });
         }
     }

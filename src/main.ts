@@ -9,6 +9,7 @@ import * as socketio from 'socket.io';
 import * as cookieParser from 'cookie-parser';
 import routes from './routes/index';
 import { JoinChatRooms } from './middlewares/JoinChatRooms';
+import * as Sentry from '@sentry/node';
 
 // packages has no ts definition
 const expsession = require('cookie-session');
@@ -43,6 +44,11 @@ const sessionMiddleware = expsession({
     secure: false,
     expires: new Date(Date.now() + 3600000),
 });
+
+// initailze sentry for error reporting
+Sentry.init({ dsn: 'https://4d868ea97fce4925b37c80b4b6a9d46f@o412866.ingest.sentry.io/5294024' });
+app.use(Sentry.Handlers.requestHandler());
+
 
 // run session middleware for regular http connections
 app.use(sessionMiddleware);
@@ -98,8 +104,12 @@ createConnection().then(async connection => {
 
 
     app.get('*', (req, res) => {
-        res.status(404).send({ error: 'Not Found' });
+        return res.status(404).send({ error: 'Not Found' });
     });
+
+    // sentry error sender
+    app.use(Sentry.Handlers.errorHandler());
+
 
     // excute each queue / cron job worker
     ChaneUsersOnlineSatusJob();
