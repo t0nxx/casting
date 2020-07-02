@@ -66,7 +66,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -155,7 +155,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -185,7 +185,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -214,7 +214,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -252,7 +252,7 @@ class FriendsController {
             return response.status(200).send({ results, count });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -366,7 +366,7 @@ class FriendsController {
             return response.status(200).send({ results, count: parseInt(count.toString(), 10) });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -404,7 +404,7 @@ class FriendsController {
             return response.status(200).send({ results, count: 10 });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -486,7 +486,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -516,7 +516,7 @@ class FriendsController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }

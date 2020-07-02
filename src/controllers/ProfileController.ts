@@ -101,7 +101,7 @@ class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -120,7 +120,7 @@ class ProfileController {
             return response.status(200).send({ success: true, ...settings });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -145,7 +145,7 @@ class ProfileController {
             return response.status(200).send(profile.albums);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -165,7 +165,7 @@ class ProfileController {
             return response.status(200).send(album);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -192,7 +192,7 @@ class ProfileController {
             return response.status(200).send(afterUpdate);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -216,7 +216,7 @@ class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -242,7 +242,7 @@ class ProfileController {
             return response.status(200).send(newAlbum);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -276,7 +276,7 @@ class ProfileController {
             return response.status(200).send({ height_range, weight_range, build, hair, eye, ethnicities, hobbies });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -320,7 +320,7 @@ class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -345,7 +345,7 @@ class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -370,7 +370,7 @@ class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -395,7 +395,7 @@ class ProfileController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -418,7 +418,7 @@ class ProfileController {
             return response.status(200).send({ success: true, ...newSettings });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -441,7 +441,7 @@ class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -466,7 +466,7 @@ class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -492,7 +492,7 @@ class ProfileController {
             return response.status(200).send(newNetwork);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -514,7 +514,7 @@ class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -538,7 +538,7 @@ class ProfileController {
             return response.status(200).send(networkAfterUpdate);
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -560,7 +560,7 @@ class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -583,7 +583,7 @@ class ProfileController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }

@@ -46,7 +46,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -142,7 +142,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -248,7 +248,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -351,7 +351,7 @@ class AuthController {
              * if ther error from class validator , return first object . else message of error
              */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -391,7 +391,7 @@ class AuthController {
             }
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -415,7 +415,7 @@ class AuthController {
             * if ther error from class validator , return first object . else message of error
             */
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -440,7 +440,7 @@ class AuthController {
             return response.status(200).send({ msg: 'An Email will be sent with code' });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -465,7 +465,7 @@ class AuthController {
             return response.status(200).send({ msg: 'password reset is done' });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -487,7 +487,7 @@ class AuthController {
             return response.redirect('https://castingsecret.com/account/login');
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }

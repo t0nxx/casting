@@ -160,7 +160,7 @@ class ChatController {
             return response.status(200).send({ ...resObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
@@ -203,7 +203,7 @@ class ChatController {
 
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
 
@@ -299,7 +299,7 @@ class ChatController {
             return response.status(200).send({ ...responseObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -326,7 +326,7 @@ class ChatController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -353,7 +353,7 @@ class ChatController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -378,7 +378,7 @@ class ChatController {
             return response.status(200).send({ success: true });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
         }
     }
@@ -439,7 +439,7 @@ class ChatController {
             return response.status(200).send({ ...resObject });
         } catch (error) {
             const err = error[0] ? Object.values(error[0].constraints) : [error.message];
-            Sentry.captureException(err);
+            Sentry.captureException(error);
             return response.status(400).send({ error: err });
 
         }
