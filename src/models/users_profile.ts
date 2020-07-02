@@ -41,7 +41,7 @@ export class Profile {
     @Column({ default: 'Not Provided' })
     location: string;
 
-    @Column({ default: '2020-1-1T22:00:00.000Z' })
+    @Column({ default: '2020-01-01T22:00:00.000Z' })
     birthDate: string;
 
     @Column('longtext')
