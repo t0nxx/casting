@@ -12,7 +12,7 @@
       "typescript": "^3.3.3333"
    },
    "dependencies": {
-      "@sentry/node": "5.19.0",
+      "@sentry/node": "^5.19.0",
       "@types/bcryptjs": "^2.4.2",
       "@types/body-parser": "^1.17.1",
       "@types/cookie-session": "^2.0.37",
