@@ -408,6 +408,66 @@ export function sendInterviewDate(mail, userName, date, interviewLocation, inter
   });
 }
 
+export function sendNewApplicantHasAppliedToJobOwner(mail, userName, jobLink) {
+  const html_template = `
+  <body>
+  <table cellspacing="0" cellpadding="0" border="0"
+    style="color:#333;background:#fff;padding:0;margin:0;width:100%;font:15px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica">
+    <tbody>
+      <tr width="100%">
+        <td valign="top" align="left"
+          style="background:#eef0f1;font:15px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica">
+          <table style="border:none;padding:0 18px;margin:50px auto;width:500px">
+            <tbody>
+              <tr width="100%" height="60">
+                <td valign="top" align="left"
+                  style="border-top-left-radius:4px;border-top-right-radius:4px;background:#3c2b3f;padding:10px 18px;text-align:center">
+                  <img height="100" width="125" src="https://casting-secret-new.s3.eu-central-1.amazonaws.com/images/1582555484792%20-%20logo%2050.jpg" title="Castingsecret"
+                    style="font-weight:bold;font-size:18px;color:#fff;vertical-align:top"> </td>
+              </tr>
+              <tr width="100%">
+                <td valign="top" align="left" style="background:#fff;padding:18px">
+                  <h1 style="font-size:20px;margin:16px 0;color:#333;text-align:center"> Dear
+                    ${userName} ,</h1>
+
+                  <div style="background:#f6f7f8;border-radius:3px">
+                    <br>
+                    <h1
+                      style="font:40px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;text-align:center">
+                      Congratulation!
+                    </h1>
+                    <p
+                      style="font:20px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;text-align:center">
+                      You Have New Applicant On Your Job . Have A Good Chance :)</p>
+                    </p>
+                    <p style="font:15px/1.25em;margin-bottom:0;text-align:center"> <a
+                        href="${jobLink}"
+                        style="border-radius:3px;background:#3c2b3f;color:#fff;display:block;font-weight:700;font-size:16px;line-height:1.25em;margin:24px auto 6px;padding:10px 18px;text-decoration:none;width:180px"
+                        target="_blank"> Mange Your Job Now </a> </p> <br><br>
+                  </div>
+                  <p style="font:14px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;color:#333">
+                    <strong>Casting Secret </strong>
+                  <p>Copyright © 2020 castingsceret, All rights reserved. </p>
+                  <p> 9091 Abdulmajid
+                    Shubukshi · Jeddah 23434 · Saudi Arabia</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>`;
+
+  SendFromSES({
+    subjectText: 'New Applicant On Your Job!',
+    singleMail: mail,
+    html_template,
+  });
+}
+
+
 
 export function sendNewJobToMail(mails: string[], jobTitle, jobDescription, jobLink) {
 

@@ -13,7 +13,7 @@ import { JobShortlist } from '../models/jobs_shortlisted';
 import { transformAndValidate } from 'class-transformer-validator';
 import { notificationQueue, sendEmailsQueue } from '../main';
 import { NotificationShape, NotificationTypeEnum } from '../jobs/SendNotification';
-import { sendInterviewDate } from '../helpers/sendMail';
+import { sendInterviewDate, sendNewApplicantHasAppliedToJobOwner } from '../helpers/sendMail';
 import * as moment from 'moment-timezone';
 import { IgnoredMailsFromNewsletter } from '../models/ignored_users_from_newsletter';
 import { EmailQueueInterface, EmailsToSendType } from '../jobs/SendEmails';
@@ -259,11 +259,33 @@ class JobsController {
         const JobInterviewRepository = getRepository(JobInterview);
         try {
             const profile = await profileRepository.findOne({ slug: request['user'].username });
-            const job = await JobRepository.findOne({ slug: request.params.jobSlug }, { relations: ['applicants', 'company'] });
-            if (!job) { throw new Error('job Not Found'); }
+            const job = await JobRepository.createQueryBuilder('j')
+                .innerJoin('j.company', 'company')
+                .leftJoin('j.applicants', 'applicants')
+                .select(['j.id', 'j.slug', 'company.id', 'company.name', 'company.slug', 'applicants.id'])
+                .where(`j.slug = '${request.params.jobSlug}'`)
+                .getOne();
 
 
-            const companyAdmin = await CompanyRepository.findOne({ id: job.company.id }, { relations: ['profile'] });
+            if (!job) { throw new Error('job Not Found Or Deleted'); }
+
+
+            const companyAdmin = await CompanyRepository.createQueryBuilder('c')
+                .innerJoin('c.profile', 'profile')
+                .select(['c.id', 'profile.id'])
+                .where(`c.id = ${job.company.id}`)
+                .getOne();
+
+            if (!companyAdmin) { throw new Error('job Company Not Found or Deleted'); }
+
+
+            const companyAdminProfile = await profileRepository.createQueryBuilder('p')
+                .innerJoin('p.user', 'user')
+                .select(['p.id', 'user.email'])
+                .where(`p.id = ${companyAdmin.profile.id}`)
+                .getOne();
+
+            if (!companyAdminProfile) { throw new Error('job Company Not Found or Deleted'); }
 
             const isAlreadyApplied = await JobApplicantRepository.findOne({ job, profile });
             const isAlreadyShortlisted = await JobShortListedRepository.findOne({ job, profile });
@@ -303,6 +325,10 @@ class JobsController {
                 recipient: companyAdmin.profile.id,
             }
             await notificationQueue.add(notiToQueu);
+
+            const jobLink = `https://castingsecret.com/job/job-page/${job.slug}/${job.company.slug}`;
+
+            sendNewApplicantHasAppliedToJobOwner(companyAdminProfile.user.email, job.company.name, jobLink)
 
             return response.status(200).send({ success: true });
         } catch (error) {
