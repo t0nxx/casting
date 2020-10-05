@@ -194,7 +194,7 @@ style="border-collapse:collapse;background-color:#f5f8fa;text-align:center;" wid
           </td>
         </tr>
         <tr>
-          <td bgcolor="#F5F8FA">&nbsp;</td>
+          <td bgcolor="#F5F8FA"></td>
         </tr>
       </tbody>
     </table><!-- /FRAME -->
@@ -289,7 +289,7 @@ export function sendInviteMail(mail) {
                                 <td class="stack"
                                   style="font-size:15px;font-family:Arial,sans-serif;line-height:18px;color:#66757f;vertical-align:top;"
                                   valign="top">
-                                  Hello&nbsp,<br>
+                                  Hello ,<br>
                                   <br>We Invite you to join our website casting secret.<br>
                                   <br>Sincerely,
 
@@ -327,7 +327,7 @@ export function sendInviteMail(mail) {
                 </td>
               </tr>
               <tr>
-                <td bgcolor="#F5F8FA">&nbsp;</td>
+                <td bgcolor="#F5F8FA"></td>
               </tr>
             </tbody>
           </table><!-- /FRAME -->
@@ -364,8 +364,7 @@ export function sendInterviewDate(mail, userName, date, interviewLocation, inter
               </tr>
               <tr width="100%">
                 <td valign="top" align="left" style="background:#fff;padding:18px">
-                  <h1 style="font-size:20px;margin:16px 0;color:#333;text-align:center"> Dear&nbsp
-                    ${userName} ,</h1>
+                  <h1 style="font-size:20px;margin:16px 0;color:#333;text-align:center"> Dear ${userName} ,</h1>
 
                   <div style="background:#f6f7f8;border-radius:3px">
                     <br>
