@@ -46,8 +46,7 @@ export function sendResetPasswordMail(mail, resetCode, userName) {
                     <p style="font:14px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;color:#333">
                       <strong>Casting Secret </strong>
                     <p>Copyright © 2020 castingsceret, All rights reserved. </p>
-                    <p> 9091 Abdulmajid
-                      Shubukshi · Jeddah 23434 · Saudi Arabia</p>
+
                   </td>
                 </tr>
               </tbody>
@@ -389,8 +388,7 @@ export function sendInterviewDate(mail, userName, date, interviewLocation, inter
                   <p style="font:14px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;color:#333">
                     <strong>Casting Secret </strong>
                   <p>Copyright © 2020 castingsceret, All rights reserved. </p>
-                  <p> 9091 Abdulmajid
-                    Shubukshi · Jeddah 23434 · Saudi Arabia</p>
+                 
                 </td>
               </tr>
             </tbody>
@@ -448,8 +446,6 @@ export function sendNewApplicantHasAppliedToJobOwner(mail, userName, jobLink) {
                   <p style="font:14px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;color:#333">
                     <strong>Casting Secret </strong>
                   <p>Copyright © 2020 castingsceret, All rights reserved. </p>
-                  <p> 9091 Abdulmajid
-                    Shubukshi · Jeddah 23434 · Saudi Arabia</p>
                 </td>
               </tr>
             </tbody>
@@ -515,7 +511,6 @@ export function sendNewJobToMail(mails: string[], jobTitle, jobDescription, jobL
                                 <p style="font:14px/1.25em &#39;Helvetica Neue&#39;,Arial,Helvetica;color:#333">
                                     <strong>Casting Secret </strong>
                                 <p>Copyright © 2020 castingsceret, All rights reserved. </p>
-                                <p> 9091 Abdulmajid Shubukshi · Jeddah 23434 · Saudi Arabia</p>
                             </td>
 
                         </tr>
