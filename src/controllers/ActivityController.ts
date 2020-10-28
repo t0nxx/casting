@@ -809,6 +809,11 @@ class ActivityController {
 
             const friends: any = await getAllFriendSharedBtwnApp(request, response, profile.slug);
             const friendsArray = friends.map(e => e.pk);
+            // if the user is new and have no friends , then show the admin profile posts to him
+            if (friendsArray.length < 1) {
+                // id of the admin profile
+                friendsArray.push(91);
+            }
             const myHiddenActivity = profile.hidden.map(e => e.id);
 
             const q = ActivityRepository.createQueryBuilder('activity')
@@ -822,10 +827,10 @@ class ActivityController {
                 .orderBy('activity.publish_date', 'DESC')
                 .addSelect(['profile.id', 'profile.avatar', 'profile.slug']);
 
-            if (friendsArray.length < 1) {
-                // no friends , no posts in wall
-                return response.status(200).send({ results: [], count: 0 });
-            }
+            // if (friendsArray.length < 1) {
+            //     // no friends , no posts in wall
+            //     return response.status(200).send({ results: [], count: 0 });
+            // }
             if (myHiddenActivity.length > 0) {
                 q.andWhere(`activity.id NOT IN (${myHiddenActivity})`);
             }
