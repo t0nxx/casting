@@ -357,6 +357,106 @@ class AuthController {
     }
 
     /**
+     * @Post
+     */
+
+    async LoginWithApple(request: Request, response: Response) {
+        const userRepository = getRepository(User);
+        const profileRepository = getRepository(Profile);
+        const profileSettingsRepository = getRepository(ProfileSettings);
+        const talentCategoryRepository = getRepository(TalentCategories);
+        try {
+
+            //     {"user":"000508.c62527fb73044654b850b810caac7ab7.1633"
+            //     ,"fullname":"hazem habeb"
+            //     ,"email":"hazemhabeb94@gmail.com"
+            //     ,"token":"eyJraWQiOiI4NkQ4OEtmIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLkNhc3RpbmdBcHAuQ2FzdGluZyIsImV4cCI6MTYwMzk5MTc3NywiaWF0IjoxNjAzOTA1Mzc3LCJzdWIiOiIwMDA1MDguYzYyNTI3ZmI3MzA0NDY1NGI4NTBiODEwY2FhYzdhYjcuMTYzMyIsImNfaGFzaCI6Il9RV2lJN19Ba0NLekprSmFGbGt1bmciLCJlbWFpbCI6ImhhemVtaGFiZWI5NEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6InRydWUiLCJhdXRoX3RpbWUiOjE2MDM5MDUzNzcsIm5vbmNlX3N1cHBvcnRlZCI6dHJ1ZX0.EfnohEsNAhNRhG0YFdN9hkCBtee72Bxk3HXOr2FU9fFfXqBt1TClYKVcsy4AVl4kutwwXIGzOR4nY9OyduQCn9zRaEBQu3HI8DaDxyOo-boa5EspCcY-FvF34DwNp8T5VPURjGoVYSH1Yi4s2ycovhhsf_CEEJ88Z3RSsvQfOrI7If6hNWXe5BMuTzv8Oar5v9r2xySOVeXqW43mniEtqyCLAU5LshX5bTlEPGHcv28pTdNxztXuUaUeUwpwXBILjcRGEKoXI2rzlzLeyMKY7wpE1dd15VJSLMRXQgwEMV8AHwYlXA6dMlcnC13zeolnKmNPsokLgowmzpLt72iBYw"
+            // }
+
+            const usernameExist = await userRepository.findOne({ social_site_id: request.body.user, social_site: 'apple' });
+
+            if (usernameExist) {
+                const data = await profileRepository.findOne({ slug: usernameExist.username }, {
+                    relations: ['user']
+                });
+                delete data.user;
+                const token = await generateJwtToken({
+                    id: usernameExist.id,
+                    isAdmin: usernameExist.isAdmin,
+                });
+                const { first_name, last_name, id, email, username } = usernameExist;
+                const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+                return response.status(200).send({ success: true, token, user: { ...responseObject } });
+                /**
+                 *  return data
+                 */
+            }
+            const newUser = new User();
+            newUser.social_site_id = request.body.user;
+            // since email in apple is optional , so we can't depend on it . we will create a virtual email for each user. 
+            // and if he want to set pass and treated as normal user , then he should change his email on website first and set a pass
+            newUser.email = `appleuser_${randomString.generate({ length: 5 })}@castingsecret.com`;
+            newUser.first_name = request.body.fullname;
+            newUser.last_name = '';
+            newUser.about = 'tell people about you';
+            newUser.username = request.body.fullname + '-' + randomString.generate({ length: 5 });
+            newUser.social_site = 'apple';
+
+            const DefaultPass = 'casting_dev_pass';
+            // just optional 
+            newUser.password1 = DefaultPass;
+            newUser.password2 = DefaultPass;
+            newUser.password = await hash(DefaultPass, 10);
+            const create = await userRepository.save(newUser);
+
+            // start create profile for the new user
+            const newProfile = new Profile();
+            newProfile.slug = create.username;
+            newProfile.user = create;
+            newProfile.about = 'tell people about you';
+            // newProfile.about = request.body.about;
+
+            if (request.body.category) {
+                const categories = await talentCategoryRepository.findByIds(request.body.category);
+                newProfile.categories = categories;
+            }
+
+            // profile pic 
+            if (request.body.user.picture) {
+                newProfile.avatar = request.body.user.picture;
+            }
+            const createProfile = await profileRepository.save(newProfile);
+            // end create profile for the new user
+            // start create settings for the new user
+            const newProfileSettings = new ProfileSettings();
+            newProfileSettings.profile = createProfile;
+            // cause response message not have default value
+            newProfileSettings.response_message = '';
+            const crateProfileSettings = await profileSettingsRepository.save(newProfileSettings);
+            // start create settings for the new user
+            const token = await generateJwtToken({
+                id: create.id,
+                isAdmin: create.isAdmin,
+            });
+            const data = await profileRepository.findOne({ slug: createProfile.slug }, {
+                relations: ['user']
+            });
+            delete data.user;
+            const { first_name, last_name, id, email, username } = create;
+            const responseObject = { ...data, auth_user: { pk: id, first_name, last_name, email, username } }
+            return response.status(200).send({ success: true, token, user: { ...responseObject } });
+        } catch (error) {
+            /**
+             * if ther error from class validator , return first object . else message of error
+             */
+            const err = error[0] ? Object.values(error[0].constraints) : [error.message];
+            Sentry.captureException(error);
+            return response.status(400).send({ error: err });
+        }
+    }
+
+
+    /**
      * @Post 
      */
 
